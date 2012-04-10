@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html lang="en" class="no-js ie6 old-ie"> <![endif]-->
+<!--[if IE 7]>    <html lang="en" class="no-js ie7 old-ie"> <![endif]-->
+<!--[if IE 8]>    <html lang="en" class="no-js ie8 old-ie"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class='no-js' lang='en'>
+<!--<![endif]-->
+<head>
+  <meta charset='utf-8'>
+  <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+  <title>iFish exmaple - Flotr </title>
+  <meta content='noindex, nofollow' name='robots'>
+  <meta content='' name='keywords'>
+  <meta content='width=device-width, maximum-scale=1.0' name='viewport'>
+  <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css"/>
+  <link href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/cupertino/jquery-ui.css' rel='stylesheet'>
+</head>
+  <body>
+  <div class='container'>
+  </div>
+  <div class='container'>
+    <ul class='nav nav-tabs'>
+      <li><a href="/ponds/uhEHwd/fish">Fish</a></li>
+      <li class="active"><a href="/ponds/uhEHwd/query">Query</a></li>
+      <li><a href="/ponds/uhEHwd/edit">Edit</a></li>
+      <li><a href="/ponds/uhEHwd" data-confirm="Are you sure? You cannot undo this action." data-method="delete" rel="nofollow">Delete</a></li>
+    </ul>
+  </div>
+  <div class='container'>
+    <div class='page-header'>
+      <p class='pull-right'>
+      </p>
+      <h1>
+      Query <small>in Science Majors (36 fish)</small>
+      </h1>
+    </div>
+  </div>
+  <div class='container'>
+    <section data-api_key='6OqHqMf609P6tSrxuj2ANuj3S6fAUphnjyOcGWdtD' data-pond_id='uhEHwd' id='query'>
+    <div class='row'>
+      <div class='loading span4 offset4'>
+        <center>
+        <p>
+          <strong>
+          Loading </strong>
+        </p>
+        </center>
+        <div class='progress progress-striped active'>
+          <div class='bar' width='100%'>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='row form-and-results hide'>
+      <div class='span5'>
+        <div class='well'>
+          <h2>Tags</h2>
+          <form class='form-horizontal'>
+            <fieldset>
+              <div class='control-group'>
+                <label class="control-label">Quantitative (6)</label>
+                <div class='controls'>
+                  <input data-slug="quantitative" id="query_tags_gwx" name="query[tags][gwx]" type="hidden" value="6"/>
+                  <div class='slider span2' data-target='query[tags][gwx]'>
+                  </div>
+                </div>
+              </div>
+              <div class='control-group'>
+                <label class="control-label">Biological (6)</label>
+                <div class='controls'>
+                  <input data-slug="biological" id="query_tags_Ymp" name="query[tags][Ymp]" type="hidden" value="6"/>
+                  <div class='slider span2' data-target='query[tags][Ymp]'>
+                  </div>
+                </div>
+              </div>
+              <div class='control-group'>
+                <label class="control-label">Pure (6)</label>
+                <div class='controls'>
+                  <input data-slug="pure" id="query_tags_WxI" name="query[tags][WxI]" type="hidden" value="6"/>
+                  <div class='slider span2' data-target='query[tags][WxI]'>
+                  </div>
+                </div>
+              </div>
+              <div class='control-group'>
+                <label class="control-label">Indoors (6)</label>
+                <div class='controls'>
+                  <input data-slug="indoors" id="query_tags_CjC" name="query[tags][CjC]" type="hidden" value="6"/>
+                  <div class='slider span2' data-target='query[tags][CjC]'>
+                  </div>
+                </div>
+              </div>
+              <div class='control-group'>
+                <label class="control-label">Dunno (6)</label>
+                <div class='controls'>
+                  <input data-slug="dunno" id="query_tags_2TE" name="query[tags][2TE]" type="hidden" value="6"/>
+                  <div class='slider span2' data-target='query[tags][2TE]'>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+          <h2>Filters</h2>
+          <p>
+            <em>No filters defined.</em>
+          </p>
+        </div>
+      </div>
+      <div class='span6 offset1' id='results'>
+        <h2>Results</h2>
+        <ul class='thumbnails'>
+        </ul>
+      </div>
+    </div>
+    </section>
+  </div>
+  <div class='container'>
+    <hr>
+    <footer>
+    &copy; iFish 2012 </footer>
+  </div>
+  
+
+  <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var api_key = "6OqHqMf609P6tSrxuj2ANuj3S6fAUphnjyOcGWdtD";
+    var options = { development: true, debug: false };
+    var fishpond = new Fishpond(api_key, options);
+
+    fishpond.resultsUpdated(function(results){
+
+    });
+
+    fishpond.loading(function(percentage){
+      $(".progress .bar", container).width((percentage * 100) + "%");
+    });
+
+    fishpond.ready(function(pond){
+      // data is loaded
+      
+      // enable form, or whatever
+      $(".submit").click(function(){
+        var tags = {};
+        var filters = {};
+      
+        tags['tag_slug'] = 9;
+      
+        fishpond.query(tags, filters);
+      });
+    });
+
+    fishpond.init(pond_id);
+  </script>
+
+  
+  </body>
+</html>
