@@ -1,18 +1,56 @@
 %h1 Demo Scaffold
 
-%em Content here will appear once your pond has loaded.
+%hr
+
+.row
+  .span6.offset3
+    %ul.thumbnails.results
+
+- content_for :css do
+  :css
+    h1 {
+      text-align: center;
+      }
+
+    ul.results li .thumbnail{
+      height: 40px;
+      text-align: center;
+    }
 
 - content_for :javascript do
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
 
+      fishpond.resultsUpdated(function(results){
+        console.log(results);
+        for(var i = 0; i < results.length; i++){
+          var li = $("<li></li>");
+          var thumbnail = $("<div></div>");
+          thumbnail.html(results[i].fish.title);
+          thumbnail.addClass("thumbnail");
+
+          if(i < 2){
+            li.addClass("span6");
+          } else if (i < 6) {
+            li.addClass("span3");
+          } else {
+            li.addClass("span2");
+          }
+          li.append(thumbnail);
+          $(".results").append(li);
+        }
+      });
+
       fishpond.ready(function(pond){
         $("#loading").fadeOut(0);
         $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');
+        fishpond.query({}, {});
       });
 
       fishpond.loading(function(percent){
-        console.log("Demo loading " + (percent * 100) + "%");
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
       });
 
     };
