@@ -1,0 +1,18 @@
+%h1 Demo Scaffold
+
+%em Content here will appear once your pond has loaded.
+
+- content_for :javascript do
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+      });
+
+      fishpond.loading(function(percent){
+        console.log("Demo loading " + (percent * 100) + "%");
+      });
+
+    };
