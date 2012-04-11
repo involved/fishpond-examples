@@ -37,8 +37,12 @@ helpers do
   end
 end
 
+###
 # Config
-set :build_dir, "gh-pages"
+###
+
+# Nothing, yet.
+
 
 # Build-specific configuration
 configure :build do
