@@ -1,0 +1,86 @@
+.page-header
+  %h1 Quicksand Demo
+
+.row.form-and-results
+  .span5
+    .well
+      %h2 Tags
+      %form.form-horizontal
+        %fieldset
+          .control-group
+            %label.control-label Quantitative (6)
+            .controls
+              %input#query_tags_gwx{"data-slug" => "quantitative", :name => "query[tags][gwx]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][gwx]"}
+          .control-group
+            %label.control-label Biological (6)
+            .controls
+              %input#query_tags_Ymp{"data-slug" => "biological", :name => "query[tags][Ymp]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][Ymp]"}
+          .control-group
+            %label.control-label Pure (6)
+            .controls
+              %input#query_tags_WxI{"data-slug" => "pure", :name => "query[tags][WxI]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][WxI]"}
+          .control-group
+            %label.control-label Indoors (6)
+            .controls
+              %input#query_tags_CjC{"data-slug" => "indoors", :name => "query[tags][CjC]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][CjC]"}
+          .control-group
+            %label.control-label Dunno (6)
+            .controls
+              %input#query_tags_2TE{"data-slug" => "dunno", :name => "query[tags][2TE]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][2TE]"}
+      %h2 Filters
+      %p
+        %em No filters defined.
+  #results.span6.offset1
+    %h2 Results
+    %ul.thumbnails
+
+
+= javascript_include_tag "https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js"
+
+- content_for :javascript do
+  :javascript
+
+    $('.container.hide').removeClass("hide"); // Temporary fix whilst Data can't be accessed.
+
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+      });
+
+      fishpond.loading(function(percent){
+        console.log("Demo loading " + (percent * 100) + "%");
+      });
+
+    };
+
+
+    $(".slider").slider({
+      value: 6,
+      min: 1,
+      max: 11,
+      step: 0.1,
+      slide: function(e, ui){
+        var label = $(this).parents('.control-group').find('label');
+        var hiddenField = $("input[name='" + $(this).data('target') + "']");
+        var value = Math.round(Math.abs(12 - ui['value']));
+
+        if(value.toString() != hiddenField.val().toString()){
+          hiddenField.val(value);
+          label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
+
+          var tags = {};
+          var filters = {};
+          $("form input").each(function(){
+            tags[$(this).data('slug')] = $(this).val();
+          });
+          fishpond.query(tags, filters);
+        }
+      }
+    });

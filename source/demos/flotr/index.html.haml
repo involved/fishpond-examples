@@ -1,0 +1,169 @@
+.page-header
+  %h1 Flotr Demo
+  %br
+  %p using the #{link_to "Flotr", "https://github.com/HumbleSoftware/Flotr2"} Canvas Graphing Library 
+
+.row
+  .span5
+    .well
+      %h2 Tags
+      %form.form-horizontal
+        %fieldset
+          .control-group
+            %label.control-label Quantitative (6)
+            .controls
+              %input#query_tags_gwx{"data-slug" => "quantitative", :name => "query[tags][gwx]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][gwx]"}
+          .control-group
+            %label.control-label Biological (6)
+            .controls
+              %input#query_tags_Ymp{"data-slug" => "biological", :name => "query[tags][Ymp]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][Ymp]"}
+          .control-group
+            %label.control-label Pure (6)
+            .controls
+              %input#query_tags_WxI{"data-slug" => "pure", :name => "query[tags][WxI]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][WxI]"}
+          .control-group
+            %label.control-label Indoors (6)
+            .controls
+              %input#query_tags_CjC{"data-slug" => "indoors", :name => "query[tags][CjC]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][CjC]"}
+          .control-group
+            %label.control-label Dunno (6)
+            .controls
+              %input#query_tags_2TE{"data-slug" => "dunno", :name => "query[tags][2TE]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][2TE]"}
+      %h2 Filters
+      %p
+        %em No filters defined.
+  #radar.span6.offset1
+
+.row
+  #results.span12
+    %h2 Results
+    %ul.thumbnails.results
+    
+
+
+= javascript_include_tag "http://humblesoftware.com/static/js/hsd-flotr2.js"
+
+
+-# content_for :css do
+:css
+  #radar{
+ 
+    height: 350px;
+    
+  }
+
+
+- content_for :javascript do
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      fishpond.resultsUpdated(function(results){
+        console.log(results);
+        for(var i = 0; i < results.length; i++){
+          var li = $("<li></li>");
+          var thumbnail = $("<div></div>");
+          thumbnail.html(results[i].fish.title);
+          thumbnail.addClass("thumbnail");
+
+          if(i < 2){
+            li.addClass("span6");
+          } else if (i < 6) {
+            li.addClass("span3");
+          } else {
+            li.addClass("span2");
+          }
+          li.append(thumbnail);
+          $(".results").append(li);
+        }
+      });
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');
+        fishpond.query({}, {});
+
+        demo.init();
+      });
+
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+    };
+    
+    demo = {
+      init: function () { 
+        console.log("[Demo][init]");
+        var container = document.getElementById("radar");
+        
+        demo.ui.sliders();
+        demo.flotr.basic_radar(container);
+      },
+
+      //////////////////////////////////////////////////////////////////////////
+      ui: {
+        sliders: function () {
+          $(".slider").slider({
+            value: 6,
+            min: 1,
+            max: 11,
+            step: 0.1,
+            slide: function(e, ui){
+              var label = $(this).parents('.control-group').find('label');
+              var hiddenField = $("input[name='" + $(this).data('target') + "']");
+              var value = Math.round(Math.abs(12 - ui['value']));
+
+              if(value.toString() != hiddenField.val().toString()){
+                hiddenField.val(value);
+                label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
+
+                var tags = {};
+                var filters = {};
+                $("form input").each(function(){
+                  tags[$(this).data('slug')] = $(this).val();
+                });
+                //fishpond.query(tags, filters);
+              }
+            }
+          });
+        }
+      },
+
+      //////////////////////////////////////////////////////////////////////////
+      flotr: {
+        basic_radar: function (container) {
+          console.log("[Demo][Flotr][Basic Radar]");
+        
+          var
+            s1 = { label : false, data : [[0, 3], [1, 8], [2, 5], [3, 5], [4, 3], [5, 9]] },
+            graph, ticks;
+
+          // Radar Labels
+          ticks = [
+            [0, "Statutory"],
+            [1, "External"],
+            [2, "Videos"],
+            [3, "Yippy"],
+            [4, "Management"],
+            [5, "oops"]
+          ];
+            
+          // Draw the graph.
+          graph = Flotr.draw(container, [ s1 ], {
+            radar : { show : true}, 
+            grid  : { circular : true, minorHorizontalLines : false, horizontalLines : false, verticalLines : true}, 
+            yaxis : { min : 0, max : 10, minorTickFreq : 2, showLabels : false}, 
+            xaxis : { ticks : ticks}
+          });
+        }
+      }
+    }
+
+    
