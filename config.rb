@@ -37,14 +37,12 @@ helpers do
   end
 end
 
-# Change the CSS directory
-# set :css_dir, "alternative_css_directory"
+###
+# Config
+###
 
-# Change the JS directory
-# set :js_dir, "alternative_js_directory"
+# Nothing, yet.
 
-# Change the images directory
-# set :images_dir, "alternative_image_directory"
 
 # Build-specific configuration
 configure :build do
