@@ -1,0 +1,118 @@
+%form#query
+  .control Control
+  .control Control
+  .control Control
+  .control Control
+
+%ul#results
+
+- content_for :css do
+  :css
+    #demo{
+      height: 700px;
+      border: 1px solid #CCC;
+      position: relative;
+      overflow: hidden;
+    }
+
+    form#query{
+      position: absolute;
+      border: 1px solid #CCC;
+      width: 100px;
+      height: 100px;
+      left: 420px;
+      top: 300px;
+      text-align: center;
+    }
+
+    ul#results{
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      position: relative;
+    }
+
+    ul#results li{
+      position: absolute;
+      border: 1px solid #CCC;
+      width: 90px;
+      height: 90px;
+      text-align: center;
+      overflow: hidden;
+      background: #EEE;
+    }
+
+    ul#results li.orbital2{
+      font-size: 10px;
+      background: #FFF;
+      width: 60px;
+      height: 60px;
+    }
+
+- content_for :javascript do
+  :javascript
+    var time = 0;
+    function updateAnimation(){
+      time++;
+
+      var canvas = $("#demo");
+      var results = $("ul#results");
+      var index = 0;
+      var gravX = canvas.width()/2;
+      var gravY = canvas.height()/2;
+      var speed = 0.5; // in degrees/second
+      var orbitalRadius = 140;
+      var totalResults = results.find("li").length;
+      var firstOrbitalSize = 6;
+
+      results.find("li").each(function(){
+        var fish = $(this);
+        var orbital = 1;
+        var orbitalSize = firstOrbitalSize;
+        if(index >= firstOrbitalSize){
+          speed = 0.6;
+          orbitalRadius = 350;
+          orbital = 2
+          orbitalSize = totalResults - firstOrbitalSize;
+          fish.addClass("orbital" + orbital);
+        }
+
+        var degrees = (time * speed)%360;
+        degrees -= (360/orbitalSize)*index;
+        var radians = degrees * (Math.PI/180);
+        var x = orbitalRadius * Math.cos(radians);
+        var y = orbitalRadius * Math.sin(radians);
+        x += gravX - 45;
+        y += gravY - 45;
+
+        fish.css({left: x + "px", top: y + "px"});
+        index++;
+      });
+    };
+
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      fishpond.resultsUpdated(function(results){
+        for(var i = 0; i < results.length; i++){
+          var result = results[i];
+          var fish = result.fish
+          var li = $("<li></li>");
+          li.html(fish.title);
+          $("#results").append(li);
+        }
+        setInterval(updateAnimation, 10);
+      });
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        fishpond.query({}, {});
+      });
+
+      fishpond.loading(function(percent){
+        console.log("Demo loading " + (percent * 100) + "%");
+      });
+
+    };
+
+    $("#demo").show();
