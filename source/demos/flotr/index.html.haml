@@ -1,0 +1,89 @@
+.page-header
+  %h1 Flotr Demo
+  %br
+  %p Based on the #{link_to "Flotr", "https://github.com/HumbleSoftware/Flotr2"} Canvas Graphing Library 
+
+#radar
+    
+
+= javascript_include_tag "http://humblesoftware.com/static/js/hsd-flotr2.js"
+
+
+-# content_for :css do
+:css
+  #radar{
+    float: left;
+    width: 500px;
+    height: 500px;
+    border: red 1px solid
+  }
+
+
+- content_for :javascript do
+  :javascript
+    
+    var demo = demo || {};
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+
+        setTimeout('demo.init()', 2000);
+    
+      });
+
+      fishpond.loading(function(percent){
+        console.log("Demo loading " + (percent * 100) + "%");
+      });
+
+    };
+
+    
+    demo = {
+      init: function () { 
+        console.log("[Demo][init]");
+        var container = $("#radar");
+
+        if( container.is(':visible') ) {
+          console.log("Container visible [TRUE]");
+          demo.flotr.basic_radar(container);
+        }
+        else {
+          console.log("Container visible [FALSE]");
+        }
+
+        
+      },
+
+      //////////////////////////////////////////////////////////////////////////
+      flotr: {
+        basic_radar: function (container) {
+          console.log("[Demo][Flotr][Basic Radar]");
+        
+          var
+            s1 = { label : 'Actual', data : [[0, 3], [1, 8], [2, 5], [3, 5], [4, 3], [5, 9]] },
+            graph, ticks;
+
+          // Radar Labels
+          ticks = [
+            [0, "Statutory"],
+            [1, "External"],
+            [2, "Videos"],
+            [3, "Yippy"],
+            [4, "Management"],
+            [5, "oops"]
+          ];
+            
+          // Draw the graph.
+          graph = Flotr.draw(container, [ s1 ], {
+            radar : { show : true}, 
+            grid  : { circular : true, minorHorizontalLines : false, horizontalLines : false, verticalLines : true}, 
+            yaxis : { min : 0, max : 10, minorTickFreq : 2, showLabels : false}, 
+            xaxis : { ticks : ticks}
+          });
+        }
+      }
+    }
+
+    
