@@ -37,14 +37,8 @@ helpers do
   end
 end
 
-# Change the CSS directory
-# set :css_dir, "alternative_css_directory"
-
-# Change the JS directory
-# set :js_dir, "alternative_js_directory"
-
-# Change the images directory
-# set :images_dir, "alternative_image_directory"
+# Config
+set :build_dir, "gh-pages"
 
 # Build-specific configuration
 configure :build do
