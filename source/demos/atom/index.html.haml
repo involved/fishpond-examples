@@ -1,111 +1,249 @@
-%form#query
-  .control Control
-  .control Control
-  .control Control
-  .control Control
-
 %ul#results
+
+%form#query
+  %input{:value => 6, :type => 'hidden', :data => {:tag => "quantitative"}}
+  %input{:value => 6, :type => 'hidden', :data => {:tag => "pure"}}
+  %input{:value => 6, :type => 'hidden', :data => {:tag => "biological"}}
+  %input{:value => 6, :type => 'hidden', :data => {:tag => "indoors"}}
+  
+  %div
+    %button.btn.btn-mini{:data => {:value => -1, :target => "quantitative"}}
+      %i.icon-minus-sign
+    %span.criteria Quant.
+    %button.btn.btn-mini{:data => {:value => 1, :target => "quantitative"}}
+      %i.icon-plus-sign
+
+  %div
+    %button.btn.btn-mini{:data => {:value => -1, :target => "pure"}}
+      %i.icon-minus-sign
+    %span.criteria Pure
+    %button.btn.btn-mini{:data => {:value => 1, :target => "pure"}}
+      %i.icon-plus-sign
+
+  %div
+    %button.btn.btn-mini{:data => {:value => -1, :target => "biological"}}
+      %i.icon-minus-sign
+    %span.criteria Biology
+    %button.btn.btn-mini{:data => {:value => 1, :target => "biological"}}
+      %i.icon-plus-sign
+
+  %div
+    %button.btn.btn-mini{:data => {:value => -1, :target => "indoors"}}
+      %i.icon-minus-sign
+    %span.criteria Indoors
+    %button.btn.btn-mini{:data => {:value => 1, :target => "indoors"}}
+      %i.icon-plus-sign
+
+#controls
+  %button.btn.play
+    %i.icon-play
+  %button.btn.pause
+    %i.icon-pause
 
 - content_for :css do
   :css
     #demo{
       height: 700px;
-      border: 1px solid #CCC;
       position: relative;
-      overflow: hidden;
     }
 
     form#query{
       position: absolute;
-      border: 1px solid #CCC;
-      width: 100px;
-      height: 100px;
-      left: 420px;
-      top: 300px;
-      text-align: center;
+      width: 131px;
+      height: 107px;
+      padding: 40px 28px;
+      left: 376px;
+      top: 256px;
+      background: url("/images/atom/background-large.png");
     }
+
+    form#query > div{
+      margin: 5px 0 5px 10px
+    }
+
+    form#query .criteria{
+      color: #FFF;
+      font-weight: bold;
+      font-size: 9px;
+      line-height: 9px;
+      text-transform: uppercase;
+      text-align: center;
+      width: 50px;
+      display: inline-block;
+    }
+
+    #controls{
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
 
     ul#results{
       list-style: none;
       padding: 0;
       margin: 0;
-      position: relative;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow: hidden;
     }
 
     ul#results li{
       position: absolute;
-      border: 1px solid #CCC;
-      width: 90px;
-      height: 90px;
+      width: 70px;
+      height: 70px;
+      padding: 13px;
       text-align: center;
       overflow: hidden;
-      background: #EEE;
-    }
+      background: url("/images/atom/background-small.png");
+      color: #FFF;
+      font-weight: bold;
+      font-size: 9px;
+      text-transform: uppercase;
 
-    ul#results li.orbital2{
-      font-size: 10px;
-      background: #FFF;
-      width: 60px;
-      height: 60px;
     }
 
 - content_for :javascript do
   :javascript
+    var animationInterval;
     var time = 0;
+    var initialOrbitalSize = 6;
+    var orbitalMultiplier = 2.2;
+    var initialRadius = 150;
+    var radiusMultiplier = 1.7;
+    var initialSpeed = 0.5; // in degrees/second
+    var speedMultiplier = 1.2;
+    var orbitalCutoff = 2;
+    var demoCanvas = $("#demo");
+    var resultsCanvas = $("ul#results");
+
+    // start by correctly tagging fish into their orbitals
+    // if a fish's radius is not correct for it's current orbital, then ease the radius and time toward the correct orbital
+    // check if object is at correct radial distance, if not - then enable easing, otherwise animate as normal - this doesn't work, since easing will need to accommodate things on the rigtht radius
+    // add JS scaling library, rather than using styles
+    // measure cursors distance from each orbital (compare relative radii), and adjust that orbital's speed occordingly - allowing for nicer mouseovers.
+
+    var gravX = 470;
+    var gravY = 350;
+
     function updateAnimation(){
       time++;
 
-      var canvas = $("#demo");
-      var results = $("ul#results");
-      var index = 0;
-      var gravX = canvas.width()/2;
-      var gravY = canvas.height()/2;
-      var speed = 0.5; // in degrees/second
-      var orbitalRadius = 140;
-      var totalResults = results.find("li").length;
-      var firstOrbitalSize = 6;
+      for(var currentOrbitalIndex = 0; currentOrbitalIndex <= orbitalCutoff + 1; currentOrbitalIndex ++){
 
-      results.find("li").each(function(){
-        var fish = $(this);
-        var orbital = 1;
-        var orbitalSize = firstOrbitalSize;
-        if(index >= firstOrbitalSize){
-          speed = 0.6;
-          orbitalRadius = 350;
-          orbital = 2
-          orbitalSize = totalResults - firstOrbitalSize;
-          fish.addClass("orbital" + orbital);
-        }
+        var particles = resultsCanvas.find("li[data-orbital='" + (currentOrbitalIndex + 1) + "']");
+        var particleIndex = 0;
+        var speed = initialSpeed * Math.pow(speedMultiplier, currentOrbitalIndex);
+        var orbitalRadius = initialRadius * Math.pow(radiusMultiplier, currentOrbitalIndex);
 
-        var degrees = (time * speed)%360;
-        degrees -= (360/orbitalSize)*index;
-        var radians = degrees * (Math.PI/180);
-        var x = orbitalRadius * Math.cos(radians);
-        var y = orbitalRadius * Math.sin(radians);
-        x += gravX - 45;
-        y += gravY - 45;
+        particles.each(function(){
+          var particle = $(this);
+          var degrees = (time * speed) % 360;
+          degrees -= (360/particles.length) * particleIndex;
+          var radians = degrees * (Math.PI/180);
+          var x0 = parseInt(particle.css('left').split("px")[0]);
+          var y0 = parseInt(particle.css('top').split("px")[0]);
+          var x1 = orbitalRadius * Math.cos(radians);
+          var y1 = orbitalRadius * Math.sin(radians);
+          x1 += gravX - 48; //(particle.width()/2);
+          y1 += gravY - 48; //(particle.height()/2);
 
-        fish.css({left: x + "px", top: y + "px"});
-        index++;
-      });
+          var xEased = x0 + ((x1 - x0)/5);
+          var yEased = y0 + ((y1 - y0)/5);
+
+          particle.css({left: xEased + "px", top: yEased + "px"});
+          particleIndex++;
+        });
+      }
     };
+
+    function startAnimation(){
+      if(animationInterval == undefined){
+        animationInterval = setInterval(updateAnimation, 10);
+      }
+    };
+
+    function pauseAnimation(){
+      clearInterval(animationInterval);
+      animationInterval = undefined;
+    };
+
+    function orbitalSize(orbital){
+      return Math.pow(orbitalMultiplier, orbital - 1) * initialOrbitalSize;
+    }
 
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
 
       fishpond.resultsUpdated(function(results){
+        var currentOrbitalIndex = 0;
+        var currentOribtalSize = 0;
+
+        resultsCanvas.find("li").each(function(){
+          $(this).attr('data-orbital', orbitalCutoff + 1);
+        });
+
         for(var i = 0; i < results.length; i++){
           var result = results[i];
-          var fish = result.fish
-          var li = $("<li></li>");
+          var fish = result.fish;
+
+          var li = resultsCanvas.find("li[data-id='" + fish.id + "']");
+          if(li.length == 0){
+            var li = $("<li></li>");
+          }
+
+          if(currentOribtalSize + 1 > orbitalSize(currentOrbitalIndex + 1) && currentOrbitalIndex + 1 <= orbitalCutoff){
+            currentOrbitalIndex++;
+            currentOribtalSize = 0;
+          }
+
           li.html(fish.title);
-          $("#results").append(li);
+          li.attr('data-id', fish.id);
+          li.attr('data-orbital', currentOrbitalIndex + 1);
+          li.attr('data-score', result.score);
+
+          if(resultsCanvas.find("li[data-id='" + fish.id + "']").length == 0){
+            li.css({left: gravX + "px", top: gravY + "px"});
+            resultsCanvas.append(li);
+          }
+          currentOribtalSize++;
         }
-        setInterval(updateAnimation, 10);
       });
 
       fishpond.ready(function(pond){
         $("#loading").fadeOut(0);
         $("#demo").fadeIn(400);
+        $("#query .btn").each(function(){
+          $(this).click(function(e){
+            e.preventDefault();
+            var btn = $(this);
+            var input = $("#query input[data-tag='" + btn.attr('data-target') + "']");
+            input.val(parseInt(input.val()) + parseInt(btn.attr('data-value')));
+
+            if(input.val() < 1) input.val(1);
+            if(input.val() > 11) input.val(11);
+
+            fishpond.query({
+              quantitative: $("#query input[data-tag='quantitative']").val(),
+              pure: $("#query input[data-tag='pure']").val(),
+              biological: $("#query input[data-tag='biological']").val(),
+              indoors: $("#query input[data-tag='indoors']").val()
+            }, {});
+          });
+        });
+
+        $(".btn.play").click(function(e){
+          e.preventDefault();
+          startAnimation();
+        });
+        $(".btn.pause").click(function(e){
+          e.preventDefault();
+          pauseAnimation();
+        });
+
+        startAnimation();
         fishpond.query({}, {});
       });
 
@@ -114,5 +252,3 @@
       });
 
     };
-
-    $("#demo").show();
