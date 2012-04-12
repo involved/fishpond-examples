@@ -60,6 +60,13 @@
       text-align: center;
     }
     
+    output:before {
+      content: "(";
+    }
+
+    output:after {
+      content: ")";
+    }
 
     input[type="range"]{
       width: 150px;
@@ -104,7 +111,7 @@
         tag_id = $(this).attr("id");
         tag_output = $('label[for="'+tag_id+'"] output');
 
-        output.html(tag_range);
+        tag_output.html(tag_range);
 
         fishpond.query({
           quantitative: $("#quantitative").val(),
