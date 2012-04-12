@@ -1,0 +1,125 @@
+.page-header
+  %h1 Basic HTML5 Demo
+  %br
+  %p Pure HTML5 form elements, no fallbacks or polyfils used. Hardcoded for use with the 'Science Majors' pond. 
+
+.row
+  .span5
+    .well
+      %h2 Tags
+      %form.form-horizontal
+        %fieldset
+          .control-group
+            %label.control-label{ :for => "quantitative"}
+              Quantitative
+              %output 6
+            .controls
+              %input{ :id => "quantitative", :type => "range", :min => "1", :max => "11", :value => "6", :step => "1" }
+          
+          .control-group
+            %label.control-label{ :for => "biological"}
+              Biological 
+              %output 6
+            .controls
+              %input{ :id => "biological", :type => "range", :min => "1", :max => "11", :value => "6", :step => "1" }
+          
+          .control-group
+            %label.control-label{ :for => "pure"} 
+              Pure
+              %output 6
+            .controls
+              %input{ :id => "pure", :type => "range", :min => "1", :max => "11", :value => "6", :step => "1" }
+            
+          .control-group
+            %label.control-label{ :for => "indoors"}
+              Indoors
+              %output 6
+            .controls
+              %input{ :id => "indoors", :type => "range", :min => "1", :max => "11", :value => "6", :step => "1" }
+          
+          .control-group
+            %label.control-label{ :for => "dunno"}
+              Dunno
+              %output 6
+            .controls
+              %input{ :id => "dunno", :type => "range", :min => "1", :max => "11", :value => "6", :step => "1" }
+
+      %h2 Filters
+      %p
+        %em No filters defined.
+
+  .span6.offset1
+    %h2 Results
+    %ul.results
+
+
+- content_for :css do
+  :css
+    .page-header h1,
+    .page-header p{
+      text-align: center;
+    }
+    
+    output:before {
+      content: "(";
+    }
+
+    output:after {
+      content: ")";
+    }
+
+    input[type="range"]{
+      width: 150px;
+    }
+
+- content_for :javascript do
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      fishpond.resultsUpdated(function(results){
+        //console.log(results);
+
+        $(".results li").remove(); // Clear old results
+
+        for(var i = 0; i < results.length; i++){
+          var li = $("<li></li>");
+          var thumbnail = $("<div></div>");
+          thumbnail.html(results[i].fish.title);
+          li.append(thumbnail);
+          $(".results").append(li);
+        }
+      });
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');
+        fishpond.query({}, {});
+      });
+
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+      var tag_range,
+          tag_id,
+          tag_output;
+     
+      $('input[type=range]').change(function() {
+        tag_range = $(this).val();
+        tag_id = $(this).attr("id");
+        tag_output = $('label[for="'+tag_id+'"] output');
+
+        tag_output.html(tag_range);
+
+        fishpond.query({
+          quantitative: $("#quantitative").val(),
+          biological: $("#biological").val(),
+          pure: $("#pure").val(),
+          indoors: $("#indoors").val(),
+          dunno: $("#dunno").val()
+        },
+        {/* no filters, yet */});
+      });
+    };
