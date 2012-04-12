@@ -1,0 +1,207 @@
+.page-header
+  %h1 Basic (Dynamic) Demo
+
+.row
+  .span5
+    .well
+      %h2 Tags
+      %form.form-horizontal
+        -#
+          %fieldset
+            .control-group
+              %label.control-label Quantitative (6)
+              .controls
+                %input#query_tags_quantitative{"data-slug" => "quantitative", :name => "query[tags][quantitative]", :type => "hidden", :value => "6"}/
+                .slider.span2{"data-target" => "query[tags][quantitative]"}
+            .control-group
+              %label.control-label Biological (6)
+              .controls
+                %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "6"}/
+                .slider.span2{"data-target" => "query[tags][biological]"}
+            .control-group
+              %label.control-label Pure (6)
+              .controls
+                %input#query_tags_pure{"data-slug" => "pure", :name => "query[tags][pure]", :type => "hidden", :value => "6"}/
+                .slider.span2{"data-target" => "query[tags][pure]"}
+            .control-group
+              %label.control-label Indoors (6)
+              .controls
+                %input#query_tags_indoors{"data-slug" => "indoors", :name => "query[tags][indoors]", :type => "hidden", :value => "6"}/
+                .slider.span2{"data-target" => "query[tags][indoors]"}
+            .control-group
+              %label.control-label Dunno (6)
+              .controls
+                %input#query_tags_dunno{"data-slug" => "dunno", :name => "query[tags][dunno]", :type => "hidden", :value => "6"}/
+                .slider.span2{"data-target" => "query[tags][dunno]"}
+
+      %h2 Filters
+      %p
+        %em No filters defined.
+
+  .span6.offset1
+    %h2 Results
+    %ul.results
+
+%input#query_tags_Ymp{"data-slug" => "biological", :name => "query[tags][Ymp]", :type => "hidden", :value => "6"}/
+  .slider.span2{"data-target" => "query[tags][Ymp]"}
+
+
+- content_for :javascript do
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      fishpond.resultsUpdated(function(results){
+        //console.log(results);
+
+        $(".results li").remove(); // Clear old results
+
+        for(var i = 0; i < results.length; i++){
+          var li = $("<li></li>");
+          var thumbnail = $("<div></div>");
+          thumbnail.html(results[i].fish.title);
+          li.append(thumbnail);
+          $(".results").append(li);
+        }
+      });
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');       
+        
+        var form = $("form");
+        var controlGroup;
+        var controlLabel = $("<label class='control-label'></label>");
+        var controlInput = $("<input></input>");
+
+        form.append("<fieldset></fieldset>");
+
+        $.each(pond.tag_ids, function(name, token){ 
+          console.log(name + ': ' + token); 
+
+          controlGroup = $("" +
+            "<div class='control-group'>" +
+              "<label class='control-label'>"+name+
+                " <output>(6)</output>" +
+              "</label>" +
+              "<div class='controls'>" +
+                "<input id='query_tag_'"+token+" data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+
+                "</input>" +
+              "</div>" +
+            "</div>");
+
+          //control.html(label);
+          form.find('fieldset').append(controlGroup);
+
+        });
+
+        fishpond.query({}, {});
+
+      });
+
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+      $(".slider").slider({
+        value: 6,
+        min: 1,
+        max: 11,
+        step: 0.1,
+        slide: function(e, ui){
+          var label = $(this).parents('.control-group').find('label');
+          var hiddenField = $("input[name='" + $(this).data('target') + "']");
+          var value = Math.round(Math.abs(12 - ui['value']));
+
+          if(value.toString() != hiddenField.val().toString()){
+            hiddenField.val(value);
+            label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
+
+            var tags = {};
+            var filters = {};
+            $("form input").each(function(){
+              tags[$(this).data('slug')] = $(this).val();
+            });
+            fishpond.query({
+              quantitative: $("#query_tags_quantitative").val(),
+              biological: $("#query_tags_biological").val(),
+              pure: $("#query_tags_pure").val(),
+              indoors: $("#query_tags_indoors").val(),
+              dunno: $("#query_tags_dunno").val()
+            },
+            {/* no filters, yet */});
+          }
+        }
+      });
+
+      
+    };
+
+    /*
+    fishpond.resultsUpdated(function(results){
+        var source = $("#results ul", container)
+
+        var list = $("<ul></ul>");
+        list.addClass("thumbnails");
+
+        for(var resultIndex in results){
+          var result = results[resultIndex];
+          var listItem = $("<li></li>");
+          var thumbnail = $("<div></div>");
+
+          listItem.addClass("span2");
+          listItem.attr('data-id', result.fish.id);
+
+          thumbnail.html("<strong>" + result.fish.title + "</strong><br />" + result.score);
+          thumbnail.addClass("thumbnail");
+
+          source.find("li[data-id='" + result.fish.id + "'] .thumbnail").html(thumbnail.html());
+
+          listItem.append(thumbnail);
+          list.append(listItem);
+        }
+        if(source.find("li").length == 0) {
+          source.append(list.find("li"));
+        } else {
+          source.quicksand(list.find("li"));
+        }
+      });
+
+      fishpond.loading(function(percentage){
+        $(".progress .bar", container).width((percentage * 100) + "%");
+      });
+
+      fishpond.ready(function(pond){
+        $(".slider").slider({
+          value: 6,
+          min: 1,
+          max: 11,
+          step: 0.1,
+          slide: function(e, ui){
+            var label = $(this).parents('.control-group').find('label');
+            var hiddenField = $("input[name='" + $(this).data('target') + "']");
+            var value = Math.round(Math.abs(12 - ui['value']));
+
+            if(value.toString() != hiddenField.val().toString()){
+              hiddenField.val(value);
+              label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
+
+              var tags = {};
+              var filters = {};
+              $("form input").each(function(){
+                tags[$(this).data('slug')] = $(this).val();
+              });
+              fishpond.query(tags, filters);
+            }
+          }
+        });
+
+        fishpond.query({}, {});
+        $(".progress").removeClass("active");
+        $(".loading").delay(500).fadeOut(200);
+        $(".form-and-results", container).fadeOut(1);
+        $(".form-and-results", container).delay(500).fadeIn(200);
+      });
+      */
