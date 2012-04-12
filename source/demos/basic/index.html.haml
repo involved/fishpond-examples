@@ -10,34 +10,30 @@
       %form.form-horizontal
         %fieldset
           .control-group
-            %label.control-label Quantitative
+            %label.control-label Quantitative (6)
             .controls
-              %input{:type => "hidden", :value => "6"}/
-              .slider.quantitative.span2
-          
+              %input#query_tags_quantitative{"data-slug" => "quantitative", :name => "query[tags][gwx]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][gwx]"}
           .control-group
-            %label.control-label Biological
+            %label.control-label Biological (6)
             .controls
-              %input{:type => "hidden", :value => "6"}/
-              .slider.biological.span2
-          
+              %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][Ymp]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][Ymp]"}
           .control-group
-            %label.control-label Pure
+            %label.control-label Pure (6)
             .controls
-              %input{:type => "hidden", :value => "6"}/
-              .slider.pure.span2
-          
+              %input#query_tags_pure{"data-slug" => "pure", :name => "query[tags][WxI]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][WxI]"}
           .control-group
-            %label.control-label Indoors
+            %label.control-label Indoors (6)
             .controls
-              %input{:type => "hidden", :value => "6"}/
-              .slider.indoors.span2
-          
+              %input#query_tags_indoors{"data-slug" => "indoors", :name => "query[tags][CjC]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][CjC]"}
           .control-group
-            %label.control-label Dunno
+            %label.control-label Dunno (6)
             .controls
-              %input{:type => "hidden", :value => "6"}/
-              .slider.dunno.span2
+              %input#query_tags_dunno{"data-slug" => "dunno", :name => "query[tags][2TE]", :type => "hidden", :value => "6"}/
+              .slider.span2{"data-target" => "query[tags][2TE]"}
 
       %h2 Filters
       %p
@@ -56,7 +52,7 @@
       fishpond.resultsUpdated(function(results){
         //console.log(results);
 
-        
+        $(".results li").remove(); // Clear old results
 
         for(var i = 0; i < results.length; i++){
           var li = $("<li></li>");
@@ -79,59 +75,34 @@
         $("#loading .bar").css({width: (percent * 100) + "%"});
       });
 
-      $(".slider-old").slider({
+      $(".slider").slider({
         value: 6,
         min: 1,
         max: 11,
         step: 0.1,
         slide: function(e, ui){
-          $(".results li").remove();
-          fishpond.query({
-            quantitative: $(".slider.quantitative").val(),
-            biological: $(".slider.biological").val(),
-            pure: $(".slider.pure").val(),
-            indoors: $(".slider.indoors").val(),
-            dunno: $(".slider.dunno").val()
-          },
-          {/* no filters, yet */});
+          var label = $(this).parents('.control-group').find('label');
+          var hiddenField = $("input[name='" + $(this).data('target') + "']");
+          var value = Math.round(Math.abs(12 - ui['value']));
 
-          val_quantitve = $(".slider.quantitative").val();
-          val_biological = $(".slider.biological").val();
-          val_pure = $(".slider.pure").val();
-          val_indoors = $(".slider.indoors").val();
-          val_dunno = $(".slider.dunno").val();
+          if(value.toString() != hiddenField.val().toString()){
+            hiddenField.val(value);
+            label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
 
-          console.log("quantitative - " + val_quantitve);
-          console.log("biological - " + val_biological);
-          console.log("pure - " + val_pure);
-          console.log("indoors - " + val_indoors);
-          console.log("dunno - " + val_dunno);
+            var tags = {};
+            var filters = {};
+            $("form input").each(function(){
+              tags[$(this).data('slug')] = $(this).val();
+            });
+            fishpond.query({
+              quantitative: $("#query_tags_quantitative").val(),
+              biological: $("#query_tags_biological").val(),
+              pure: $("#query_tags_pure").val(),
+              indoors: $("#query_tags_indoors").val(),
+              dunno: $("#query_tags_dunno").val()
+            },
+            {/* no filters, yet */});
+          }
         }
       });
     };
-
-    $(".slider").slider({
-      value: 6,
-      min: 1,
-      max: 11,
-      step: 0.1,
-      slide: function(e, ui){
-        var label = $(this).parents('.control-group').find('label');
-        var hiddenField = $("input[name='" + $(this).data('target') + "']");
-        var value = Math.round(Math.abs(12 - ui['value']));
-
-        if(value.toString() != hiddenField.val().toString()){
-          hiddenField.val(value);
-          label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
-
-          var tags = {};
-          var filters = {};
-          $("form input").each(function(){
-            tags[$(this).data('slug')] = $(this).val();
-          });
-          //fishpond.query(tags, filters);
-        }
-      }
-    });
-    
-  
