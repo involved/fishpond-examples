@@ -1,0 +1,137 @@
+.page-header
+  %h1 Basic Demo
+  %br
+  %p Hardcoded for use with the 'Science Majors' pond.
+
+.row
+  .span5
+    .well
+      %h2 Tags
+      %form.form-horizontal
+        %fieldset
+          .control-group
+            %label.control-label Quantitative
+            .controls
+              %input{:type => "hidden", :value => "6"}/
+              .slider.quantitative.span2
+          
+          .control-group
+            %label.control-label Biological
+            .controls
+              %input{:type => "hidden", :value => "6"}/
+              .slider.biological.span2
+          
+          .control-group
+            %label.control-label Pure
+            .controls
+              %input{:type => "hidden", :value => "6"}/
+              .slider.pure.span2
+          
+          .control-group
+            %label.control-label Indoors
+            .controls
+              %input{:type => "hidden", :value => "6"}/
+              .slider.indoors.span2
+          
+          .control-group
+            %label.control-label Dunno
+            .controls
+              %input{:type => "hidden", :value => "6"}/
+              .slider.dunno.span2
+
+      %h2 Filters
+      %p
+        %em No filters defined.
+
+  .span6.offset1
+    %h2 Results
+    %ul.results
+
+
+
+- content_for :javascript do
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      fishpond.resultsUpdated(function(results){
+        //console.log(results);
+
+        
+
+        for(var i = 0; i < results.length; i++){
+          var li = $("<li></li>");
+          var thumbnail = $("<div></div>");
+          thumbnail.html(results[i].fish.title);
+          li.append(thumbnail);
+          $(".results").append(li);
+        }
+      });
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');
+        fishpond.query({}, {});
+      });
+
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+      $(".slider-old").slider({
+        value: 6,
+        min: 1,
+        max: 11,
+        step: 0.1,
+        slide: function(e, ui){
+          $(".results li").remove();
+          fishpond.query({
+            quantitative: $(".slider.quantitative").val(),
+            biological: $(".slider.biological").val(),
+            pure: $(".slider.pure").val(),
+            indoors: $(".slider.indoors").val(),
+            dunno: $(".slider.dunno").val()
+          },
+          {/* no filters, yet */});
+
+          val_quantitve = $(".slider.quantitative").val();
+          val_biological = $(".slider.biological").val();
+          val_pure = $(".slider.pure").val();
+          val_indoors = $(".slider.indoors").val();
+          val_dunno = $(".slider.dunno").val();
+
+          console.log("quantitative - " + val_quantitve);
+          console.log("biological - " + val_biological);
+          console.log("pure - " + val_pure);
+          console.log("indoors - " + val_indoors);
+          console.log("dunno - " + val_dunno);
+        }
+      });
+    };
+
+    $(".slider").slider({
+      value: 6,
+      min: 1,
+      max: 11,
+      step: 0.1,
+      slide: function(e, ui){
+        var label = $(this).parents('.control-group').find('label');
+        var hiddenField = $("input[name='" + $(this).data('target') + "']");
+        var value = Math.round(Math.abs(12 - ui['value']));
+
+        if(value.toString() != hiddenField.val().toString()){
+          hiddenField.val(value);
+          label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
+
+          var tags = {};
+          var filters = {};
+          $("form input").each(function(){
+            tags[$(this).data('slug')] = $(this).val();
+          });
+          //fishpond.query(tags, filters);
+        }
+      }
+    });
+    
+  
