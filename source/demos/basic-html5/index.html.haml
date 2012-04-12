@@ -1,7 +1,7 @@
 .page-header
   %h1 Basic HTML5 Demo
   %br
-  %p Hardcoded for use with the 'Science Majors' pond.
+  %p Pure HTML5 form elements, no fallbacks or polyfils used. Hardcoded for use with the 'Science Majors' pond. 
 
 .row
   .span5
@@ -55,11 +55,12 @@
 
 - content_for :css do
   :css
-    h1 {
+    .page-header h1,
+    .page-header p{
       text-align: center;
-      }
-
+    }
     
+
     input[type="range"]{
       width: 150px;
     }
@@ -94,16 +95,16 @@
         $("#loading .bar").css({width: (percent * 100) + "%"});
       });
 
-      var range,
-          input_id,
-          output;
+      var tag_range,
+          tag_id,
+          tag_output;
      
       $('input[type=range]').change(function() {
-        range = $(this).val();
-        input_id = $(this).attr("id");
-        output = $('label[for="'+input_id+'"] output');
+        tag_range = $(this).val();
+        tag_id = $(this).attr("id");
+        tag_output = $('label[for="'+tag_id+'"] output');
 
-        output.html(range);
+        output.html(tag_range);
 
         fishpond.query({
           quantitative: $("#quantitative").val(),
