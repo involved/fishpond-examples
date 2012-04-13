@@ -17,20 +17,21 @@
     .span6.offset1
       %h2 Results
       #results
-        %ul
+        %ul.thumbnails
 
-
-
+- content_for :javascript_plugins do
+  = javascript_include_tag "https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js"
 
 - content_for :javascript do
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
-       var container = $("section#query");
+      var container = $("section#query");
 
       fishpond.resultsUpdated(function(results){
         //console.log(results);
 
-        var source = $("#results ul", container)
+        var source = $("#results", container);
+        var list = $("#results ul");
         var resultsThumb;
 
         $.each(results, function(position, result){ 
@@ -42,13 +43,15 @@
             "</li>");
 
           source.append(resultsThumb);
-
-          if(source.find("li").length == 0) {
-            source.append(list.find("li"));
-          } else {
-            source.quicksand(list.find("li"));
-          }
         });
+
+        if(source.find("li").length == 0) {
+          console.log("Quicksand [FALSE]");
+          source.append(list.find("li"));
+        } else {
+          console.log("Quicksand [TRUE]");
+          source.quicksand(list.find("li"));
+        }
 
 
         /*
