@@ -38,11 +38,10 @@
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
       // Flotr Array Variables
-
       var resultsList = [];
       var tags = [];
       var tagsList = [];
-      var positionCount = 0;
+      
 
       fishpond.resultsUpdated(function(results){
         console.log(results);
@@ -58,21 +57,6 @@
           $(".results").append(li);
         }
 
-        // Create Array for Flotr
-        /*resultsList = []
-        for(var i = 0; i < tagsList.length; i++){
-          var tagValue = 
-          resultsList.push([ i, 4 ]);
-        }*/
-
-        
-         
-        /*positionCount = 0;
-        $.each(pond.tag_ids, function(name, token){ ;
-          resultsList.push([ positionCount, 4 ]);
-          positionCount++;
-        });*/
-
         flotr();
       });
 
@@ -82,6 +66,7 @@
         $("#demo h1").append(' "' + pond.name + '"');       
         
         // Create Array for Flotr
+        var positionCount = 0;
         $.each(pond.tag_ids, function(name, token){
           tagsList.push([ positionCount, name ]);
           resultsList.push([ positionCount, 6 ]);
@@ -130,8 +115,7 @@
               $("form#fishpond input").each(function(){
                 tags[$(this).data('slug')] = $(this).val();
               
-                // Create Array for Flotr
-                
+                // Update Array for Flotr
                 resultsList.push([ count, $(this).val() ]);
                 count++;
               });
