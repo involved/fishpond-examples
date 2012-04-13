@@ -19,6 +19,18 @@
       #results
         %ul.thumbnails
 
+- content_for :css do
+  :css
+    h1 {
+      text-align: center;
+      }
+
+    #results ul li .thumbnail{
+      height: 50px;
+      text-align: center;
+    }
+
+
 - content_for :javascript_plugins do
   = javascript_include_tag "https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js"
 
@@ -30,64 +42,35 @@
       fishpond.resultsUpdated(function(results){
         //console.log(results);
 
-        var source = $("#results", container);
-        var list = $("#results ul");
-        var resultsThumb;
+        var source = $("#results ul", container);
+        var list = $("<ul></ul>");
+
+        var listItem;
 
         $.each(results, function(position, result){ 
-          resultsThumb = $("" +
+          listItem = $("" +
             "<li class='span2' data-id='"+result.fish.id+"'>" +
               "<div class='thumbnail'>" +
                 "<strong>" + result.fish.title + "</strong><br />" + result.score +
               "</div>" +
             "</li>");
 
-          source.append(resultsThumb);
+          list.append(listItem);
         });
 
         if(source.find("li").length == 0) {
-          console.log("Quicksand [FALSE]");
-          source.append(list.find("li"));
-        } else {
-          console.log("Quicksand [TRUE]");
-          source.quicksand(list.find("li"));
-        }
-
-
-        /*
-        var source = $("#results", container)
-
-        var list = $("<ul></ul>");
-        list.addClass("thumbnails");
-
-        for(var resultIndex in results){
-          var result = results[resultIndex];
-          var listItem = $("<li></li>");
-          var thumbnail = $("<div></div>");
-
-          listItem.addClass("span2");
-          listItem.attr('data-id', result.fish.id);
-
-          thumbnail.html("<strong>" + result.fish.title + "</strong><br />" + result.score);
-          thumbnail.addClass("thumbnail");
-
-          source.find("li[data-id='" + result.fish.id + "'] .thumbnail").html(thumbnail.html());
-
-          listItem.append(thumbnail);
-          list.append(listItem);
-        }
-        if(source.find("li").length == 0) {
           source.append(list.find("li"));
         } else {
           source.quicksand(list.find("li"));
-        }*/
-      });
+        }
+     });
 
       fishpond.ready(function(pond){
         $("#loading").fadeOut(0);
         $("#demo").fadeIn(400);
         $("#demo h1").append(' "' + pond.name + '"');       
-        
+
+        // Dynamically Generate Form Controls        
         var form = $("form fieldset");
         var controlGroup;
 
