@@ -80,7 +80,6 @@
               var filters = {};
               $("form#fishpond input").each(function(){
                 tags[$(this).data('slug')] = $(this).val();
-                console.log("tags -> " + $(this).val());
               });
               fishpond.query(tags, filters);
             }
