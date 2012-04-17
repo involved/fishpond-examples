@@ -1,7 +1,7 @@
 .page-header
-  %h1 YUI Dial Demo
+  %h1 Dial Demo
   %br
-  %p= link_to "Yahoo YUI Dial", "http://yuilibrary.com/yui/docs/dial/dial-basic.html"
+  %p= link_to "Yahoo YUI Dial Widget", "http://yuilibrary.com/yui/docs/dial/dial-basic.html"
 
 .row
   .span12
@@ -14,17 +14,11 @@
       %p
         %em No filters defined.
 
-  
-
 .row
   #results.span12
     %h2 Results
     %ul.thumbnails.results
     
-
-
-= javascript_include_tag "http://humblesoftware.com/static/js/hsd-flotr2.js"
-
 
 -# content_for :css do
 :css
@@ -35,7 +29,6 @@
 
 - content_for :javascript do
   = javascript_include_tag "http://yui.yahooapis.com/3.5.0/build/yui/yui-min.js"
-
 
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
@@ -81,7 +74,7 @@
 
         $.each(pond.tag_ids, function(name, token){ 
           controlGroup = $("" +
-            "<div id='query_tag_"+token+"' class='span2'>" +
+            "<div id='query_tag_"+token+"' class='dial span2'>" +
             "</div>");
 
           form.append(controlGroup);
@@ -97,49 +90,25 @@
                 }
             });
             dial.render("#query_tag_"+token);
-          });
+            dial.on( "resetStr", function(e){
+              console.log("RESET");
+            });
 
-        });
-
-        
-        /*dial.on( "valueChange", function(e){
-          console.log("Dial change");
-        }, '#dials' );*/
-
-
-        // jQuery UI Slider
-        $(".slider").slider({
-          value: 6,
-          min: 1,
-          max: 11,
-          step: 0.1,
-          slide: function(e, ui){
-            var output = $(this).parents('.control-group').find('output');
-            var hiddenField = $("input[name='" + $(this).data('target') + "']");
-            var value = Math.round(Math.abs(12 - ui['value']));
-
-            if(value.toString() != hiddenField.val().toString()){
-              hiddenField.val(value);
-              output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
-
+            dial.on( "valueChange", function(e){
               var tags = {};
               var filters = {};
-              resultsList = [];
-
-              var count = 0;
-              $("form#fishpond input").each(function(){
-                tags[$(this).data('slug')] = $(this).val();
               
-                // Update Array for Radar
-                resultsList.push([ count, $(this).val() ]);
-                count++;
+              $(".dial").each(function(){
+                tags[name] = e.newVal;
               });
 
               fishpond.query(tags, filters);
-            }
-          }
+            }, '#dials' );
+
+          });
         });
 
+        
         fishpond.query({}, {});
 
       });
