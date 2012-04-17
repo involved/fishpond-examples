@@ -23,10 +23,6 @@
     %ul.thumbnails.results
     
 
-
-= javascript_include_tag "http://humblesoftware.com/static/js/hsd-flotr2.js"
-
-
 -# content_for :css do
 :css
   #radar{
@@ -35,6 +31,9 @@
 
 
 - content_for :javascript do
+
+  = javascript_include_tag "http://humblesoftware.com/static/js/hsd-flotr2.js"
+
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
       // Flotr Array Variables
