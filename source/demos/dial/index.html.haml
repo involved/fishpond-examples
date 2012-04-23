@@ -81,26 +81,25 @@
 
           YUI().use('dial', function(Y) {
             var dial = new Y.Dial({
-                // remap 1-11 to 0-10
-                min:0,
-                max:10,
-                stepsPerRevolution:10,
-                value: 5,
-                strings:{label:name, resetStr: 'Reset', tooltipHandle: 'Drag to set'}
+                min:1,
+                max:11,
+                stepsPerRevolution:11,
+                value: 6,
+                strings:{label:name, resetStr: 'Reset', tooltipHandle: 'Drag to set'},
+                after : {
+                }
             });
             dial.render("#query_tag_"+token);
-            $(".yui3-dial-value-string").html(6);
+            dial.on( "resetStr", function(e){
+              console.log("RESET");
+            });
 
             dial.on( "valueChange", function(e){
               var tags = {};
               var filters = {};
-              var new_value;
-
+              
               $(".dial").each(function(){
-                // remap 1-11 to 0-10
-                newValue = e.newVal + 1;
-                tags[name] = newValue;
-                $(this).find(".yui3-dial-value-string").html(newValue);
+                tags[name] = e.newVal;
               });
 
               fishpond.query(tags, filters);
