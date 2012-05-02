@@ -62,9 +62,17 @@
         var source = $("#results ul", container);
         var list = $("<ul></ul>");
 
-        var listItem;
+        var listItem,
+            modalGroup;
+
+        $('a.btn').on('click', function(e){
+            e.preventDefault();
+
+            console.error("CLICKED");
+        });
 
         $.each(results, function(position, result){ 
+
           listItem = $("" +
             "<li class='span2' data-id='"+result.fish.id+"'>" +
               "<div class='thumbnail'>" +
@@ -73,28 +81,40 @@
               "</div>" +
             "</li>");
 
-          listItem.find('a').click(function(e){
+          //console.error(listItem.html());
+
+          listItem.find('a').on('click', function(e){
             e.preventDefault();
+
+            console.warn("Fish Clicked");
+
             fishpond.get_fish($(this).closest('li').attr('data-id'), function(data){
               console.log("Metadata receieved:")
               console.log(data);
             
               modalGroup = $("" +
-               "<div class='modal-header'>" +
-                "<button class='close' data-dismiss='modal'>×</button>" +
-                "<h3>" + data.title + "</h3>" +
-              "</div>" +
-              "<div class='modal-body'>" +
-                "<p>" + data.description + "</p>" +
-              "</div>" +
-              "<div class='modal-footer'>" +
-                "<a href='#' class='btn' data-dismiss='modal'>Close</a>" +
-              "</div>");
+                "<div class='modal-header'>" +
+                  "<button class='close' data-dismiss='modal'>×</button>" +
+                  "<h3>" + data.title + "</h3>" +
+                "</div>" +
+                "<div class='modal-body'>" +
+                  "<div class='row'>" + 
+                    "<div class='span2'>" + 
+                      "<img src='http://placehold.it/100x100' alt='" + data.title + "' />" +
+                    "</div>" + 
+                    "<div class='span4'>" + 
+                      "<p>" + data.description + "</p>" +
+                    "</div>" +
+                  "</div>" +
+                "</div>" +
+                "<div class='modal-footer'>" +
+                  "<a href='#' class='btn' data-dismiss='modal'>Close</a>" +
+                "</div>");
 
               $('#fishInfo').modal('show');
             });
 
-            $('#fishInfo').on('shown', function () {
+            $('#fishInfo').on('shown', function(){
               $(this).html(modalGroup);
             });
           });
