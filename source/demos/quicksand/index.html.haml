@@ -19,6 +19,16 @@
       #results
         %ul.thumbnails
 
+
+#fishInfo.modal.hide
+  .modal-header
+    %button.close{"data-dismiss" => "modal"} ×
+    %h3 Modal header
+  .modal-body
+    %p One fine body…
+  .modal-footer
+    %a.btn{:href => "#", "data-dismiss" => "modal"} Close
+
 - content_for :css do
   :css
     h1 {
@@ -26,9 +36,17 @@
       }
 
     #results ul li .thumbnail{
-      height: 50px;
+      min-height: 100px;
       text-align: center;
+      position: relative;
     }
+
+      #results ul li .thumbnail .btn{
+        position: absolute;
+        bottom: 15px;
+        left: 30px;
+        display: block;
+      }
  
 
 - content_for :javascript do
@@ -50,9 +68,36 @@
           listItem = $("" +
             "<li class='span2' data-id='"+result.fish.id+"'>" +
               "<div class='thumbnail'>" +
-                "<strong>" + result.fish.title + "</strong><br />" + result.score +
+                "<strong>" + result.fish.title + "</strong><br />" + result.score + "<br />" +
+                "<a class='btn' href='#fishInfo'>More Info</a>" +
               "</div>" +
             "</li>");
+
+          listItem.find('a').click(function(e){
+            e.preventDefault();
+            fishpond.get_fish($(this).closest('li').attr('data-id'), function(data){
+              console.log("Metadata receieved:")
+              console.log(data);
+            
+              modalGroup = $("" +
+               "<div class='modal-header'>" +
+                "<button class='close' data-dismiss='modal'>×</button>" +
+                "<h3>" + data.title + "</h3>" +
+              "</div>" +
+              "<div class='modal-body'>" +
+                "<p>" + data.description + "</p>" +
+              "</div>" +
+              "<div class='modal-footer'>" +
+                "<a href='#' class='btn' data-dismiss='modal'>Close</a>" +
+              "</div>");
+
+              $('#fishInfo').modal('show');
+            });
+
+            $('#fishInfo').on('shown', function () {
+              $(this).html(modalGroup);
+            });
+          });
 
           list.append(listItem);
         });
@@ -77,7 +122,7 @@
           controlGroup = $("" +
             "<div class='control-group'>" +
               "<label class='control-label'>" +
-                name + " <output>(6)</output>" +
+                name + " <output>(10)</output>" +
               "</label>" +
               "<div class='controls'>" +
                 "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
@@ -90,9 +135,9 @@
 
         // jQuery UI Slider
         $(".slider").slider({
-          value: 6,
-          min: 1,
-          max: 11,
+          value: 10,
+          min: 0,
+          max: 20,
           step: 0.1,
           slide: function(e, ui){
             var output = $(this).parents('.control-group').find('output');
