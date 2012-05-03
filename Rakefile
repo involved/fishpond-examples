@@ -39,7 +39,7 @@ task :publish do
   pb.increment!
   %x{git checkout master /build}
   pb.increment!
-  %x{mv build/*}
+  %x{mv build/* ./}
   pb.increment!
   %x{rmdir build}
   pb.increment!
