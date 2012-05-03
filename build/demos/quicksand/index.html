@@ -258,6 +258,14 @@
               fishpond.get_fish(fishID, function(data){
                 console.log("[Fish] Metadata receieved:");
                 console.log(data);
+<<<<<<< HEAD
+=======
+        
+                if (data.thumbnail_url === ""){
+                  // Backup thumbnail
+                  data.thumbnail_url = "http://placehold.it/120x120" ;
+                }
+>>>>>>> d7732cdd1667846340d19e673cb9c83285f9b53f
               
                 modalGroup = $("" +
                   "<div class='modal-header'>" +
@@ -267,7 +275,11 @@
                   "<div class='modal-body'>" +
                     "<div class='row'>" + 
                       "<div class='span2'>" + 
+<<<<<<< HEAD
                         "<img src='http://placehold.it/100x100' alt='" + data.title + "' />" +
+=======
+                        "<img src='" + data.thumbnail_url + "' alt='" + data.title + "' />" +
+>>>>>>> d7732cdd1667846340d19e673cb9c83285f9b53f
                       "</div>" + 
                       "<div class='span4'>" + 
                         "<p>" + data.description + "</p>" +
