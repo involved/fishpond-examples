@@ -21,26 +21,7 @@
         }
       /*]]>*/
     </style>
-    <style type='text/css'>
-      /*<![CDATA[*/
-        .page-header h1,
-        .page-header p{
-          text-align: center;
-        }
-        
-        output:before {
-          content: "(";
-        }
-        
-        output:after {
-          content: ")";
-        }
-        
-        input[type="range"]{
-          width: 150px;
-        }
-      /*]]>*/
-    </style>
+    
   </head>
   <body>
     <div class='navbar navbar-fixed-top'>
@@ -91,9 +72,9 @@
     </div>
     <div class='container hide' id='demo'>
       <div class='page-header'>
-        <h1>Basic HTML5 Demo</h1>
+        <h1>Basic (Static) Demo</h1>
         <br />
-        <p>Pure HTML5 form elements, no fallbacks or polyfils used. Hardcoded for use with the 'Science Majors' pond.</p>
+        <p>Hardcoded for use with the 'Science Majors' pond.</p>
       </div>
       <div class='row'>
         <div class='span5'>
@@ -102,48 +83,38 @@
             <form class='form-horizontal'>
               <fieldset>
                 <div class='control-group'>
-                  <label class='control-label' for='quantitative'>
-                    Quantitative
-                    <output>6</output>
-                  </label>
+                  <label class='control-label'>Quantitative (6)</label>
                   <div class='controls'>
-                    <input id='quantitative' max='11' min='1' step='1' type='range' value='6' />
+                    <input data-slug='quantitative' id='query_tags_quantitative' name='query[tags][quantitative]' type='hidden' value='6' />
+                    <div class='slider span2' data-target='query[tags][quantitative]'></div>
                   </div>
                 </div>
                 <div class='control-group'>
-                  <label class='control-label' for='biological'>
-                    Biological
-                    <output>6</output>
-                  </label>
+                  <label class='control-label'>Biological (6)</label>
                   <div class='controls'>
-                    <input id='biological' max='11' min='1' step='1' type='range' value='6' />
+                    <input data-slug='biological' id='query_tags_biological' name='query[tags][biological]' type='hidden' value='6' />
+                    <div class='slider span2' data-target='query[tags][biological]'></div>
                   </div>
                 </div>
                 <div class='control-group'>
-                  <label class='control-label' for='pure'>
-                    Pure
-                    <output>6</output>
-                  </label>
+                  <label class='control-label'>Pure (6)</label>
                   <div class='controls'>
-                    <input id='pure' max='11' min='1' step='1' type='range' value='6' />
+                    <input data-slug='pure' id='query_tags_pure' name='query[tags][pure]' type='hidden' value='6' />
+                    <div class='slider span2' data-target='query[tags][pure]'></div>
                   </div>
                 </div>
                 <div class='control-group'>
-                  <label class='control-label' for='indoors'>
-                    Indoors
-                    <output>6</output>
-                  </label>
+                  <label class='control-label'>Indoors (6)</label>
                   <div class='controls'>
-                    <input id='indoors' max='11' min='1' step='1' type='range' value='6' />
+                    <input data-slug='indoors' id='query_tags_indoors' name='query[tags][indoors]' type='hidden' value='6' />
+                    <div class='slider span2' data-target='query[tags][indoors]'></div>
                   </div>
                 </div>
                 <div class='control-group'>
-                  <label class='control-label' for='dunno'>
-                    Dunno
-                    <output>6</output>
-                  </label>
+                  <label class='control-label'>Dunno (6)</label>
                   <div class='controls'>
-                    <input id='dunno' max='11' min='1' step='1' type='range' value='6' />
+                    <input data-slug='dunno' id='query_tags_dunno' name='query[tags][dunno]' type='hidden' value='6' />
+                    <div class='slider span2' data-target='query[tags][dunno]'></div>
                   </div>
                 </div>
               </fieldset>
@@ -202,25 +173,35 @@
             $("#loading .bar").css({width: (percent * 100) + "%"});
           });
         
-          var tag_range,
-              tag_id,
-              tag_output;
-         
-          $('input[type=range]').change(function() {
-            tag_range = $(this).val();
-            tag_id = $(this).attr("id");
-            tag_output = $('label[for="'+tag_id+'"] output');
+          $(".slider").slider({
+            value: 6,
+            min: 1,
+            max: 11,
+            step: 0.1,
+            slide: function(e, ui){
+              var label = $(this).parents('.control-group').find('label');
+              var hiddenField = $("input[name='" + $(this).data('target') + "']");
+              var value = Math.round(Math.abs(12 - ui['value']));
         
-            tag_output.html(tag_range);
+              if(value.toString() != hiddenField.val().toString()){
+                hiddenField.val(value);
+                label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
         
-            fishpond.query({
-              quantitative: $("#quantitative").val(),
-              biological: $("#biological").val(),
-              pure: $("#pure").val(),
-              indoors: $("#indoors").val(),
-              dunno: $("#dunno").val()
-            },
-            {/* no filters, yet */});
+                var tags = {};
+                var filters = {};
+                $("form input").each(function(){
+                  tags[$(this).data('slug')] = $(this).val();
+                });
+                fishpond.query({
+                  quantitative: $("#query_tags_quantitative").val(),
+                  biological: $("#query_tags_biological").val(),
+                  pure: $("#query_tags_pure").val(),
+                  indoors: $("#query_tags_indoors").val(),
+                  dunno: $("#query_tags_dunno").val()
+                },
+                {/* no filters, yet */});
+              }
+            }
           });
         };
       //]]>

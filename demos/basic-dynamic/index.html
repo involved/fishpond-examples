@@ -35,12 +35,15 @@
                 <b class='caret'></b>
               </a>
               <ul class='dropdown-menu'>
-                <li><a href="/demos/atom">atom</a></li>
-                <li><a href="/demos/basic">basic</a></li>
-                <li><a href="/demos/basic-html5">basic-html5</a></li>
-                <li><a href="/demos/flotr">flotr</a></li>
-                <li><a href="/demos/quicksand">quicksand</a></li>
-                <li><a href="/demos/scaffold">scaffold</a></li>
+                <li><a href="/fishpond-examples/demos/atom">atom</a></li>
+                <li><a href="/fishpond-examples/demos/basic-dynamic">basic-dynamic</a></li>
+                <li><a href="/fishpond-examples/demos/basic-html5">basic-html5</a></li>
+                <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
+                <li><a href="/fishpond-examples/demos/dial">dial</a></li>
+                <li><a href="/fishpond-examples/demos/flotr">flotr</a></li>
+                <li><a href="/fishpond-examples/demos/quicksand">quicksand</a></li>
+                <li><a href="/fishpond-examples/demos/scaffold">scaffold</a></li>
+                <li><a href="/fishpond-examples/demos/spider-graph">spider-graph</a></li>
               </ul>
             </li>
           </ul>
@@ -69,51 +72,14 @@
     </div>
     <div class='container hide' id='demo'>
       <div class='page-header'>
-        <h1>Basic Demo</h1>
-        <br />
-        <p>Hardcoded for use with the 'Science Majors' pond.</p>
+        <h1>Basic (Dynamic) Demo</h1>
       </div>
       <div class='row'>
         <div class='span5'>
           <div class='well'>
             <h2>Tags</h2>
-            <form class='form-horizontal'>
+            <form class='form-horizontal' id='fishpond'>
               <fieldset>
-                <div class='control-group'>
-                  <label class='control-label'>Quantitative (6)</label>
-                  <div class='controls'>
-                    <input data-slug='quantitative' id='query_tags_quantitative' name='query[tags][quantitative]' type='hidden' value='6' />
-                    <div class='slider span2' data-target='query[tags][quantitative]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Biological (6)</label>
-                  <div class='controls'>
-                    <input data-slug='biological' id='query_tags_biological' name='query[tags][biological]' type='hidden' value='6' />
-                    <div class='slider span2' data-target='query[tags][biological]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Pure (6)</label>
-                  <div class='controls'>
-                    <input data-slug='pure' id='query_tags_pure' name='query[tags][pure]' type='hidden' value='6' />
-                    <div class='slider span2' data-target='query[tags][pure]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Indoors (6)</label>
-                  <div class='controls'>
-                    <input data-slug='indoors' id='query_tags_indoors' name='query[tags][indoors]' type='hidden' value='6' />
-                    <div class='slider span2' data-target='query[tags][indoors]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Dunno (6)</label>
-                  <div class='controls'>
-                    <input data-slug='dunno' id='query_tags_dunno' name='query[tags][dunno]' type='hidden' value='6' />
-                    <div class='slider span2' data-target='query[tags][dunno]'></div>
-                  </div>
-                </div>
               </fieldset>
             </form>
             <h2>Filters</h2>
@@ -137,13 +103,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js" type="text/javascript"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
+    <script src="https://raw.github.com/yeco/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
     <script type='text/javascript'>
       //<![CDATA[
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
         
           fishpond.resultsUpdated(function(results){
-            //console.log(results);
+            console.log(results);
         
             $(".results li").remove(); // Clear old results
         
@@ -159,8 +127,54 @@
           fishpond.ready(function(pond){
             $("#loading").fadeOut(0);
             $("#demo").fadeIn(400);
-            $("#demo h1").append(' "' + pond.name + '"');
+            $("#demo h1").append(' "' + pond.name + '"');       
+            
+            // Dynamically Generate Form Controls
+            var form = $("form fieldset");
+            var controlGroup;
+        
+            $.each(pond.tag_ids, function(name, token){ 
+              controlGroup = $("" +
+                "<div class='control-group'>" +
+                  "<label class='control-label'>" +
+                    name + " <output>(6)</output>" +
+                  "</label>" +
+                  "<div class='controls'>" +
+                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                    "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+                  "</div>" +
+                "</div>");
+        
+              form.append(controlGroup);
+            });
+        
+            // jQuery UI Slider
+            $(".slider").slider({
+              value: 6,
+              min: 1,
+              max: 11,
+              step: 0.1,
+              slide: function(e, ui){
+                var output = $(this).parents('.control-group').find('output');
+                var hiddenField = $("input[name='" + $(this).data('target') + "']");
+                var value = Math.round(Math.abs(12 - ui['value']));
+        
+                if(value.toString() != hiddenField.val().toString()){
+                  hiddenField.val(value);
+                  output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+        
+                  var tags = {};
+                  var filters = {};
+                  $("form#fishpond input").each(function(){
+                    tags[$(this).data('slug')] = $(this).val();
+                  });
+                  fishpond.query(tags, filters);
+                }
+              }
+            });
+        
             fishpond.query({}, {});
+        
           });
         
           fishpond.loading(function(percent){
@@ -168,36 +182,6 @@
             $("#loading .bar").css({width: (percent * 100) + "%"});
           });
         
-          $(".slider").slider({
-            value: 6,
-            min: 1,
-            max: 11,
-            step: 0.1,
-            slide: function(e, ui){
-              var label = $(this).parents('.control-group').find('label');
-              var hiddenField = $("input[name='" + $(this).data('target') + "']");
-              var value = Math.round(Math.abs(12 - ui['value']));
-        
-              if(value.toString() != hiddenField.val().toString()){
-                hiddenField.val(value);
-                label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
-        
-                var tags = {};
-                var filters = {};
-                $("form input").each(function(){
-                  tags[$(this).data('slug')] = $(this).val();
-                });
-                fishpond.query({
-                  quantitative: $("#query_tags_quantitative").val(),
-                  biological: $("#query_tags_biological").val(),
-                  pure: $("#query_tags_pure").val(),
-                  indoors: $("#query_tags_indoors").val(),
-                  dunno: $("#query_tags_dunno").val()
-                },
-                {/* no filters, yet */});
-              }
-            }
-          });
         };
       //]]>
     </script>

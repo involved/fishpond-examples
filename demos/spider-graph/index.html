@@ -21,26 +21,7 @@
         }
       /*]]>*/
     </style>
-    <style type='text/css'>
-      /*<![CDATA[*/
-        .page-header h1,
-        .page-header p{
-          text-align: center;
-        }
-        
-        output:before {
-          content: "(";
-        }
-        
-        output:after {
-          content: ")";
-        }
-        
-        input[type="range"]{
-          width: 150px;
-        }
-      /*]]>*/
-    </style>
+    
   </head>
   <body>
     <div class='navbar navbar-fixed-top'>
@@ -91,74 +72,26 @@
     </div>
     <div class='container hide' id='demo'>
       <div class='page-header'>
-        <h1>Basic HTML5 Demo</h1>
+        <h1>Spider Graph Demo</h1>
         <br />
-        <p>Pure HTML5 form elements, no fallbacks or polyfils used. Hardcoded for use with the 'Science Majors' pond.</p>
+        <p>using <a href="https://github.com/jmstriegel/jquery.spidergraph">jmstriegel spidergraph</a>. Relies on Canvas</p>
       </div>
       <div class='row'>
-        <div class='span5'>
-          <div class='well'>
-            <h2>Tags</h2>
-            <form class='form-horizontal'>
-              <fieldset>
-                <div class='control-group'>
-                  <label class='control-label' for='quantitative'>
-                    Quantitative
-                    <output>6</output>
-                  </label>
-                  <div class='controls'>
-                    <input id='quantitative' max='11' min='1' step='1' type='range' value='6' />
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label' for='biological'>
-                    Biological
-                    <output>6</output>
-                  </label>
-                  <div class='controls'>
-                    <input id='biological' max='11' min='1' step='1' type='range' value='6' />
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label' for='pure'>
-                    Pure
-                    <output>6</output>
-                  </label>
-                  <div class='controls'>
-                    <input id='pure' max='11' min='1' step='1' type='range' value='6' />
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label' for='indoors'>
-                    Indoors
-                    <output>6</output>
-                  </label>
-                  <div class='controls'>
-                    <input id='indoors' max='11' min='1' step='1' type='range' value='6' />
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label' for='dunno'>
-                    Dunno
-                    <output>6</output>
-                  </label>
-                  <div class='controls'>
-                    <input id='dunno' max='11' min='1' step='1' type='range' value='6' />
-                  </div>
-                </div>
-              </fieldset>
-            </form>
-            <h2>Filters</h2>
-            <p>
-              <em>No filters defined.</em>
-            </p>
-          </div>
-        </div>
-        <div class='span6 offset1'>
+        <div class='span6' id='radar'></div>
+        <div class='span5 offset7' id='results'>
           <h2>Results</h2>
-          <ul class='results'></ul>
+          <ul class='thumbnails results'></ul>
         </div>
       </div>
+      <style type='text/css'>
+        /*<![CDATA[*/
+          #radar{
+            position: fixed;
+            top: 200px;
+            height: 500px;
+          }
+        /*]]>*/
+      </style>
     </div>
     <div class='container'>
       <hr />
@@ -172,9 +105,15 @@
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
     <script src="https://raw.github.com/yeco/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
+    <script src="https://raw.github.com/jmstriegel/jquery.spidergraph/master/assets/js/jquery.spidergraph.js" type="text/javascript"></script>
     <script type='text/javascript'>
       //<![CDATA[
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+          
+          // Spidergraph Array Variables
+          var tagValues = [];
+          var tagList = [];
+          
         
           fishpond.resultsUpdated(function(results){
             //console.log(results);
@@ -188,13 +127,43 @@
               li.append(thumbnail);
               $(".results").append(li);
             }
+        
           });
         
           fishpond.ready(function(pond){
             $("#loading").fadeOut(0);
             $("#demo").fadeIn(400);
-            $("#demo h1").append(' "' + pond.name + '"');
+            $("#demo h1").append(' "' + pond.name + '"');       
+            
+            // Create Array for Spidergraph
+            $.each(pond.tag_ids, function(name, token){
+              tagList.push(name);
+              tagValues.push(6); // Inital value
+            });
+        
+            spidergraph(tagList, tagValues);
+           
+            // Dynamically Generate Form Controls
+            var form = $("form fieldset");
+            var controlGroup;
+        
+            $.each(pond.tag_ids, function(name, token){ 
+              controlGroup = $("" +
+                "<div class='control-group'>" +
+                  "<label class='control-label'>" +
+                    name + " <output>(6)</output>" +
+                  "</label>" +
+                  "<div class='controls'>" +
+                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                    "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+                  "</div>" +
+                "</div>");
+        
+              form.append(controlGroup);
+            });
+        
             fishpond.query({}, {});
+        
           });
         
           fishpond.loading(function(percent){
@@ -202,26 +171,39 @@
             $("#loading .bar").css({width: (percent * 100) + "%"});
           });
         
-          var tag_range,
-              tag_id,
-              tag_output;
-         
-          $('input[type=range]').change(function() {
-            tag_range = $(this).val();
-            tag_id = $(this).attr("id");
-            tag_output = $('label[for="'+tag_id+'"] output');
         
-            tag_output.html(tag_range);
+          function spidergraph(tagList, tagValues){   
+            $('#radar').spidergraph({
+                'fields': tagList,
+                'strokewidth': 2,
+                'handlewidth': 4,
+                'increments': 11,
+                'minrad': 0,
+                'gridcolor': 'rgba(20,20,20,1)'   
+            });
+            
+            $('#radar').spidergraph('resetdata');
+            
+            $('#radar').spidergraph('setactivedata', { 
+              'strokecolor': 'rgba(0, 41, 199,0.8)',
+              'fillcolor': 'rgba(10,77,255,0.6)',
+              'data': tagValues
+            });
         
-            fishpond.query({
-              quantitative: $("#quantitative").val(),
-              biological: $("#biological").val(),
-              pure: $("#pure").val(),
-              indoors: $("#indoors").val(),
-              dunno: $("#dunno").val()
-            },
-            {/* no filters, yet */});
-          });
+            $('#radar').bind('spiderdatachange', function( ev, data ) {
+              var tags = {};
+              var filters = {};
+              var new_value;
+        
+              $.each(data, function(index, value) { 
+                console.log(tagList[index] + ': ' + value); 
+        
+                tags[tagList[index]] = value;
+              });
+        
+              fishpond.query(tags, filters);
+            });
+          }
         };
       //]]>
     </script>

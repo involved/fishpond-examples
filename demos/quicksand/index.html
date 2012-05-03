@@ -21,7 +21,31 @@
         }
       /*]]>*/
     </style>
-    
+    <style type='text/css'>
+      /*<![CDATA[*/
+        h1 {
+          text-align: center;
+          }
+        
+        #results ul li .thumbnail{
+          min-height: 100px;
+          text-align: center;
+          position: relative;
+        }
+        
+          #results ul li .thumbnail .btn{
+            position: absolute;
+            bottom: 15px;
+            left: 30px;
+            display: block;
+          }
+        
+        .modal-body.loading{
+          background: url(/images/common/loading.gif) no-repeat center center;
+          min-height: 150px;
+        }
+      /*]]>*/
+    </style>
   </head>
   <body>
     <div class='navbar navbar-fixed-top'>
@@ -35,12 +59,15 @@
                 <b class='caret'></b>
               </a>
               <ul class='dropdown-menu'>
-                <li><a href="/demos/atom">atom</a></li>
-                <li><a href="/demos/basic">basic</a></li>
-                <li><a href="/demos/basic-html5">basic-html5</a></li>
-                <li><a href="/demos/flotr">flotr</a></li>
-                <li><a href="/demos/quicksand">quicksand</a></li>
-                <li><a href="/demos/scaffold">scaffold</a></li>
+                <li><a href="/fishpond-examples/demos/atom">atom</a></li>
+                <li><a href="/fishpond-examples/demos/basic-dynamic">basic-dynamic</a></li>
+                <li><a href="/fishpond-examples/demos/basic-html5">basic-html5</a></li>
+                <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
+                <li><a href="/fishpond-examples/demos/dial">dial</a></li>
+                <li><a href="/fishpond-examples/demos/flotr">flotr</a></li>
+                <li><a href="/fishpond-examples/demos/quicksand">quicksand</a></li>
+                <li><a href="/fishpond-examples/demos/scaffold">scaffold</a></li>
+                <li><a href="/fishpond-examples/demos/spider-graph">spider-graph</a></li>
               </ul>
             </li>
           </ul>
@@ -71,61 +98,41 @@
       <div class='page-header'>
         <h1>Quicksand Demo</h1>
       </div>
-      <div class='row form-and-results'>
-        <div class='span5'>
-          <div class='well'>
-            <h2>Tags</h2>
-            <form class='form-horizontal'>
-              <fieldset>
-                <div class='control-group'>
-                  <label class='control-label'>Quantitative (6)</label>
-                  <div class='controls'>
-                    <input data-slug='quantitative' id='query_tags_gwx' name='query[tags][gwx]' type='hidden' value='6' />
-                    <div class='slider span2' data-target='query[tags][gwx]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Biological (6)</label>
-                  <div class='controls'>
-                    <input data-slug='biological' id='query_tags_Ymp' name='query[tags][Ymp]' type='hidden' value='6' />
-                    <div class='slider span2' data-target='query[tags][Ymp]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Pure (6)</label>
-                  <div class='controls'>
-                    <input data-slug='pure' id='query_tags_WxI' name='query[tags][WxI]' type='hidden' value='6' />
-                    <div class='slider span2' data-target='query[tags][WxI]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Indoors (6)</label>
-                  <div class='controls'>
-                    <input data-slug='indoors' id='query_tags_CjC' name='query[tags][CjC]' type='hidden' value='6' />
-                    <div class='slider span2' data-target='query[tags][CjC]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Dunno (6)</label>
-                  <div class='controls'>
-                    <input data-slug='dunno' id='query_tags_2TE' name='query[tags][2TE]' type='hidden' value='6' />
-                    <div class='slider span2' data-target='query[tags][2TE]'></div>
-                  </div>
-                </div>
-              </fieldset>
-            </form>
-            <h2>Filters</h2>
-            <p>
-              <em>No filters defined.</em>
-            </p>
+      <section id='query'>
+        <div class='row'>
+          <div class='span5'>
+            <div class='well'>
+              <h2>Tags</h2>
+              <form class='form-horizontal' id='fishpond'>
+                <fieldset>
+                </fieldset>
+              </form>
+              <h2>Filters</h2>
+              <p>
+                <em>No filters defined.</em>
+              </p>
+            </div>
+          </div>
+          <div class='span6 offset1'>
+            <h2>Results</h2>
+            <div id='results'>
+              <ul class='thumbnails'></ul>
+            </div>
           </div>
         </div>
-        <div class='span6 offset1' id='results'>
-          <h2>Results</h2>
-          <ul class='thumbnails'></ul>
+      </section>
+      <div class='modal hide' id='fishInfo'>
+        <div class='modal-header'>
+          <button class='close' data-dismiss='modal'>×</button>
+          <h3>Loading</h3>
+        </div>
+        <div class='modal-body loading'>
+          <!-- / Empty -->
+        </div>
+        <div class='modal-footer'>
+          <a class='btn' data-dismiss='modal' href='#'>Close</a>
         </div>
       </div>
-      <script src="https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js" type="text/javascript"></script>
     </div>
     <div class='container'>
       <hr />
@@ -136,48 +143,148 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js" type="text/javascript"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
+    <script src="https://raw.github.com/yeco/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
+    <script src="https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js" type="text/javascript"></script>
     <script type='text/javascript'>
       //<![CDATA[
-        $('.container.hide').removeClass("hide"); // Temporary fix whilst Data can't be accessed.
-        
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+          var container = $("section#query");
+        
+          fishpond.resultsUpdated(function(results){
+            //console.log(results);
+        
+            var source = $("#results ul", container);
+            var list = $("<ul></ul>");
+            var listItem;
+        
+            $.each(results, function(position, result){ 
+              listItem = $("" +
+                "<li class='span2' data-id='"+result.fish.id+"'>" +
+                  "<div class='thumbnail'>" +
+                    "<strong>" + result.fish.title + "</strong><br />" + result.score + "<br />" +
+                    "<a class='btn' href='#fishInfo'>More Info</a>" +
+                  "</div>" +
+                "</li>");
+        
+              list.append(listItem);
+            });
+        
+            if(source.find("li").length == 0) {
+              source.append(list.find("li"));
+              modalInit();
+            } else {
+              source.quicksand(list.find("li"), {
+                // Do nothing
+              }, function() {
+                modalInit();
+              });
+            }
+         });
         
           fishpond.ready(function(pond){
             $("#loading").fadeOut(0);
             $("#demo").fadeIn(400);
+            $("#demo h1").append(' "' + pond.name + '"');       
+        
+            // Dynamically Generate Form Controls        
+            var form = $("form fieldset");
+            var controlGroup;
+        
+            $.each(pond.tag_ids, function(name, token){ 
+              controlGroup = $("" +
+                "<div class='control-group'>" +
+                  "<label class='control-label'>" +
+                    name + " <output>(10)</output>" +
+                  "</label>" +
+                  "<div class='controls'>" +
+                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                    "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+                  "</div>" +
+                "</div>");
+        
+              form.append(controlGroup);
+            });
+        
+            // jQuery UI Slider
+            $(".slider").slider({
+              value: 10,
+              min: 0,
+              max: 20,
+              step: 0.1,
+              slide: function(e, ui){
+                var output = $(this).parents('.control-group').find('output');
+                var hiddenField = $("input[name='" + $(this).data('target') + "']");
+                var value = Math.round(Math.abs(12 - ui['value']));
+        
+                if(value.toString() != hiddenField.val().toString()){
+                  hiddenField.val(value);
+                  output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+        
+                  var tags = {};
+                  var filters = {};
+                  $("form#fishpond input").each(function(){
+                    tags[$(this).data('slug')] = $(this).val();
+                  });
+                  fishpond.query(tags, filters);
+                }
+              }
+            });
+        
+            fishpond.query({}, {});
+        
           });
         
           fishpond.loading(function(percent){
-            console.log("Demo loading " + (percent * 100) + "%");
+            $("#loading .progress").removeClass("progress-striped");
+            $("#loading .bar").css({width: (percent * 100) + "%"});
           });
         
-        };
         
+          //Functions
         
-        $(".slider").slider({
-          value: 6,
-          min: 1,
-          max: 11,
-          step: 0.1,
-          slide: function(e, ui){
-            var label = $(this).parents('.control-group').find('label');
-            var hiddenField = $("input[name='" + $(this).data('target') + "']");
-            var value = Math.round(Math.abs(12 - ui['value']));
+          function modalInit(){
+            var modalGroup;
         
-            if(value.toString() != hiddenField.val().toString()){
-              hiddenField.val(value);
-              label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
+            $('#results a').on('click', function(e){
+              e.preventDefault();
+              console.log("[Fish] Clicked");
         
-              var tags = {};
-              var filters = {};
-              $("form input").each(function(){
-                tags[$(this).data('slug')] = $(this).val();
+              fishpond.get_fish($(this).closest('li').attr('data-id'), function(data){
+                console.log("[Fish] Metadata receieved:");
+                console.log(data);
+              
+                modalGroup = $("" +
+                  "<div class='modal-header'>" +
+                    "<button class='close' data-dismiss='modal'>×</button>" +
+                    "<h3>" + data.title + "</h3>" +
+                  "</div>" +
+                  "<div class='modal-body'>" +
+                    "<div class='row'>" + 
+                      "<div class='span2'>" + 
+                        "<img src='http://placehold.it/100x100' alt='" + data.title + "' />" +
+                      "</div>" + 
+                      "<div class='span4'>" + 
+                        "<p>" + data.description + "</p>" +
+                        "<a href='" + data.url + "' target='_blank'>Find out more</a>" +
+                      "</div>" +
+                    "</div>" +
+                  "</div>" +
+                  "<div class='modal-footer'>" +
+                    "<a href='#' class='btn' data-dismiss='modal'>Close</a>" +
+                  "</div>");
+        
+                $('#fishInfo').modal('show');
               });
-              fishpond.query(tags, filters);
-            }
+        
+              $('#fishInfo').on('shown', function(){
+                $(this).html(modalGroup);
+              });
+            });
           }
-        });
+        
+        };
       //]]>
     </script>
     <script type='text/javascript'>
