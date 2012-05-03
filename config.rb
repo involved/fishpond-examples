@@ -65,4 +65,18 @@ configure :build do
   
   # Or use a different image path
   # set :http_path, "/Content/images/"
+  #
+  helpers do
+    def link_to(label, link, options = {})
+      if link =~ /^http/
+        super(label, link, options)
+      else
+        super(label, File.join("/fishpond-examples", link), options)
+      end
+    end
+
+    def asset_url(path, prefix = nil)
+      File.join "/fishdpond-examples", super(path, prefix)
+    end
+  end
 end
