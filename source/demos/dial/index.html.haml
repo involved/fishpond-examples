@@ -61,7 +61,7 @@
         var positionCount = 0;
         $.each(pond.tag_ids, function(name, token){
           tagsList.push([ positionCount, name ]);
-          resultsList.push([ positionCount, 6 ]);
+          resultsList.push([ positionCount, 10 ]);
           positionCount++;
         });
        
@@ -81,10 +81,10 @@
 
           YUI().use('dial', function(Y) {
             var dial = new Y.Dial({
-                min:1,
-                max:11,
-                stepsPerRevolution:11,
-                value: 6,
+                min:0,
+                max:20,
+                stepsPerRevolution:20,
+                value: 10,
                 strings:{label:name, resetStr: 'Reset', tooltipHandle: 'Drag to set'},
                 after : {
                 }

@@ -18,6 +18,9 @@
     top: 200px;
     height: 500px;
   }
+  #results{
+    min-height: 550px;
+  }
 
 
 - content_for :javascript do
@@ -54,7 +57,7 @@
         // Create Array for Spidergraph
         $.each(pond.tag_ids, function(name, token){
           tagList.push(name);
-          tagValues.push(6); // Inital value
+          tagValues.push(10); // Inital value
         });
 
         spidergraph(tagList, tagValues);
@@ -70,7 +73,7 @@
                 name + " <output>(6)</output>" +
               "</label>" +
               "<div class='controls'>" +
-                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='10'>" +
                 "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
               "</div>" +
             "</div>");
@@ -93,7 +96,7 @@
             'fields': tagList,
             'strokewidth': 2,
             'handlewidth': 4,
-            'increments': 11,
+            'increments': 20,
             'minrad': 0,
             'gridcolor': 'rgba(20,20,20,1)'   
         });
