@@ -39,8 +39,8 @@ task :publish do
   pb = ProgressBar.new(commands.count, :bar, :percentage, :eta)
 
   commands.each do |command|
-    puts command
     stdin, stdout, stderr = Open3.popen3(command)
     pb.increment!
+    stdin.flush
   end
 end
