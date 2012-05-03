@@ -41,6 +41,6 @@ task :publish do
   commands.each do |command|
     stdin, stdout, stderr = Open3.popen3(command)
     pb.increment!
-    stdout.flush
+    $stdout.flush
   end
 end
