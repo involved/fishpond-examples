@@ -83,7 +83,7 @@
         slide: function(e, ui){
           var label = $(this).parents('.control-group').find('label');
           var hiddenField = $("input[name='" + $(this).data('target') + "']");
-          var value = Math.round(Math.abs(12 - ui['value']));
+          var value = ui['value'];
 
           if(value.toString() != hiddenField.val().toString()){
             hiddenField.val(value);
