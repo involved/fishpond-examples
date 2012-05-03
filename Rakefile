@@ -1,5 +1,7 @@
 require 'rake'
 require 'progress_bar'
+require 'open3'
+
 
 task :publish do
   puts "+----------------------------------+"
@@ -37,7 +39,7 @@ task :publish do
   pb = ProgressBar.new(commands.count, :bar, :percentage, :eta)
 
   commands.each do |command|
-    system("#{command} > /dev/null")
+    stdin, stdout, stderr = Open3.popen3(command)
     pb.increment!
   end
 end
