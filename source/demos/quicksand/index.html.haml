@@ -20,10 +20,10 @@
         %ul.thumbnails
 
 
-#fishInfo.modal.hide
+#modalTemplate.modal.fade.hide
   .modal-header
     %button.close{"data-dismiss" => "modal"} ×
-    %h3 Loading
+    %h3 
   .modal-body.loading
     // Empty
   .modal-footer
@@ -71,10 +71,9 @@
         $.each(results, function(position, result){ 
           listItem = $("" +
             "<li class='span2' data-id='"+result.fish.id+"'>" +
-              "<div class='thumbnail'>" +
+              "<a class='thumbnail' href='#fishInfo'>" +
                 "<strong>" + result.fish.title + "</strong><br />" + result.score + "<br />" +
-                "<a class='btn' href='#fishInfo'>More Info</a>" +
-              "</div>" +
+              "</a>" +
             "</li>");
 
           list.append(listItem);
@@ -121,11 +120,11 @@
           value: 10,
           min: 0,
           max: 20,
-          step: 0.1,
+          step: 1,
           slide: function(e, ui){
             var output = $(this).parents('.control-group').find('output');
             var hiddenField = $("input[name='" + $(this).data('target') + "']");
-            var value = Math.round(Math.abs(12 - ui['value']));
+            var value = ui['value'];
 
             if(value.toString() != hiddenField.val().toString()){
               hiddenField.val(value);
@@ -152,15 +151,20 @@
 
 
       //Functions
-
       function modalInit(){
-        var modalGroup;
+        var modalGroup,
+            fishModal,
+            fishID;
 
         $('#results a').on('click', function(e){
           e.preventDefault();
           console.log("[Fish] Clicked");
+          fishID = $(this).closest('li').attr('data-id');
+          fishModal = $('#modalTemplate').clone().attr("id",fishID);
 
-          fishpond.get_fish($(this).closest('li').attr('data-id'), function(data){
+          fishModal.modal('show');
+
+          fishpond.get_fish(fishID, function(data){
             console.log("[Fish] Metadata receieved:");
             console.log(data);
           
@@ -184,11 +188,9 @@
                 "<a href='#' class='btn' data-dismiss='modal'>Close</a>" +
               "</div>");
 
-            $('#fishInfo').modal('show');
-          });
-
-          $('#fishInfo').on('shown', function(){
-            $(this).html(modalGroup);
+            if (fishModal.attr("id") == data.id){
+              fishModal.html(modalGroup);
+            }
           });
         });
       }
