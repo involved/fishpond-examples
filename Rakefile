@@ -37,7 +37,7 @@ task :publish do
   pb = ProgressBar.new(commands.count, :bar, :percentage, :eta)
 
   commands.each do |command|
-    system("command > /dev/null")
+    system("#{command} > /dev/null")
     pb.increment!
   end
 end
