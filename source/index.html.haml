@@ -1,3 +1,60 @@
-%ul
-  - @demos.each do |demo|
-    %li= link_to demo, demo_path(demo)
+#loading.container
+  .span4.offset4
+    .progress.progress-striped.active
+      .bar{:style => "width: 100%"}
+
+%section#query
+  .row
+    .span5
+      .well
+        %h2 Tags
+        %form#fishpond.form-horizontal
+          %fieldset
+            -# Sliders Dynamically added
+
+        %h2 Filters
+        %p
+          %em No filters defined.
+
+    .span6.offset1
+      %h2 Results
+      #results
+        %ul.thumbnails
+
+
+#modalTemplate.modal.fade.hide
+  .modal-body.loading
+    // Empty
+
+- content_for :css do
+  :css
+    .hidden{
+      display: none;
+    }
+
+    h1 {
+      text-align: center;
+      }
+
+    #results ul li .thumbnail{
+      min-height: 100px;
+      text-align: center;
+      position: relative;
+    }
+
+      #results ul li .thumbnail .btn{
+        position: absolute;
+        bottom: 15px;
+        left: 30px;
+        display: block;
+      }
+
+    .modal-body.loading{
+      background: url(/images/common/loading.gif) no-repeat center center;
+      min-height: 150px;
+    }
+   
+
+- content_for :javascript do
+  = javascript_include_tag "https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js"
+  = javascript_include_tag "/javascripts/application"
