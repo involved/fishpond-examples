@@ -42,12 +42,12 @@ Application = {
 
         if(source.find("li").length == 0) {
           source.append(list.find("li"));
-          Application.query.modal(fishpond);
+          Application.ui.modals(fishpond);
         } else {
           source.quicksand(list.find("li"), {
             // Do nothing
           }, function() {
-            Application.query.modal(fishpond);
+            Application.ui.modals(fishpond);
           });
         }
       });
@@ -77,45 +77,50 @@ Application = {
           form.append(controlGroup);
         });
 
-        // jQuery UI Slider
-        $(".slider").slider({
-          value: 10,
-          min: 0,
-          max: 20,
-          step: 1,
-          slide: function(e, ui){
-            var output = $(this).parents('.control-group').find('output');
-            var hiddenField = $("input[name='" + $(this).data('target') + "']");
-            var value = ui['value'];
-
-            if(value.toString() != hiddenField.val().toString()){
-              hiddenField.val(value);
-              output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
-
-              var tags = {};
-              var filters = {};
-              $("form#fishpond input").each(function(){
-                tags[$(this).data('slug')] = $(this).val();
-              });
-              fishpond.query(tags, filters);
-            }
-          }
-        });
+        Application.ui.sliders(fishpond);
 
         fishpond.query({}, {});
-
       });
-
 
       //------------------------------------------------------------------------
       fishpond.loading(function(percent){
         $("#loading .progress").removeClass("progress-striped");
         $("#loading .bar").css({width: (percent * 100) + "%"});
       });
+    }
+  },
+
+  //////////////////////////////////////////////////////////////////////////
+  ui: {
+    sliders: function (fishpond) {
+      // jQuery UI Slider
+      $(".slider").slider({
+        value: 10,
+        min: 0,
+        max: 20,
+        step: 1,
+        slide: function(e, ui){
+          var output = $(this).parents('.control-group').find('output');
+          var hiddenField = $("input[name='" + $(this).data('target') + "']");
+          var value = ui['value'];
+
+          if(value.toString() != hiddenField.val().toString()){
+            hiddenField.val(value);
+            output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+
+            var tags = {};
+            var filters = {};
+            $("form#fishpond input").each(function(){
+              tags[$(this).data('slug')] = $(this).val();
+            });
+            fishpond.query(tags, filters);
+          }
+        }
+      });
     },
 
     //------------------------------------------------------------------------
-    modal: function (fishpond) {
+    modals: function (fishpond) {
       var modalGroup,
           fishModal,
           fishID;
@@ -163,7 +168,6 @@ Application = {
         });
       });
     }
-
     //------------------------------------------------------------------------
   }
 };
