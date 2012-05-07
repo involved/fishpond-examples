@@ -1,86 +1,47 @@
 var Application = Application || {};
 
 Application = {
-  init: function () {
-    Application.query.init();
-  },
-
-  //////////////////////////////////////////////////////////////////////////
-  query: {
+  Query: {
     init: function () {
       var apiKey = "6OqHqMf609P6tSrxuj2ANuj3S6fAUphnjyOcGWdtD";
       var pondToken = "sC8IZQ";
       var options = { debug: true };
       var fishpond = new Fishpond(apiKey, options);
 
-      Application.query.setup(fishpond);
+      Application.Query.setup(fishpond);
       fishpond.init(pondToken);
     },
 
     //------------------------------------------------------------------------
     setup: function (fishpond) {
-      var container = $("section#query");
 
-      //------------------------------------------------------------------------
       fishpond.resultsUpdated(function(results){
-        Application.query.listResults(results);
-
-        // Setup Quicksilver
-        if(source.find("li").length == 0) {
-          source.append(list.find("li"));
-          Application.ui.modals(fishpond);
-        } else {
-          source.quicksand(list.find("li"), {
-            // Do nothing
-          }, function() {
-            Application.ui.modals(fishpond);
-          });
-        }
+        var source = $("#query #results ul");
+        Application.Results.format(results, source);
+        Application.Results.filter(source);
       });
 
-      //------------------------------------------------------------------------
       fishpond.ready(function(pond){
         $("#loading").fadeOut(0);
         $("#demo").fadeIn(400);
         $("#demo h1").append(' "' + pond.name + '"');       
 
-        Application.query.createForm(pond);
-        Application.ui.sliders(fishpond);
+        Application.Search.generateForm(pond);
+        Application.Search.initSliders(fishpond);
         fishpond.query({}, {});
       });
 
-      //------------------------------------------------------------------------
       fishpond.loading(function(percent){
         $("#loading .progress").removeClass("progress-striped");
         $("#loading .bar").css({width: (percent * 100) + "%"});
       });
     },
+   
+  },
 
-    //------------------------------------------------------------------------
-    createForm: function (pond) {
-      // Dynamically Generate Form Controls        
-      var form = $("form fieldset");
-      var controlGroup;
-
-      $.each(pond.tag_ids, function(name, token){ 
-        controlGroup = $("" +
-          "<div class='control-group'>" +
-            "<label class='control-label'>" +
-              name + " <output>(10)</output>" +
-            "</label>" +
-            "<div class='controls'>" +
-              "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
-              "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
-            "</div>" +
-          "</div>");
-
-        form.append(controlGroup);
-      });
-    },
-
-    //------------------------------------------------------------------------
-    listResults: function (results) {
-      var source = $("#results ul", container);
+  //////////////////////////////////////////////////////////////////////////
+  Results: {
+    format: function (results, source) {
       var list = $("<ul></ul>");
       var listItem;
 
@@ -94,39 +55,22 @@ Application = {
 
         list.append(listItem);
       });
-    }
-  },
-
-  //////////////////////////////////////////////////////////////////////////
-  ui: {
-    sliders: function (fishpond) {
-      // jQuery UI Slider
-      $(".slider").slider({
-        value: 10,
-        min: 0,
-        max: 20,
-        step: 1,
-        slide: function(e, ui){
-          var output = $(this).parents('.control-group').find('output');
-          var hiddenField = $("input[name='" + $(this).data('target') + "']");
-          var value = ui['value'];
-
-          if(value.toString() != hiddenField.val().toString()){
-            hiddenField.val(value);
-            output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
-
-            var tags = {};
-            var filters = {};
-            $("form#fishpond input").each(function(){
-              tags[$(this).data('slug')] = $(this).val();
-            });
-            fishpond.query(tags, filters);
-          }
-        }
-      });
     },
 
-    //------------------------------------------------------------------------
+    filter: function (source) {
+      // Quicksilver
+      if(source.find("li").length == 0) {
+        source.append(list.find("li"));
+        Application.Results.modals(fishpond);
+      } else {
+        source.quicksand(list.find("li"), {
+          // Do nothing
+        }, function() {
+          Application.Results.modals(fishpond);
+        });
+      }
+    },
+
     modals: function (fishpond) {
       var modalGroup,
           fishModal,
@@ -175,8 +119,58 @@ Application = {
         });
       });
     }
-    //------------------------------------------------------------------------
+  },
+
+  //////////////////////////////////////////////////////////////////////////
+  Search: {
+    generateForm: function (pond) {
+      // Dynamically Generate Form Controls        
+      var form = $("form fieldset");
+      var controlGroup;
+
+      $.each(pond.tag_ids, function(name, token){ 
+        controlGroup = $("" +
+          "<div class='control-group'>" +
+            "<label class='control-label'>" +
+              name + " <output>(10)</output>" +
+            "</label>" +
+            "<div class='controls'>" +
+              "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+              "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+            "</div>" +
+          "</div>");
+
+        form.append(controlGroup);
+      });
+    },
+
+    sliders: function (fishpond) {
+      // jQuery UI Slider
+      $(".slider").slider({
+        value: 10,
+        min: 0,
+        max: 20,
+        step: 1,
+        slide: function(e, ui){
+          var output = $(this).parents('.control-group').find('output');
+          var hiddenField = $("input[name='" + $(this).data('target') + "']");
+          var value = ui['value'];
+
+          if(value.toString() != hiddenField.val().toString()){
+            hiddenField.val(value);
+            output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+
+            var tags = {};
+            var filters = {};
+            $("form#fishpond input").each(function(){
+              tags[$(this).data('slug')] = $(this).val();
+            });
+            fishpond.query(tags, filters);
+          }
+        }
+      });
+    }
   }
 };
 
-Application.init();
+Application.Query.init();
