@@ -23,23 +23,9 @@ Application = {
 
       //------------------------------------------------------------------------
       fishpond.resultsUpdated(function(results){
-        //console.log(results);
+        Application.query.listResults(results);
 
-        var source = $("#results ul", container);
-        var list = $("<ul></ul>");
-        var listItem;
-
-        $.each(results, function(position, result){ 
-          listItem = $("" +
-            "<li class='span2' data-id='"+result.fish.id+"'>" +
-              "<a class='thumbnail' href='#fishInfo'>" +
-                "<strong>" + result.fish.title + "</strong><br />" + result.score + "<br />" +
-              "</a>" +
-            "</li>");
-
-          list.append(listItem);
-        });
-
+        // Setup Quicksilver
         if(source.find("li").length == 0) {
           source.append(list.find("li"));
           Application.ui.modals(fishpond);
@@ -58,27 +44,8 @@ Application = {
         $("#demo").fadeIn(400);
         $("#demo h1").append(' "' + pond.name + '"');       
 
-        // Dynamically Generate Form Controls        
-        var form = $("form fieldset");
-        var controlGroup;
-
-        $.each(pond.tag_ids, function(name, token){ 
-          controlGroup = $("" +
-            "<div class='control-group'>" +
-              "<label class='control-label'>" +
-                name + " <output>(10)</output>" +
-              "</label>" +
-              "<div class='controls'>" +
-                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
-                "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
-              "</div>" +
-            "</div>");
-
-          form.append(controlGroup);
-        });
-
+        Application.query.createForm(pond);
         Application.ui.sliders(fishpond);
-
         fishpond.query({}, {});
       });
 
@@ -86,6 +53,46 @@ Application = {
       fishpond.loading(function(percent){
         $("#loading .progress").removeClass("progress-striped");
         $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+    },
+
+    //------------------------------------------------------------------------
+    createForm: function (pond) {
+      // Dynamically Generate Form Controls        
+      var form = $("form fieldset");
+      var controlGroup;
+
+      $.each(pond.tag_ids, function(name, token){ 
+        controlGroup = $("" +
+          "<div class='control-group'>" +
+            "<label class='control-label'>" +
+              name + " <output>(10)</output>" +
+            "</label>" +
+            "<div class='controls'>" +
+              "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+              "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+            "</div>" +
+          "</div>");
+
+        form.append(controlGroup);
+      });
+    },
+
+    //------------------------------------------------------------------------
+    listResults: function (results) {
+      var source = $("#results ul", container);
+      var list = $("<ul></ul>");
+      var listItem;
+
+      $.each(results, function(position, result){ 
+        listItem = $("" +
+          "<li class='span2' data-id='"+result.fish.id+"'>" +
+            "<a class='thumbnail' href='#fishInfo'>" +
+              "<strong>" + result.fish.title + "</strong><br />" + result.score + "<br />" +
+            "</a>" +
+          "</li>");
+
+        list.append(listItem);
       });
     }
   },
