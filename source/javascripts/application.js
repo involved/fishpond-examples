@@ -14,63 +14,78 @@ Application = {
 
     //------------------------------------------------------------------------
     setup: function (fishpond) {
-
       fishpond.resultsUpdated(function(results){
-        var source = $("#query #results ul");
-        Application.Results.format(results, source);
-        Application.Results.filter(source);
+        var source = $("#results ul", "#query");
+        var list = $("<ul></ul>");
+        var listItem;
+
+        $.each(results, function(position, result){ 
+          listItem = $("" +
+            "<li class='span2' data-id='"+result.fish.id+"'>" +
+              "<a class='thumbnail' href='#fishInfo'>" +
+                "<strong>" + result.fish.title + "</strong><br />" + result.score + "<br />" +
+              "</a>" +
+            "</li>");
+
+          list.append(listItem);
+
+          // Quicksilver
+          if(source.find("li").length == 0) {
+            source.append(list.find("li"));
+            Application.UI.modals(fishpond);
+          } else {
+            source.quicksand(list.find("li"), {
+              // Do nothing
+            }, function() {
+              Application.UI.modals(fishpond);
+            });
+          }
+        });
       });
 
+      //------------------------------------------------------------------------
       fishpond.ready(function(pond){
         $("#loading").fadeOut(0);
         $("#demo").fadeIn(400);
         $("#demo h1").append(' "' + pond.name + '"');       
 
-        Application.Search.generateForm(pond);
-        Application.Search.initSliders(fishpond);
+        var form = $("form fieldset");
+        var tagsControlGroup;
+        var filtersControlGroup;
+
+        $.each(pond.tag_ids, function(name, token){ 
+          controlGroup = $("" +
+            "<div class='control-group'>" +
+              "<label class='control-label'>" +
+                name + " <output>(10)</output>" +
+              "</label>" +
+              "<div class='controls'>" +
+                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+              "</div>" +
+            "</div>");
+          form.append(controlGroup);
+        });
+
+
+        $.each(pond.filters, function(index, token){
+          console.error(token);
+        });
+
+        Application.UI.sliders(fishpond);
         fishpond.query({}, {});
       });
 
+      //------------------------------------------------------------------------
       fishpond.loading(function(percent){
         $("#loading .progress").removeClass("progress-striped");
         $("#loading .bar").css({width: (percent * 100) + "%"});
       });
-    },
-   
+    }   
   },
 
   //////////////////////////////////////////////////////////////////////////
-  Results: {
-    format: function (results, source) {
-      var list = $("<ul></ul>");
-      var listItem;
-
-      $.each(results, function(position, result){ 
-        listItem = $("" +
-          "<li class='span2' data-id='"+result.fish.id+"'>" +
-            "<a class='thumbnail' href='#fishInfo'>" +
-              "<strong>" + result.fish.title + "</strong><br />" + result.score + "<br />" +
-            "</a>" +
-          "</li>");
-
-        list.append(listItem);
-      });
-    },
-
-    filter: function (source) {
-      // Quicksilver
-      if(source.find("li").length == 0) {
-        source.append(list.find("li"));
-        Application.Results.modals(fishpond);
-      } else {
-        source.quicksand(list.find("li"), {
-          // Do nothing
-        }, function() {
-          Application.Results.modals(fishpond);
-        });
-      }
-    },
-
+  UI: {
     modals: function (fishpond) {
       var modalGroup,
           fishModal,
@@ -117,30 +132,6 @@ Application = {
             fishModal.html(modalGroup);
           }
         });
-      });
-    }
-  },
-
-  //////////////////////////////////////////////////////////////////////////
-  Search: {
-    generateForm: function (pond) {
-      // Dynamically Generate Form Controls        
-      var form = $("form fieldset");
-      var controlGroup;
-
-      $.each(pond.tag_ids, function(name, token){ 
-        controlGroup = $("" +
-          "<div class='control-group'>" +
-            "<label class='control-label'>" +
-              name + " <output>(10)</output>" +
-            "</label>" +
-            "<div class='controls'>" +
-              "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
-              "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
-            "</div>" +
-          "</div>");
-
-        form.append(controlGroup);
       });
     },
 
