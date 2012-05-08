@@ -67,26 +67,42 @@ Application = {
         var source = $("#results ul", "#query");
         var list = $("<ul></ul>");
         var listItem;
+        var fishID;
+
+        // Check to see if Fish has Metadata Cached
+          function updateTemplate(fishID, metadata){
+          var fishListItem = $("#results ul").find("[data-id='" + fishID + "'] .thumbnail");
+          var updatedListItem = $("" +
+            "<a class='btn btn-primary' href='" + metadata.url + "'>View Demo</a>" +
+            "<a class='btn' href='#fishInfo'>More Info</a>");
+
+          fishListItem.find(".details").html(updatedListItem);
+          fishListItem.removeClass("loading");
+        }
 
         //------------------------------------------------------------------------
         $.each(results, function(position, result){ 
-          var demoPath;
+          fishID = result.fish.id;
 
-          fishpond.get_fish(result.fish.id, function(data){
-            demoPath = data.url;
-            
-          });
-          console.log("demo path - " + demoPath);
+          // Create empty Fish
           listItem = $("" +
-            "<li class='span2' data-id='"+result.fish.id+"'>" +
-              "<div class='thumbnail'>" +
-                "<strong>" + result.fish.title + "</strong><br />" + result.score + "<br />" +
-                "<a class='btn btn-primary' href='" + demoPath + "'>View Demo</a>" +
-                "<a class='btn' href='#fishInfo'>More Info</a>" +
+            "<li class='span2' data-id='"+fishID+"'>" +
+              "<div class='thumbnail loading'>" +
+                "<strong>" + result.fish.title + "</strong>" +
+                "<div class='details'></div>" +
               "</div>" +
             "</li>");
 
+          // Add empty fish to results
           list.append(listItem);
+
+          if (result.fish.metadata.url){
+            updateTemplate(fishID, result.fish.metadata);
+          } else {
+            fishpond.get_fish(fishID, function(data){
+              updateTemplate(fishID, data); 
+            });
+          }
 
           // Quicksilver
           if(source.find("li").length == 0) {
@@ -100,6 +116,7 @@ Application = {
             });
           }
         });
+
       });
     }   
   },
