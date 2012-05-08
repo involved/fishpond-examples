@@ -14,17 +14,76 @@ Application = {
 
     //------------------------------------------------------------------------
     setup: function (fishpond) {
+      //------------------------------------------------------------------------
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+      //------------------------------------------------------------------------
+      fishpond.ready(function(pond){
+        // Loading transitions
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');       
+
+        // Generate form controls
+        var formTags = $("fieldset.tags");
+        var formFilters = $("fieldset.filters .control-group");
+        var tagControlGroup,
+            filterControl;
+
+        $.each(pond.tag_ids, function(name, token){ 
+          tagControlGroup = $("" +
+            "<div class='control-group'>" +
+              "<label class='control-label'>" +
+                name + " <output>(10)</output>" +
+              "</label>" +
+              "<div class='controls'>" +
+                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+              "</div>" +
+            "</div>");
+          formTags.append(tagControlGroup);
+        });
+
+        $.each(pond.filters, function(index, token){
+          filterControl = $("" +
+            "<div class='controls'>" +
+              "<label class='checkbox'>" +
+                "<input id='query_filter_"+token.id+"' data-slug='"+token.slug+"' name='query[filters]["+token.id+"]' type='checkbox' value='0'>" +
+                token.name + 
+              "</label>" +
+            "</div>");
+          formFilters.append(filterControl);
+        });
+
+        Application.UI.sliders(fishpond);
+        fishpond.query({}, {});
+      });
+
+      //------------------------------------------------------------------------
       fishpond.resultsUpdated(function(results){
         var source = $("#results ul", "#query");
         var list = $("<ul></ul>");
         var listItem;
 
+        //------------------------------------------------------------------------
         $.each(results, function(position, result){ 
+          var demoPath;
+
+          fishpond.get_fish(result.fish.id, function(data){
+            demoPath = data.url;
+            
+          });
+          console.log("demo path - " + demoPath);
           listItem = $("" +
             "<li class='span2' data-id='"+result.fish.id+"'>" +
-              "<a class='thumbnail' href='#fishInfo'>" +
+              "<div class='thumbnail'>" +
                 "<strong>" + result.fish.title + "</strong><br />" + result.score + "<br />" +
-              "</a>" +
+                "<a class='btn btn-primary' href='" + demoPath + "'>View Demo</a>" +
+                "<a class='btn' href='#fishInfo'>More Info</a>" +
+              "</div>" +
             "</li>");
 
           list.append(listItem);
@@ -41,45 +100,6 @@ Application = {
             });
           }
         });
-      });
-
-      //------------------------------------------------------------------------
-      fishpond.ready(function(pond){
-        $("#loading").fadeOut(0);
-        $("#demo").fadeIn(400);
-        $("#demo h1").append(' "' + pond.name + '"');       
-
-        var form = $("form fieldset");
-        var tagsControlGroup;
-        var filtersControlGroup;
-
-        $.each(pond.tag_ids, function(name, token){ 
-          controlGroup = $("" +
-            "<div class='control-group'>" +
-              "<label class='control-label'>" +
-                name + " <output>(10)</output>" +
-              "</label>" +
-              "<div class='controls'>" +
-                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
-                "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
-              "</div>" +
-            "</div>");
-          form.append(controlGroup);
-        });
-
-
-        $.each(pond.filters, function(index, token){
-          console.error(token);
-        });
-
-        Application.UI.sliders(fishpond);
-        fishpond.query({}, {});
-      });
-
-      //------------------------------------------------------------------------
-      fishpond.loading(function(percent){
-        $("#loading .progress").removeClass("progress-striped");
-        $("#loading .bar").css({width: (percent * 100) + "%"});
       });
     }   
   },

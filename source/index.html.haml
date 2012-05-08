@@ -9,15 +9,17 @@
 %section#query
   .row
     .span5
-      .well
+      %form#fishpond.form-horizontal.well
         %h2 Tags
-        %form#fishpond.form-horizontal
-          %fieldset
-            -# Sliders Dynamically added
+        %fieldset.tags
+          -# Sliders Dynamically added
 
         %h2 Filters
-        %p
-          %em No filters defined.
+        %fieldset.filters
+          .control-group
+            .control-label
+              Filters
+
 
     .span6.offset1
       #results
@@ -45,10 +47,7 @@
     }
 
       #results ul li .thumbnail .btn{
-        position: absolute;
-        bottom: 15px;
-        left: 30px;
-        display: block;
+
       }
 
     .modal-body.loading{
