@@ -1,0 +1,129 @@
+.page-header
+  %h1 jQuery Knob Demo
+  %br
+  %p
+    Powered by: 
+    = link_to "jQuery Knob", "http://anthonyterrien.com/knob/", :target => "_blank"
+    by
+    = link_to "aterrien", "https://github.com/aterrien", :target => "_blank"
+.row
+  .span12
+    .well
+      %h2 Tags
+      #dials.row
+      %br
+      %br
+      %h2 Filters
+      %p
+        %em No filters defined.
+
+.row
+  #results.span12
+    %h2 Results
+    %ul.thumbnails.results
+    
+
+-# content_for :css do
+:css
+
+  #dials h3{
+    text-align: center;
+  }
+
+  #dials div{
+    float: left;
+    min-height: 250px;
+  }
+       
+    #dials input{
+      height: auto;
+      border: none;
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
+      box-shadow: none;
+    }
+
+
+- content_for :javascript do
+  = javascript_include_tag "https://raw.github.com/aterrien/jQuery-Knob/master/js/jquery.knob-1.0.1.js"
+
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+      // Flotr Array Variables
+      var resultsList = [];
+      var tags = [];
+      var tagsList = [];
+      
+      fishpond.resultsUpdated(function(results){
+        console.log(results);
+
+        $(".results li").remove(); // Clear old results
+
+        for(var i = 0; i < results.length; i++){
+
+          var li = $("<li></li>");
+          var thumbnail = $("<div></div>");
+          thumbnail.html(results[i].fish.title);
+          li.append(thumbnail);
+          $(".results").append(li);
+        }
+      });
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');       
+        
+        // Create Array for Radar
+        var positionCount = 0;
+        $.each(pond.tag_ids, function(name, token){
+          tagsList.push([ positionCount, name ]);
+          resultsList.push([ positionCount, 10 ]);
+          positionCount++;
+        });
+       
+
+        // Dynamically Generate Form Controls
+        var form = $("#dials");
+        var controlGroup;
+
+        
+
+        $.each(pond.tag_ids, function(name, token){ 
+          controlGroup = $("<div>" +
+            "<h3>" + name + "</h3>" +
+            "<input id='query_tag_"+token+"' class='knob' data-cursor=true value='10' data-min='0' data-max='20' data-width='200' data-skin='tron'>" +
+          "</div>");
+
+          form.append(controlGroup);
+
+          var tags = {};
+          var filters = {};
+
+          $(".knob").knob({
+            'change':function(e){
+              
+             
+              
+              $(".knob").each(function(){
+                knobValue = e;
+                //console.log(knobValue);
+                tags[name] = e;
+
+              });
+              console.log(tags);
+              //fishpond.query(tags, filters);
+            }
+          });
+        });
+
+        fishpond.query({}, {});
+
+      });
+
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+    };
