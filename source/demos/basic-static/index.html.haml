@@ -1,7 +1,21 @@
 .page-header
   %h1 Basic (Static) Demo
   %br
-  %p Hardcoded for use with the 'Science Majors' pond.
+  .row
+    .span9
+      .alert.alert-error
+        %strong Note:
+        The form for this demo has been hardcoded for demonstration purposes. Results filtering will only work with the 'Science Majors' pond `uhEHwd`.
+
+      %p
+        %strong Powered by: 
+        = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-important Filters disabled
+    
 
 .row
   .span5
@@ -35,9 +49,16 @@
               %input#query_tags_dunno{"data-slug" => "dunno", :name => "query[tags][dunno]", :type => "hidden", :value => "10"}/
               .slider.span2{"data-target" => "query[tags][dunno]"}
 
-      %h2 Filters
-      %p
-        %em No filters defined.
+        %h2 Filters
+        %fieldset.filters
+          .control-group
+            .control-label
+              Only show:
+            .controls
+              %label.checkbox
+                %input#query_filter_sgH{"data-slug" => "maths-prerequisite", :name => "query[filters][sgH]", :type => "checkbox", :value => "0"} Maths Prerequisite
+          %span.label
+            Filters not included in this demo
 
   .span6.offset1
     %h2 Results

@@ -10,11 +10,16 @@
         = link_to "aterrien", "https://github.com/aterrien", :target => "_blank"
         %br 
         %strong Requires:
-        Canvas
+        Canvas capable 
+        = link_to "browser", "http://caniuse.com/#feat=canvas", :target => "_blank"
+        %br
+        %span.label.label-info iOS compatible
+
     .span2.offset1
       %span.label.label-important Metadata disabled
       %br 
       %span.label.label-important Filters disabled
+
 
 %section#query
   .row
@@ -31,7 +36,7 @@
           Filters not included in this demo
 
   .row
-    #results.span12
+    .span12
       %h2 Results
       %ul.thumbnails.results
     
