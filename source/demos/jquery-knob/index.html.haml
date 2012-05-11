@@ -1,14 +1,20 @@
 .page-header
   %h1 jQuery Knob Demo
   %br
-  %p
-    %strong Powered by: 
-    = link_to "jQuery Knob", "http://anthonyterrien.com/knob/", :target => "_blank"
-    by
-    = link_to "aterrien", "https://github.com/aterrien", :target => "_blank"
-    %br 
-    %strong Requires:
-    Canvas
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "jQuery Knob", "http://anthonyterrien.com/knob/", :target => "_blank"
+        by
+        = link_to "aterrien", "https://github.com/aterrien", :target => "_blank"
+        %br 
+        %strong Requires:
+        Canvas
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-important Filters disabled
 
 .row
   .span12
@@ -20,7 +26,7 @@
       %br
       %br
       %h2 Filters
-      %span.label.label-warning
+      %span.label
         Filters not included in this demo
 
 .row

@@ -1,9 +1,15 @@
 .page-header
   %h1 Basic (Dynamic) Demo
   %br
-  %p
-    %strong Powered by: 
-    = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-warning Filters to be hooked up
 
 .row
   .span5
@@ -18,7 +24,7 @@
           .control-label
             Only show:
 
-      %span.label.label-important
+      %span.label
         Filters currently not hooked up.
 
   .span6.offset1

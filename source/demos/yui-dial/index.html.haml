@@ -1,11 +1,17 @@
 .page-header
   %h1 Dial Demo
   %br
-  %p
-    %strong Powered by: 
-    = link_to "YUI Dial Widget", "http://yuilibrary.com/yui/docs/dial/dial-basic.html", :target => "_blank"
-    by
-    = link_to "Yahoo", "http://yuilibrary.com/yui/", :target => "_blank"
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "YUI Dial Widget", "http://yuilibrary.com/yui/docs/dial/dial-basic.html", :target => "_blank"
+        by
+        = link_to "Yahoo", "http://yuilibrary.com/yui/", :target => "_blank"
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-important Filters disabled
 
 .row
   .span12
@@ -15,7 +21,7 @@
       %br
       %br
       %h2 Filters
-      %span.label.label-warning
+      %span.label
         Filters not included in this demo
 
 .row
