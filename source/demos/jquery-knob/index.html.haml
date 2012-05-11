@@ -16,48 +16,49 @@
       %br 
       %span.label.label-important Filters disabled
 
-.row
-  .span12
-    .well
-      %h2 Tags
-      %form
-        .controls-wrapper
-           
-      %br
-      %br
-      %h2 Filters
-      %span.label
-        Filters not included in this demo
+%section#query
+  .row
+    .span12
+      .well
+        %h2 Tags
+        %form
+          .controls-wrapper
+             
+        %br
+        %br
+        %h2 Filters
+        %span.label
+          Filters not included in this demo
 
-.row
-  #results.span12
-    %h2 Results
-    %ul.thumbnails.results
+  .row
+    #results.span12
+      %h2 Results
+      %ul.thumbnails.results
     
 
 -# content_for :css do
 :css
 
-  form{
+  #query form{
     display: table;
     width: 100%;
     }
-    form .controls-wrapper{
+    #query form .controls-wrapper{
       display: table-row;
       }
-      form .control-group{
+      #query form .control-group{
         display: table-cell;
         padding-top: 20px;
         }
-        form h3{
+        #query form h3{
           text-align: center;
           margin-bottom: 10px;
           }
-          form .control-group > div{
+          #query form .control-group > div{
             display: block !important;
             margin: 0px auto;
             }
-            form .knob{
+            #query form .knob{
               height: auto;
               border: none;
               -webkit-box-shadow: none;
@@ -109,6 +110,7 @@
           });
         });
 
+        // Run Initial Query
         fishpond.query({}, {});
       });
 
