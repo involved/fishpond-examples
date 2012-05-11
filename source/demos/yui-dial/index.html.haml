@@ -1,7 +1,11 @@
 .page-header
   %h1 Dial Demo
   %br
-  %p= link_to "Yahoo YUI Dial Widget", "http://yuilibrary.com/yui/docs/dial/dial-basic.html"
+  %p
+    Powered by: 
+    = link_to "YUI Dial Widget", "http://yuilibrary.com/yui/docs/dial/dial-basic.html", :target => "_blank"
+    by
+    = link_to "Yahoo", "http://yuilibrary.com/yui/", :target => "_blank"
 
 .row
   .span12
@@ -26,16 +30,12 @@
 
   }
 
-
 - content_for :javascript do
   = javascript_include_tag "http://yui.yahooapis.com/3.5.0/build/yui/yui-min.js"
 
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
-      // Flotr Array Variables
-      var resultsList = [];
       var tags = [];
-      var tagsList = [];
       
       fishpond.resultsUpdated(function(results){
         console.log(results);
@@ -56,14 +56,6 @@
         $("#loading").fadeOut(0);
         $("#demo").fadeIn(400);
         $("#demo h1").append(' "' + pond.name + '"');       
-        
-        // Create Array for Radar
-        var positionCount = 0;
-        $.each(pond.tag_ids, function(name, token){
-          tagsList.push([ positionCount, name ]);
-          resultsList.push([ positionCount, 10 ]);
-          positionCount++;
-        });
        
         // Init YUI
         $('body').addClass("yui3-skin-sam");
@@ -107,10 +99,8 @@
 
           });
         });
-
         
         fishpond.query({}, {});
-
       });
 
       fishpond.loading(function(percent){
