@@ -20,8 +20,8 @@
       %br
       %br
       %h2 Filters
-      %p
-        %em [Not included in this demo]
+      %span.label.label-warning
+        Filters not included in this demo
 
 .row
   #results.span12
@@ -41,7 +41,6 @@
       }
       form .control-group{
         display: table-cell;
-        min-height: 250px;
         padding-top: 20px;
         }
         form h3{
@@ -60,9 +59,6 @@
               box-shadow: none;
               }
       
-
-
-
 
 - content_for :javascript do
   = javascript_include_tag "https://raw.github.com/aterrien/jQuery-Knob/master/js/jquery.knob-1.0.1.js"
