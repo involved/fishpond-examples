@@ -39,11 +39,12 @@
                 <li><a href="/fishpond-examples/demos/basic-dynamic">basic-dynamic</a></li>
                 <li><a href="/fishpond-examples/demos/basic-html5">basic-html5</a></li>
                 <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
-                <li><a href="/fishpond-examples/demos/dial">dial</a></li>
                 <li><a href="/fishpond-examples/demos/flotr">flotr</a></li>
+                <li><a href="/fishpond-examples/demos/jquery-knob">jquery-knob</a></li>
                 <li><a href="/fishpond-examples/demos/quicksand">quicksand</a></li>
                 <li><a href="/fishpond-examples/demos/scaffold">scaffold</a></li>
                 <li><a href="/fishpond-examples/demos/spider-graph">spider-graph</a></li>
+                <li><a href="/fishpond-examples/demos/yui-dial">yui-dial</a></li>
               </ul>
             </li>
           </ul>
@@ -74,7 +75,23 @@
       <div class='page-header'>
         <h1>Basic (Static) Demo</h1>
         <br />
-        <p>Hardcoded for use with the 'Science Majors' pond.</p>
+        <div class='row'>
+          <div class='span9'>
+            <div class='alert alert-error'>
+              <strong>Note:</strong>
+              The form for this demo has been hardcoded for demonstration purposes. Results filtering will only work with the 'Science Majors' pond `uhEHwd`.
+            </div>
+            <p>
+              <strong>Powered by:</strong>
+              <a target="_blank" href="http://jqueryui.com/demos/slider/">jQuery UI Slider</a>
+            </p>
+          </div>
+          <div class='span2 offset1'>
+            <span class='label label-important'>Metadata disabled</span>
+            <br />
+            <span class='label label-important'>Filters disabled</span>
+          </div>
+        </div>
       </div>
       <div class='row'>
         <div class='span5'>
@@ -83,46 +100,58 @@
             <form class='form-horizontal'>
               <fieldset>
                 <div class='control-group'>
-                  <label class='control-label'>Quantitative (6)</label>
+                  <label class='control-label'>Quantitative (10)</label>
                   <div class='controls'>
-                    <input data-slug='quantitative' id='query_tags_quantitative' name='query[tags][quantitative]' type='hidden' value='6' />
+                    <input data-slug='quantitative' id='query_tags_quantitative' name='query[tags][quantitative]' type='hidden' value='10' />
                     <div class='slider span2' data-target='query[tags][quantitative]'></div>
                   </div>
                 </div>
                 <div class='control-group'>
-                  <label class='control-label'>Biological (6)</label>
+                  <label class='control-label'>Biological (10)</label>
                   <div class='controls'>
-                    <input data-slug='biological' id='query_tags_biological' name='query[tags][biological]' type='hidden' value='6' />
+                    <input data-slug='biological' id='query_tags_biological' name='query[tags][biological]' type='hidden' value='10' />
                     <div class='slider span2' data-target='query[tags][biological]'></div>
                   </div>
                 </div>
                 <div class='control-group'>
-                  <label class='control-label'>Pure (6)</label>
+                  <label class='control-label'>Pure (10)</label>
                   <div class='controls'>
-                    <input data-slug='pure' id='query_tags_pure' name='query[tags][pure]' type='hidden' value='6' />
+                    <input data-slug='pure' id='query_tags_pure' name='query[tags][pure]' type='hidden' value='10' />
                     <div class='slider span2' data-target='query[tags][pure]'></div>
                   </div>
                 </div>
                 <div class='control-group'>
-                  <label class='control-label'>Indoors (6)</label>
+                  <label class='control-label'>Indoors (10)</label>
                   <div class='controls'>
-                    <input data-slug='indoors' id='query_tags_indoors' name='query[tags][indoors]' type='hidden' value='6' />
+                    <input data-slug='indoors' id='query_tags_indoors' name='query[tags][indoors]' type='hidden' value='10' />
                     <div class='slider span2' data-target='query[tags][indoors]'></div>
                   </div>
                 </div>
                 <div class='control-group'>
-                  <label class='control-label'>Dunno (6)</label>
+                  <label class='control-label'>Dunno (10)</label>
                   <div class='controls'>
-                    <input data-slug='dunno' id='query_tags_dunno' name='query[tags][dunno]' type='hidden' value='6' />
+                    <input data-slug='dunno' id='query_tags_dunno' name='query[tags][dunno]' type='hidden' value='10' />
                     <div class='slider span2' data-target='query[tags][dunno]'></div>
                   </div>
                 </div>
               </fieldset>
+              <h2>Filters</h2>
+              <fieldset class='filters'>
+                <div class='control-group'>
+                  <div class='control-label'>
+                    Only show:
+                  </div>
+                  <div class='controls'>
+                    <label class='checkbox'>
+                      <input data-slug='maths-prerequisite' id='query_filter_sgH' name='query[filters][sgH]' type='checkbox' value='0'>Maths Prerequisite</input>
+                    </label>
+                  </div>
+                </div>
+                <span class='label'>
+                  Filters not included in this demo
+                </span>
+              </fieldset>
             </form>
-            <h2>Filters</h2>
-            <p>
-              <em>No filters defined.</em>
-            </p>
           </div>
         </div>
         <div class='span6 offset1'>
@@ -174,10 +203,10 @@
           });
         
           $(".slider").slider({
-            value: 6,
-            min: 1,
-            max: 11,
-            step: 0.1,
+            value: 10,
+            min: 0,
+            max: 20,
+            step: 1,
             slide: function(e, ui){
               var label = $(this).parents('.control-group').find('label');
               var hiddenField = $("input[name='" + $(this).data('target') + "']");
