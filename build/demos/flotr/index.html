@@ -39,11 +39,12 @@
                 <li><a href="/fishpond-examples/demos/basic-dynamic">basic-dynamic</a></li>
                 <li><a href="/fishpond-examples/demos/basic-html5">basic-html5</a></li>
                 <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
-                <li><a href="/fishpond-examples/demos/dial">dial</a></li>
                 <li><a href="/fishpond-examples/demos/flotr">flotr</a></li>
+                <li><a href="/fishpond-examples/demos/jquery-knob">jquery-knob</a></li>
                 <li><a href="/fishpond-examples/demos/quicksand">quicksand</a></li>
                 <li><a href="/fishpond-examples/demos/scaffold">scaffold</a></li>
                 <li><a href="/fishpond-examples/demos/spider-graph">spider-graph</a></li>
+                <li><a href="/fishpond-examples/demos/yui-dial">yui-dial</a></li>
               </ul>
             </li>
           </ul>
@@ -74,7 +75,24 @@
       <div class='page-header'>
         <h1>Flotr Demo</h1>
         <br />
-        <p>using the <a href="https://github.com/HumbleSoftware/Flotr2">Flotr</a> Canvas Graphing Library</p>
+        <div class='row'>
+          <div class='span9'>
+            <p>
+              <strong>Powered by:</strong>
+              <a target="_blank" href="https://github.com/HumbleSoftware/Flotr2">Flotr2</a>
+              Canvas Graphing Library by
+              <a target="_blank" href="https://github.com/HumbleSoftware/">HumbleSoftware</a>
+              <br />
+              <strong>Requires:</strong>
+              Canvas
+            </p>
+          </div>
+          <div class='span2 offset1'>
+            <span class='label label-important'>Metadata disabled</span>
+            <br />
+            <span class='label label-important'>Filters disabled</span>
+          </div>
+        </div>
       </div>
       <div class='row'>
         <div class='span5'>
@@ -85,9 +103,9 @@
               </fieldset>
             </form>
             <h2>Filters</h2>
-            <p>
-              <em>No filters defined.</em>
-            </p>
+            <span class='label'>
+              Filters not included in this demo
+            </span>
           </div>
         </div>
         <div class='span6 offset1' id='radar'></div>
@@ -166,7 +184,7 @@
               controlGroup = $("" +
                 "<div class='control-group'>" +
                   "<label class='control-label'>" +
-                    name + " <output>(6)</output>" +
+                    name + " <output>(10)</output>" +
                   "</label>" +
                   "<div class='controls'>" +
                     "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
@@ -179,10 +197,10 @@
         
             // jQuery UI Slider
             $(".slider").slider({
-              value: 6,
-              min: 1,
-              max: 11,
-              step: 0.1,
+              value: 10,
+              min: 0,
+              max: 20,
+              step: 1,
               slide: function(e, ui){
                 var output = $(this).parents('.control-group').find('output');
                 var hiddenField = $("input[name='" + $(this).data('target') + "']");
@@ -244,7 +262,7 @@
             graph = Flotr.draw(container, [ results ], {
               radar : { show : true}, 
               grid  : { circular : true, minorHorizontalLines : false, horizontalLines : false, verticalLines : true}, 
-              yaxis : { min : 1, max : 11, minorTickFreq : 2, showLabels : false}, 
+              yaxis : { min : 0, max : 20, minorTickFreq : 2, showLabels : false}, 
               xaxis : { ticks : ticks}
             });
           }

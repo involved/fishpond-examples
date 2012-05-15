@@ -73,19 +73,15 @@
     </div>
     <div class='container hide' id='demo'>
       <div class='page-header'>
-        <h1>Spider Graph Demo</h1>
+        <h1>Dial Demo</h1>
         <br />
         <div class='row'>
           <div class='span9'>
             <p>
               <strong>Powered by:</strong>
-              <a target="_blank" href="https://github.com/jmstriegel/jquery.spidergraph">Spidergraph</a>
-              jQuery Plugin by
-              <a target="_blank" href="https://github.com/jmstriegel">jmstriegel</a>
-              <br />
-              <strong>Requires:</strong>
-              Canvas capable
-              <a target="_blank" href="http://caniuse.com/#feat=canvas">browser</a>
+              <a target="_blank" href="http://yuilibrary.com/yui/docs/dial/dial-basic.html">YUI Dial Widget</a>
+              by
+              <a target="_blank" href="http://yuilibrary.com/yui/">Yahoo</a>
               <br />
               <span class='label label-info'>iOS compatible</span>
             </p>
@@ -97,40 +93,31 @@
           </div>
         </div>
       </div>
-      <section id='query'>
-        <div class='row'>
-          <div class='span7'>
-            <div class='well'>
-              <h2>Tags</h2>
-              <div class='span6'>
-                <div id='radar'></div>
-                <br />
-                <br />
-                <h2>Filters</h2>
-                <span class='label'>
-                  Filters not included in this demo
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class='span4 offset1'>
-            <h2>Results</h2>
-            <ul class='thumbnails results'></ul>
+      <div class='row'>
+        <div class='span12'>
+          <div class='well'>
+            <h2>Tags</h2>
+            <div class='row' id='dials'></div>
+            <br />
+            <br />
+            <h2>Filters</h2>
+            <span class='label'>
+              Filters not included in this demo
+            </span>
           </div>
         </div>
-      </section>
+      </div>
+      <div class='row'>
+        <div class='span12'>
+          <h2>Results</h2>
+          <ul class='thumbnails results'></ul>
+        </div>
+      </div>
       <style type='text/css'>
         /*<![CDATA[*/
-          .well{
-            overflow: auto
-            }
-            #radar{
-              position: relative;;
-              height: 500px;
-            }
-          .results{
-            min-height: 550px;
-            }
+          #dials{
+          
+          }
         /*]]>*/
       </style>
     </div>
@@ -146,63 +133,75 @@
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
     <script src="https://raw.github.com/yeco/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
-    <script src="https://raw.github.com/jmstriegel/jquery.spidergraph/master/assets/js/jquery.spidergraph.js" type="text/javascript"></script>
+    <script src="http://yui.yahooapis.com/3.5.0/build/yui/yui-min.js" type="text/javascript"></script>
     <script type='text/javascript'>
       //<![CDATA[
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+          var tags = [];
           
-          // Spidergraph Array Variables
-          var tagValues = [];
-          var tagList = [];
-          
-        
           fishpond.resultsUpdated(function(results){
-            //console.log(results);
+            console.log(results);
         
             $(".results li").remove(); // Clear old results
         
             for(var i = 0; i < results.length; i++){
+        
               var li = $("<li></li>");
               var thumbnail = $("<div></div>");
               thumbnail.html(results[i].fish.title);
               li.append(thumbnail);
               $(".results").append(li);
             }
-        
           });
         
           fishpond.ready(function(pond){
             $("#loading").fadeOut(0);
             $("#demo").fadeIn(400);
             $("#demo h1").append(' "' + pond.name + '"');       
-            
-            // Create Array for Spidergraph
-            $.each(pond.tag_ids, function(name, token){
-              tagList.push(name);
-              tagValues.push(10); // Inital value
-            });
-        
-            spidergraph(tagList, tagValues);
            
+            // Init YUI
+            $('body').addClass("yui3-skin-sam");
+        
             // Dynamically Generate Form Controls
-            var form = $("form fieldset");
+            var form = $("#dials");
             var controlGroup;
         
             $.each(pond.tag_ids, function(name, token){ 
               controlGroup = $("" +
-                "<div class='control-group'>" +
-                  "<label class='control-label'>" +
-                    name + " <output>(6)</output>" +
-                  "</label>" +
-                  "<div class='controls'>" +
-                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='10'>" +
-                    "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
-                  "</div>" +
+                "<div id='query_tag_"+token+"' class='dial span2'>" +
                 "</div>");
         
               form.append(controlGroup);
-            });
         
+              YUI().use('dial', function(Y) {
+                var dial = new Y.Dial({
+                    min:0,
+                    max:20,
+                    stepsPerRevolution:20,
+                    value: 10,
+                    strings:{label:name, resetStr: 'Reset', tooltipHandle: 'Drag to set'},
+                    after : {
+                    }
+                });
+                dial.render("#query_tag_"+token);
+                dial.on( "resetStr", function(e){
+                  console.log("RESET");
+                });
+        
+                dial.on( "valueChange", function(e){
+                  var tags = {};
+                  var filters = {};
+                  
+                  $(".dial").each(function(){
+                    tags[name] = e.newVal;
+                  });
+        
+                  fishpond.query(tags, filters);
+                }, '#dials' );
+        
+              });
+            });
+            
             fishpond.query({}, {});
           });
         
@@ -211,39 +210,6 @@
             $("#loading .bar").css({width: (percent * 100) + "%"});
           });
         
-        
-          function spidergraph(tagList, tagValues){   
-            $('#radar').spidergraph({
-                'fields': tagList,
-                'strokewidth': 2,
-                'handlewidth': 4,
-                'increments': 20,
-                'minrad': 0,
-                'gridcolor': 'rgba(20,20,20,1)'   
-            });
-            
-            $('#radar').spidergraph('resetdata');
-            
-            $('#radar').spidergraph('setactivedata', { 
-              'strokecolor': 'rgba(0, 41, 199,0.8)',
-              'fillcolor': 'rgba(10,77,255,0.6)',
-              'data': tagValues
-            });
-        
-            $('#radar').bind('spiderdatachange', function( ev, data ) {
-              var tags = {};
-              var filters = {};
-              var new_value;
-        
-              $.each(data, function(index, value) { 
-                console.log(tagList[index] + ': ' + value); 
-        
-                tags[tagList[index]] = value;
-              });
-        
-              fishpond.query(tags, filters);
-            });
-          }
         };
       //]]>
     </script>

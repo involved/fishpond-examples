@@ -73,15 +73,15 @@
     </div>
     <div class='container hide' id='demo'>
       <div class='page-header'>
-        <h1>Spider Graph Demo</h1>
+        <h1>jQuery Knob Demo</h1>
         <br />
         <div class='row'>
           <div class='span9'>
             <p>
               <strong>Powered by:</strong>
-              <a target="_blank" href="https://github.com/jmstriegel/jquery.spidergraph">Spidergraph</a>
-              jQuery Plugin by
-              <a target="_blank" href="https://github.com/jmstriegel">jmstriegel</a>
+              <a target="_blank" href="http://anthonyterrien.com/knob/">jQuery Knob</a>
+              by
+              <a target="_blank" href="https://github.com/aterrien">aterrien</a>
               <br />
               <strong>Requires:</strong>
               Canvas capable
@@ -99,21 +99,23 @@
       </div>
       <section id='query'>
         <div class='row'>
-          <div class='span7'>
+          <div class='span12'>
             <div class='well'>
               <h2>Tags</h2>
-              <div class='span6'>
-                <div id='radar'></div>
-                <br />
-                <br />
-                <h2>Filters</h2>
-                <span class='label'>
-                  Filters not included in this demo
-                </span>
-              </div>
+              <form>
+                <div class='controls-wrapper'></div>
+              </form>
+              <br />
+              <br />
+              <h2>Filters</h2>
+              <span class='label'>
+                Filters not included in this demo
+              </span>
             </div>
           </div>
-          <div class='span4 offset1'>
+        </div>
+        <div class='row'>
+          <div class='span12'>
             <h2>Results</h2>
             <ul class='thumbnails results'></ul>
           </div>
@@ -121,16 +123,32 @@
       </section>
       <style type='text/css'>
         /*<![CDATA[*/
-          .well{
-            overflow: auto
+          #query form{
+            display: table;
+            width: 100%;
             }
-            #radar{
-              position: relative;;
-              height: 500px;
-            }
-          .results{
-            min-height: 550px;
-            }
+            #query form .controls-wrapper{
+              display: table-row;
+              }
+              #query form .control-group{
+                display: table-cell;
+                padding-top: 20px;
+                }
+                #query form h3{
+                  text-align: center;
+                  margin-bottom: 10px;
+                  }
+                  #query form .control-group > div{
+                    display: block !important;
+                    margin: 0px auto;
+                    }
+                    #query form .knob{
+                      height: auto;
+                      border: none;
+                      -webkit-box-shadow: none;
+                      -moz-box-shadow: none;
+                      box-shadow: none;
+                      }
         /*]]>*/
       </style>
     </div>
@@ -146,18 +164,54 @@
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
     <script src="https://raw.github.com/yeco/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
-    <script src="https://raw.github.com/jmstriegel/jquery.spidergraph/master/assets/js/jquery.spidergraph.js" type="text/javascript"></script>
+    <script src="https://raw.github.com/aterrien/jQuery-Knob/master/js/jquery.knob-1.0.1.js" type="text/javascript"></script>
     <script type='text/javascript'>
       //<![CDATA[
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
-          
-          // Spidergraph Array Variables
-          var tagValues = [];
-          var tagList = [];
-          
+          var tags = [];
+        
+          fishpond.loading(function(percent){
+            $("#loading .progress").removeClass("progress-striped");
+            $("#loading .bar").css({width: (percent * 100) + "%"});
+          });
+        
+          fishpond.ready(function(pond){
+            $("#loading").fadeOut(0);
+            $("#demo").fadeIn(400);
+            $("#demo h1").append(' "' + pond.name + '"');       
+            
+            // Dynamically Generate Form Controls
+            var form = $("form .controls-wrapper");
+            var controlGroup;
+        
+            $.each(pond.tag_ids, function(name, token){ 
+              controlGroup = $("<div class='control-group'>" +
+                "<h3>" + name + "</h3>" +
+                "<input id='query_tag_"+token+"' class='knob' data-slug='"+name+"' data-cursor=false value='10' data-min='0' data-max='20' data-width='150' data-fgColor='#87ceeb' data-skin='tron' data-thickness='.3' data-ticks='20' data-displayInput=false>" +
+              "</div>");
+        
+              form.append(controlGroup);
+        
+              var tags = {};
+              var filters = {};
+        
+              $(".knob").knob({
+                'change':function(e){
+                  $(".knob").each(function(){
+                    tags[$(this).data('slug')] = $(this).val();
+                  });
+        
+                  fishpond.query(tags, filters);
+                }
+              });
+            });
+        
+            // Run Initial Query
+            fishpond.query({}, {});
+          });
         
           fishpond.resultsUpdated(function(results){
-            //console.log(results);
+            console.log(results);
         
             $(".results li").remove(); // Clear old results
         
@@ -168,82 +222,7 @@
               li.append(thumbnail);
               $(".results").append(li);
             }
-        
           });
-        
-          fishpond.ready(function(pond){
-            $("#loading").fadeOut(0);
-            $("#demo").fadeIn(400);
-            $("#demo h1").append(' "' + pond.name + '"');       
-            
-            // Create Array for Spidergraph
-            $.each(pond.tag_ids, function(name, token){
-              tagList.push(name);
-              tagValues.push(10); // Inital value
-            });
-        
-            spidergraph(tagList, tagValues);
-           
-            // Dynamically Generate Form Controls
-            var form = $("form fieldset");
-            var controlGroup;
-        
-            $.each(pond.tag_ids, function(name, token){ 
-              controlGroup = $("" +
-                "<div class='control-group'>" +
-                  "<label class='control-label'>" +
-                    name + " <output>(6)</output>" +
-                  "</label>" +
-                  "<div class='controls'>" +
-                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='10'>" +
-                    "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
-                  "</div>" +
-                "</div>");
-        
-              form.append(controlGroup);
-            });
-        
-            fishpond.query({}, {});
-          });
-        
-          fishpond.loading(function(percent){
-            $("#loading .progress").removeClass("progress-striped");
-            $("#loading .bar").css({width: (percent * 100) + "%"});
-          });
-        
-        
-          function spidergraph(tagList, tagValues){   
-            $('#radar').spidergraph({
-                'fields': tagList,
-                'strokewidth': 2,
-                'handlewidth': 4,
-                'increments': 20,
-                'minrad': 0,
-                'gridcolor': 'rgba(20,20,20,1)'   
-            });
-            
-            $('#radar').spidergraph('resetdata');
-            
-            $('#radar').spidergraph('setactivedata', { 
-              'strokecolor': 'rgba(0, 41, 199,0.8)',
-              'fillcolor': 'rgba(10,77,255,0.6)',
-              'data': tagValues
-            });
-        
-            $('#radar').bind('spiderdatachange', function( ev, data ) {
-              var tags = {};
-              var filters = {};
-              var new_value;
-        
-              $.each(data, function(index, value) { 
-                console.log(tagList[index] + ': ' + value); 
-        
-                tags[tagList[index]] = value;
-              });
-        
-              fishpond.query(tags, filters);
-            });
-          }
         };
       //]]>
     </script>
