@@ -5,7 +5,7 @@ Application = {
     init: function () {
       var apiKey = "6OqHqMf609P6tSrxuj2ANuj3S6fAUphnjyOcGWdtD";
       var pondToken = "sC8IZQ";
-      var options = { debug: true };
+      var options = { debug: false };
       var fishpond = new Fishpond(apiKey, options);
 
       Application.Query.setup(fishpond);
@@ -68,16 +68,20 @@ Application = {
         var list = $("<ul></ul>");
         var listItem;
         var fishID;
+        var resultItem;
+        var resultDetails;
 
         // Check to see if Fish has Metadata Cached
-          function updateTemplate(fishID, metadata){
-          var fishListItem = $("#results ul").find("[data-id='" + fishID + "'] .thumbnail");
-          var updatedListItem = $("" +
+        function updateTemplate(fishID, metadata){
+          resultItem = $("#results ul").find("[data-id='" + fishID + "']");
+          resultDetails = $("" +
             "<a class='btn btn-primary' href='" + metadata.url + "'>View Demo</a>" +
             "<a class='btn' href='#fishInfo'>More Info</a>");
 
-          fishListItem.find(".details").html(updatedListItem);
-          fishListItem.removeClass("loading");
+          console.log(resultItem.attr("data-id") + " - Update Template");
+
+          resultItem.find(".details").html(resultDetails);
+          resultItem.find(".loading").removeClass("loading");
         }
 
         //------------------------------------------------------------------------
@@ -86,7 +90,7 @@ Application = {
 
           // Create empty Fish
           listItem = $("" +
-            "<li class='span2' data-id='"+fishID+"'>" +
+            "<li class='span2' id='"+fishID+"' data-id='"+fishID+"'>" +
               "<div class='thumbnail loading'>" +
                 "<strong>" + result.fish.title + "</strong>" +
                 "<div class='details'></div>" +
@@ -96,13 +100,24 @@ Application = {
           // Add empty fish to results
           list.append(listItem);
 
+          
           if (result.fish.metadata.url){
             updateTemplate(fishID, result.fish.metadata);
           } else {
-            fishpond.get_fish(fishID, function(data){
-              updateTemplate(fishID, data); 
+            console.log("fishID = " + fishID);
+
+            console.log($("#results li").length);
+
+            $()
+
+            $("#results li").find().queue(function(){
+              fishpond.get_fish(fishID, function(data){
+                console.log("fishID => " + fishID);
+                 //updateTemplate(fishID, data); 
+                });
             });
           }
+          
 
           // Quicksilver
           if(source.find("li").length == 0) {
@@ -116,7 +131,6 @@ Application = {
             });
           }
         });
-
       });
     }   
   },
