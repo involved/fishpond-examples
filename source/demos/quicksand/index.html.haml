@@ -1,5 +1,17 @@
 .page-header
   %h1 Quicksand Demo
+  %br
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
+        by
+        = link_to "razorjack", "https://github.com/razorjack", :target => "_blank"
+    .span2.offset1
+      %span.label.label-success Metadata enabled
+      %br 
+      %span.label.label-important Filters disabled
 
 %section#query
   .row
@@ -11,8 +23,8 @@
             -# Sliders Dynamically added
 
         %h2 Filters
-        %p
-          %em No filters defined.
+        %span.label
+          Filters not included in this demo
 
     .span6.offset1
       %h2 Results
@@ -21,13 +33,8 @@
 
 
 #modalTemplate.modal.fade.hide
-  .modal-header
-    %button.close{"data-dismiss" => "modal"} ×
-    %h3 
   .modal-body.loading
     // Empty
-  .modal-footer
-    %a.btn{:href => "#", "data-dismiss" => "modal"} Close
 
 - content_for :css do
   :css

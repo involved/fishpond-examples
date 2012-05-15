@@ -1,7 +1,21 @@
 .page-header
   %h1 Basic (Static) Demo
   %br
-  %p Hardcoded for use with the 'Science Majors' pond.
+  .row
+    .span9
+      .alert.alert-error
+        %strong Note:
+        The form for this demo has been hardcoded for demonstration purposes. Results filtering will only work with the 'Science Majors' pond `uhEHwd`.
+
+      %p
+        %strong Powered by: 
+        = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-important Filters disabled
+    
 
 .row
   .span5
@@ -10,34 +24,41 @@
       %form.form-horizontal
         %fieldset
           .control-group
-            %label.control-label Quantitative (6)
+            %label.control-label Quantitative (10)
             .controls
-              %input#query_tags_quantitative{"data-slug" => "quantitative", :name => "query[tags][quantitative]", :type => "hidden", :value => "6"}/
+              %input#query_tags_quantitative{"data-slug" => "quantitative", :name => "query[tags][quantitative]", :type => "hidden", :value => "10"}/
               .slider.span2{"data-target" => "query[tags][quantitative]"}
           .control-group
-            %label.control-label Biological (6)
+            %label.control-label Biological (10)
             .controls
-              %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "6"}/
+              %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "10"}/
               .slider.span2{"data-target" => "query[tags][biological]"}
           .control-group
-            %label.control-label Pure (6)
+            %label.control-label Pure (10)
             .controls
-              %input#query_tags_pure{"data-slug" => "pure", :name => "query[tags][pure]", :type => "hidden", :value => "6"}/
+              %input#query_tags_pure{"data-slug" => "pure", :name => "query[tags][pure]", :type => "hidden", :value => "10"}/
               .slider.span2{"data-target" => "query[tags][pure]"}
           .control-group
-            %label.control-label Indoors (6)
+            %label.control-label Indoors (10)
             .controls
-              %input#query_tags_indoors{"data-slug" => "indoors", :name => "query[tags][indoors]", :type => "hidden", :value => "6"}/
+              %input#query_tags_indoors{"data-slug" => "indoors", :name => "query[tags][indoors]", :type => "hidden", :value => "10"}/
               .slider.span2{"data-target" => "query[tags][indoors]"}
           .control-group
-            %label.control-label Dunno (6)
+            %label.control-label Dunno (10)
             .controls
-              %input#query_tags_dunno{"data-slug" => "dunno", :name => "query[tags][dunno]", :type => "hidden", :value => "6"}/
+              %input#query_tags_dunno{"data-slug" => "dunno", :name => "query[tags][dunno]", :type => "hidden", :value => "10"}/
               .slider.span2{"data-target" => "query[tags][dunno]"}
 
-      %h2 Filters
-      %p
-        %em No filters defined.
+        %h2 Filters
+        %fieldset.filters
+          .control-group
+            .control-label
+              Only show:
+            .controls
+              %label.checkbox
+                %input#query_filter_sgH{"data-slug" => "maths-prerequisite", :name => "query[filters][sgH]", :type => "checkbox", :value => "0"} Maths Prerequisite
+          %span.label
+            Filters not included in this demo
 
   .span6.offset1
     %h2 Results
@@ -76,10 +97,10 @@
       });
 
       $(".slider").slider({
-        value: 6,
-        min: 1,
-        max: 11,
-        step: 0.1,
+        value: 10,
+        min: 0,
+        max: 20,
+        step: 1,
         slide: function(e, ui){
           var label = $(this).parents('.control-group').find('label');
           var hiddenField = $("input[name='" + $(this).data('target') + "']");

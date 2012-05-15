@@ -1,24 +1,35 @@
 .page-header
   %h1 Basic (Dynamic) Demo
+  %br
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-warning Filters to be hooked up
 
 .row
   .span5
-    .well
+    %form#fishpond.form-horizontal.well
       %h2 Tags
-      %form#fishpond.form-horizontal
-        %fieldset
-          -# Sliders Dynamically added
+      %fieldset.tags
+        -# Sliders Dynamically added
 
-      %h2 Filters
-      %p
-        %em No filters defined.
+      %h2 Filters     
+      %fieldset.filters
+        .control-group
+          .control-label
+            Only show:
+
+      %span.label
+        Filters currently not hooked up.
 
   .span6.offset1
     %h2 Results
     %ul.results
-
-
-
 
 - content_for :javascript do
   :javascript
@@ -39,35 +50,48 @@
       });
 
       fishpond.ready(function(pond){
+        // Loading transitions
         $("#loading").fadeOut(0);
         $("#demo").fadeIn(400);
         $("#demo h1").append(' "' + pond.name + '"');       
-        
-        // Dynamically Generate Form Controls
-        var form = $("form fieldset");
-        var controlGroup;
+
+        // Generate form controls
+        var formTags = $("fieldset.tags");
+        var formFilters = $("fieldset.filters .control-group");
+        var tagControlGroup,
+            filterControl;
 
         $.each(pond.tag_ids, function(name, token){ 
-          controlGroup = $("" +
+          tagControlGroup = $("" +
             "<div class='control-group'>" +
               "<label class='control-label'>" +
-                name + " <output>(6)</output>" +
+                name + " <output>(10)</output>" +
               "</label>" +
               "<div class='controls'>" +
                 "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
                 "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
               "</div>" +
             "</div>");
+          formTags.append(tagControlGroup);
+        });
 
-          form.append(controlGroup);
+        $.each(pond.filters, function(index, token){
+          filterControl = $("" +
+            "<div class='controls'>" +
+              "<label class='checkbox'>" +
+                "<input id='query_filter_"+token.id+"' data-slug='"+token.slug+"' name='query[filters]["+token.id+"]' type='checkbox' value='0'>" +
+                token.name + 
+              "</label>" +
+            "</div>");
+          formFilters.append(filterControl);
         });
 
         // jQuery UI Slider
         $(".slider").slider({
-          value: 6,
-          min: 1,
-          max: 11,
-          step: 0.1,
+          value: 10,
+          min: 0,
+          max: 20,
+          step: 1,
           slide: function(e, ui){
             var output = $(this).parents('.control-group').find('output');
             var hiddenField = $("input[name='" + $(this).data('target') + "']");
@@ -80,6 +104,7 @@
               var tags = {};
               var filters = {};
               $("form#fishpond input").each(function(){
+                console.error($(this).data('slug'));
                 tags[$(this).data('slug')] = $(this).val();
               });
               fishpond.query(tags, filters);
@@ -88,13 +113,11 @@
         });
 
         fishpond.query({}, {});
-
       });
 
       fishpond.loading(function(percent){
         $("#loading .progress").removeClass("progress-striped");
         $("#loading .bar").css({width: (percent * 100) + "%"});
       });
- 
-    };
 
+    };

@@ -1,7 +1,20 @@
 .page-header
   %h1 Dial Demo
   %br
-  %p= link_to "Yahoo YUI Dial Widget", "http://yuilibrary.com/yui/docs/dial/dial-basic.html"
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "YUI Dial Widget", "http://yuilibrary.com/yui/docs/dial/dial-basic.html", :target => "_blank"
+        by
+        = link_to "Yahoo", "http://yuilibrary.com/yui/", :target => "_blank"
+        %br
+        %span.label.label-info iOS compatible
+
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-important Filters disabled
 
 .row
   .span12
@@ -11,11 +24,11 @@
       %br
       %br
       %h2 Filters
-      %p
-        %em No filters defined.
+      %span.label
+        Filters not included in this demo
 
 .row
-  #results.span12
+  .span12
     %h2 Results
     %ul.thumbnails.results
     
@@ -26,16 +39,12 @@
 
   }
 
-
 - content_for :javascript do
   = javascript_include_tag "http://yui.yahooapis.com/3.5.0/build/yui/yui-min.js"
 
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
-      // Flotr Array Variables
-      var resultsList = [];
       var tags = [];
-      var tagsList = [];
       
       fishpond.resultsUpdated(function(results){
         console.log(results);
@@ -56,14 +65,6 @@
         $("#loading").fadeOut(0);
         $("#demo").fadeIn(400);
         $("#demo h1").append(' "' + pond.name + '"');       
-        
-        // Create Array for Radar
-        var positionCount = 0;
-        $.each(pond.tag_ids, function(name, token){
-          tagsList.push([ positionCount, name ]);
-          resultsList.push([ positionCount, 6 ]);
-          positionCount++;
-        });
        
         // Init YUI
         $('body').addClass("yui3-skin-sam");
@@ -81,10 +82,10 @@
 
           YUI().use('dial', function(Y) {
             var dial = new Y.Dial({
-                min:1,
-                max:11,
-                stepsPerRevolution:11,
-                value: 6,
+                min:0,
+                max:20,
+                stepsPerRevolution:20,
+                value: 10,
                 strings:{label:name, resetStr: 'Reset', tooltipHandle: 'Drag to set'},
                 after : {
                 }
@@ -107,10 +108,8 @@
 
           });
         });
-
         
         fishpond.query({}, {});
-
       });
 
       fishpond.loading(function(percent){

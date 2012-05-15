@@ -1,23 +1,55 @@
 .page-header
   %h1 Spider Graph Demo
   %br
-  %p using #{link_to "jmstriegel spidergraph", "https://github.com/jmstriegel/jquery.spidergraph"}. Relies on Canvas
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "Spidergraph", "https://github.com/jmstriegel/jquery.spidergraph", :target => "_blank"
+        jQuery Plugin by
+        = link_to "jmstriegel", "https://github.com/jmstriegel", :target => "_blank"
+        %br 
+        %strong Requires:
+        Canvas capable 
+        = link_to "browser", "http://caniuse.com/#feat=canvas", :target => "_blank"
+        %br
+        %span.label.label-info iOS compatible
 
-.row
-  #radar.span6
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-important Filters disabled
 
-  #results.span5.offset7
-    %h2 Results
-    %ul.thumbnails.results
+%section#query
+  .row
+    .span7
+      .well
+        %h2 Tags
+        .span6
+          #radar   
+          %br
+          %br
+          %h2 Filters
+          %span.label
+            Filters not included in this demo
+
+    .span4.offset1
+      %h2 Results
+      %ul.thumbnails.results
     
 
 -# content_for :css do
 :css
-  #radar{
-    position: fixed;
-    top: 200px;
-    height: 500px;
-  }
+  .well{
+    overflow: auto
+    }
+    #radar{
+      position: relative;;
+      height: 500px;
+    }
+  .results{
+    min-height: 550px;
+    }
 
 
 - content_for :javascript do
@@ -54,7 +86,7 @@
         // Create Array for Spidergraph
         $.each(pond.tag_ids, function(name, token){
           tagList.push(name);
-          tagValues.push(6); // Inital value
+          tagValues.push(10); // Inital value
         });
 
         spidergraph(tagList, tagValues);
@@ -70,7 +102,7 @@
                 name + " <output>(6)</output>" +
               "</label>" +
               "<div class='controls'>" +
-                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='10'>" +
                 "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
               "</div>" +
             "</div>");
@@ -79,7 +111,6 @@
         });
 
         fishpond.query({}, {});
-
       });
 
       fishpond.loading(function(percent){
@@ -93,7 +124,7 @@
             'fields': tagList,
             'strokewidth': 2,
             'handlewidth': 4,
-            'increments': 11,
+            'increments': 20,
             'minrad': 0,
             'gridcolor': 'rgba(20,20,20,1)'   
         });

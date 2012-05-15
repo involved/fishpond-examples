@@ -20,6 +20,7 @@ task :publish do
   commands = []
   commands << 'git add .'
   commands << 'git commit -am "[Automated] Pre-publish safety build"'
+  commands << 'git pull origin master'
   commands << 'git push origin master'
   commands << 'middleman build'
   commands << 'git add build/*'
