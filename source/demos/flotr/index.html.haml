@@ -1,7 +1,20 @@
 .page-header
   %h1 Flotr Demo
   %br
-  %p using the #{link_to "Flotr", "https://github.com/HumbleSoftware/Flotr2"} Canvas Graphing Library 
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "Flotr2", "https://github.com/HumbleSoftware/Flotr2", :target => "_blank"
+        Canvas Graphing Library by
+        = link_to "HumbleSoftware", "https://github.com/HumbleSoftware/", :target => "_blank"
+        %br 
+        %strong Requires:
+        Canvas
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-important Filters disabled
 
 .row
   .span5
@@ -12,8 +25,8 @@
           -# Sliders Dynamically added
 
       %h2 Filters
-      %p
-        %em No filters defined.
+      %span.label
+        Filters not included in this demo
 
   #radar.span6.offset1
 
