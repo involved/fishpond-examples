@@ -1,0 +1,120 @@
+.page-header
+  %h1 Dial Demo
+  %br
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "YUI Dial Widget", "http://yuilibrary.com/yui/docs/dial/dial-basic.html", :target => "_blank"
+        by
+        = link_to "Yahoo", "http://yuilibrary.com/yui/", :target => "_blank"
+        %br
+        %span.label.label-info iOS compatible
+
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-important Filters disabled
+
+.row
+  .span12
+    .well
+      %h2 Tags
+      #dials.row
+      %br
+      %br
+      %h2 Filters
+      %span.label
+        Filters not included in this demo
+
+.row
+  .span12
+    %h2 Results
+    %ul.thumbnails.results
+    
+
+-# content_for :css do
+:css
+  #dials{
+
+  }
+
+- content_for :javascript do
+  = javascript_include_tag "http://yui.yahooapis.com/3.5.0/build/yui/yui-min.js"
+
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+      var tags = [];
+      
+      fishpond.resultsUpdated(function(results){
+        console.log(results);
+
+        $(".results li").remove(); // Clear old results
+
+        for(var i = 0; i < results.length; i++){
+
+          var li = $("<li></li>");
+          var thumbnail = $("<div></div>");
+          thumbnail.html(results[i].fish.title);
+          li.append(thumbnail);
+          $(".results").append(li);
+        }
+      });
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');       
+       
+        // Init YUI
+        $('body').addClass("yui3-skin-sam");
+    
+        // Dynamically Generate Form Controls
+        var form = $("#dials");
+        var controlGroup;
+
+        $.each(pond.tag_ids, function(name, token){ 
+          controlGroup = $("" +
+            "<div id='query_tag_"+token+"' class='dial span2'>" +
+            "</div>");
+
+          form.append(controlGroup);
+
+          YUI().use('dial', function(Y) {
+            var dial = new Y.Dial({
+                min:0,
+                max:20,
+                stepsPerRevolution:20,
+                value: 10,
+                strings:{label:name, resetStr: 'Reset', tooltipHandle: 'Drag to set'},
+                after : {
+                }
+            });
+            dial.render("#query_tag_"+token);
+            dial.on( "resetStr", function(e){
+              console.log("RESET");
+            });
+
+            dial.on( "valueChange", function(e){
+              var tags = {};
+              var filters = {};
+              
+              $(".dial").each(function(){
+                tags[name] = e.newVal;
+              });
+
+              fishpond.query(tags, filters);
+            }, '#dials' );
+
+          });
+        });
+        
+        fishpond.query({}, {});
+      });
+
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+    };

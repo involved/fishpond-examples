@@ -1,0 +1,135 @@
+.page-header
+  %h1 Basic HTML5 Demo
+  %br
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        Pure HTML5 form elements (no fallbacks or polyfils used).
+        %br
+        %strong Requires:
+        HTML5 enabled browsers
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-warning Filters to be hooked up
+
+.row
+  .span5
+    %form#fishpond.form-horizontal.well
+      %h2 Tags
+      %fieldset.tags
+        -# Sliders Dynamically added
+
+      %h2 Filters     
+      %fieldset.filters
+        .control-group
+          .control-label
+            Only show:
+        -# Filters Dynamically added
+      %span.label
+        Filters currently not hooked up.
+
+  .span6.offset1
+    %h2 Results
+    %ul.results
+
+
+- content_for :css do
+  :css
+    output:before {
+      content: "(";
+    }
+
+    output:after {
+      content: ")";
+    }
+
+    input[type="range"]{
+      width: 150px;
+    }
+
+- content_for :javascript do
+  
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');
+
+        // Generate form controls
+        var formTags = $("fieldset.tags");
+        var formFilters = $("fieldset.filters .control-group");
+        var tagControlGroup,
+            filterControl;
+
+        $.each(pond.tag_ids, function(name, token){ 
+          tagControlGroup = $("" +
+            "<div class='control-group'>" +
+              "<label class='control-label' for='"+name+"'>" +
+                name + "&nbsp;<output data-slug='"+name+"'>6</output>" +
+              "</label>" +
+              "<div class='controls'>" +
+                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' max='20' min='0' step='1' type='range' value='10'>" +
+              "</div>" +
+            "</div>");
+          formTags.append(tagControlGroup);
+        });
+
+        $.each(pond.filters, function(index, token){
+          filterControl = $("" +
+            "<div class='controls'>" +
+              "<label class='checkbox'>" +
+                "<input id='query_filter_"+token.id+"' data-slug='"+token.slug+"' name='query[filters]["+token.id+"]' type='checkbox' value='0'>" +
+                token.name + 
+              "</label>" +
+            "</div>");
+          formFilters.append(filterControl);
+        });
+
+        // Setup Query Arrays
+        var tags = {};
+        var filters = {};
+        
+        $('input[type=range]').change(function() {
+          // Update Slider Output field
+          var sliderValue = $(this).val();
+          var name = $(this).data('slug');
+          $("output[data-slug='"+name+"']").html(sliderValue);
+
+
+          // Update Query
+          $('input[type=range]').each(function(){
+            tags[$(this).data('slug')] = $(this).val();
+          });
+
+          // Run Query
+          fishpond.query(tags, filters);
+        });
+
+        // Run Initial Query
+        fishpond.query(tags, filters);
+      });
+
+      fishpond.resultsUpdated(function(results){
+        //console.log(results);
+
+        $(".results li").remove(); // Clear old results
+
+        for(var i = 0; i < results.length; i++){
+          var li = $("<li></li>");
+          var thumbnail = $("<div></div>");
+          thumbnail.html(results[i].fish.title);
+          li.append(thumbnail);
+          $(".results").append(li);
+        }
+      });
+
+    };

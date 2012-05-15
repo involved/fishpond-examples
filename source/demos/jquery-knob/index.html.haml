@@ -1,0 +1,135 @@
+.page-header
+  %h1 jQuery Knob Demo
+  %br
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "jQuery Knob", "http://anthonyterrien.com/knob/", :target => "_blank"
+        by
+        = link_to "aterrien", "https://github.com/aterrien", :target => "_blank"
+        %br 
+        %strong Requires:
+        Canvas capable 
+        = link_to "browser", "http://caniuse.com/#feat=canvas", :target => "_blank"
+        %br
+        %span.label.label-info iOS compatible
+
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-important Filters disabled
+
+
+%section#query
+  .row
+    .span12
+      .well
+        %h2 Tags
+        %form
+          .controls-wrapper
+             
+        %br
+        %br
+        %h2 Filters
+        %span.label
+          Filters not included in this demo
+
+  .row
+    .span12
+      %h2 Results
+      %ul.thumbnails.results
+    
+
+-# content_for :css do
+:css
+
+  #query form{
+    display: table;
+    width: 100%;
+    }
+    #query form .controls-wrapper{
+      display: table-row;
+      }
+      #query form .control-group{
+        display: table-cell;
+        padding-top: 20px;
+        }
+        #query form h3{
+          text-align: center;
+          margin-bottom: 10px;
+          }
+          #query form .control-group > div{
+            display: block !important;
+            margin: 0px auto;
+            }
+            #query form .knob{
+              height: auto;
+              border: none;
+              -webkit-box-shadow: none;
+              -moz-box-shadow: none;
+              box-shadow: none;
+              }
+      
+
+- content_for :javascript do
+  = javascript_include_tag "https://raw.github.com/aterrien/jQuery-Knob/master/js/jquery.knob-1.0.1.js"
+
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+      var tags = [];
+
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');       
+        
+        // Dynamically Generate Form Controls
+        var form = $("form .controls-wrapper");
+        var controlGroup;
+
+        $.each(pond.tag_ids, function(name, token){ 
+          controlGroup = $("<div class='control-group'>" +
+            "<h3>" + name + "</h3>" +
+            "<input id='query_tag_"+token+"' class='knob' data-slug='"+name+"' data-cursor=false value='10' data-min='0' data-max='20' data-width='150' data-fgColor='#87ceeb' data-skin='tron' data-thickness='.3' data-ticks='20' data-displayInput=false>" +
+          "</div>");
+
+          form.append(controlGroup);
+
+          var tags = {};
+          var filters = {};
+
+          $(".knob").knob({
+            'change':function(e){
+              $(".knob").each(function(){
+                tags[$(this).data('slug')] = $(this).val();
+              });
+
+              fishpond.query(tags, filters);
+            }
+          });
+        });
+
+        // Run Initial Query
+        fishpond.query({}, {});
+      });
+
+      fishpond.resultsUpdated(function(results){
+        console.log(results);
+
+        $(".results li").remove(); // Clear old results
+
+        for(var i = 0; i < results.length; i++){
+          var li = $("<li></li>");
+          var thumbnail = $("<div></div>");
+          thumbnail.html(results[i].fish.title);
+          li.append(thumbnail);
+          $(".results").append(li);
+        }
+      });
+    };
