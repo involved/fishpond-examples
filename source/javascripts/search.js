@@ -88,6 +88,26 @@ Application = {
           resultItem.find(".loading").removeClass("loading");
         }
 
+        function asyncEvent(result){
+          var dfd = new jQuery.Deferred();
+
+          if (result.fish.metadata.url){
+            updateTemplate(result.fish.id, result.fish.metadata);
+          } else {
+            fishpond.get_fish(result.fish.id, function(data){
+              console.log("fishID => " + result.fish.id);
+              updateTemplate(result.fish.id, data)
+              dfd.resolve("Success");
+            });    
+          };
+
+
+          // Return the Promise so caller can't change the Deferred
+          return dfd.promise();
+        }
+
+
+        
         //------------------------------------------------------------------------
         $.each(results, function(position, result){ 
           fishID = result.fish.id;
@@ -104,37 +124,42 @@ Application = {
           // Add empty fish to results
           list.append(listItem);
 
-          
-          if (result.fish.metadata.url){
-            updateTemplate(fishID, result.fish.metadata);
-          } else {
-            console.log("fishID = " + fishID);
 
-            console.log($("#results li").length);
+          // Check to see if Fish Metadata has already been loaded, otherwise fetch it.
+          // Attach a done, fail, and progress handler for the asyncEvent
+          $.when( asyncEvent(result) ).then(
+            function(status){
+              console.warn( status+' -> Metadata loaded ' );
+            },
+            function(status){
+              console.warn( status+' -> Metadata not loaded ' );
+            },
+            function(status){
+              console.warn("what is this");
+              //$("body").append(status);
+            }
+          ); 
 
-            $()
-
-            $("#results li").find().queue(function(){
-              fishpond.get_fish(fishID, function(data){
-                console.log("fishID => " + fishID);
-                 //updateTemplate(fishID, data); 
-                });
-            });
-          }
-          
-
-          // Quicksilver
-          if(source.find("li").length == 0) {
-            source.append(list.find("li"));
-            Application.UI.modals(fishpond);
-          } else {
-            source.quicksand(list.find("li"), {
-              // Do nothing
-            }, function() {
-              Application.UI.modals(fishpond);
-            });
-          }
         });
+  
+
+
+        
+
+       
+        
+        // Sort Results with Quicksilver
+        if(source.find("li").length == 0) {
+          source.append(list.find("li"));
+          Application.UI.modals(fishpond);
+        } else {
+          source.quicksand(list.find("li"), {
+            // Do nothing
+          }, function() {
+            Application.UI.modals(fishpond);
+          });
+        }
+
       });
     }   
   },
