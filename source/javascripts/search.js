@@ -80,33 +80,52 @@ Application = {
           resultItem = $("#results ul").find("[data-id='" + fishID + "']");
           resultDetails = $("" +
             "<a class='btn btn-primary' href='" + metadata.url + "'>View Demo</a>" +
-            "<a class='btn' href='#fishInfo'>More Info</a>");
+            "<a class='btn launch-modal' href='#fishInfo'>More Info</a>");
 
-          console.log(resultItem.attr("data-id") + " - Update Template");
+          //console.log(resultItem.attr("data-id") + " - Template Updated");
 
           resultItem.find(".details").html(resultDetails);
           resultItem.find(".loading").removeClass("loading");
         }
 
-        function asyncEvent(result){
-          var dfd = new jQuery.Deferred();
+        function loadMetadata(result){
+          var fishMetadata = new $.Deferred();
+          var fishID = result.fish.id;
 
           if (result.fish.metadata.url){
-            updateTemplate(result.fish.id, result.fish.metadata);
+            fishMetadata.resolve("Already loaded");
+            updateTemplate(fishID, result.fish.metadata);
           } else {
-            fishpond.get_fish(result.fish.id, function(data){
-              console.log("fishID => " + result.fish.id);
-              updateTemplate(result.fish.id, data)
-              dfd.resolve("Success");
+            fishpond.get_fish(fishID, function(data){
+              fishMetadata.resolve("Success");
+              updateTemplate(fishID, data);
+              //console.log(data.id);
             });    
           };
 
-
           // Return the Promise so caller can't change the Deferred
-          return dfd.promise();
+          return fishMetadata.promise();
         }
 
 
+        function sortResults() {
+          var reorderResults = new $.Deferred();
+
+          // Sorting Results with Quicksand
+          if(source.find("li").length == 0) {
+            source.append(list.find("li"));
+            reorderResults.reject("No results in list");
+            //Application.UI.modals(fishpond);
+          } else {
+            source.quicksand(list.find("li"), {
+              // Do nothing
+            }, function() {
+              reorderResults.resolve("Success");
+              //Application.UI.modals(fishpond);
+            });
+          }
+          return reorderResults.promise();
+        }
         
         //------------------------------------------------------------------------
         $.each(results, function(position, result){ 
@@ -125,40 +144,44 @@ Application = {
           list.append(listItem);
 
 
-          // Check to see if Fish Metadata has already been loaded, otherwise fetch it.
-          // Attach a done, fail, and progress handler for the asyncEvent
-          $.when( asyncEvent(result) ).then(
+          // Check to see if Fish Metadata has already been loaded, otherwise fetch it. Attach a done, fail, and progress handler for the asyncEvent
+          $.when( loadMetadata(result) ).then(
             function(status){
+              // fishMetadata.resolve
+
               console.warn( status+' -> Metadata loaded ' );
             },
             function(status){
-              console.warn( status+' -> Metadata not loaded ' );
+              // fishMetadata.reject
+              console.warn( status+' -> Results reordered ' );
             },
             function(status){
-              console.warn("what is this");
-              //$("body").append(status);
+              // fishMetadata.notify
             }
           ); 
 
+          //sortResults();
+          $.when( sortResults() ).then(
+            function(status){
+              // fishMetadata.resolve
+
+              console.warn( status+' -> Results reordered ' );
+            },
+            function(status){
+              // fishMetadata.reject
+              console.warn( status+' -> Results not reordered ' );
+            },
+            function(status){
+              // fishMetadata.notify
+            }
+          ); 
+
+
         });
   
-
-
         
 
-       
         
-        // Sort Results with Quicksilver
-        if(source.find("li").length == 0) {
-          source.append(list.find("li"));
-          Application.UI.modals(fishpond);
-        } else {
-          source.quicksand(list.find("li"), {
-            // Do nothing
-          }, function() {
-            Application.UI.modals(fishpond);
-          });
-        }
 
       });
     }   
@@ -167,14 +190,19 @@ Application = {
   //////////////////////////////////////////////////////////////////////////
   UI: {
     modals: function (fishpond) {
+
       var modalGroup,
           fishModal,
           fishID;
 
+          console.log("[Modals] Init");
+
       $('#results a').on('click', function(e){
         e.preventDefault();
         console.log("[Fish] Clicked");
-        fishID = $(this).closest('li').attr('data-id');
+        
+        
+        /*fishID = $(this).closest('li').attr('data-id');
         fishModal = $('#modalTemplate').clone().attr("id",fishID);
 
         fishModal.modal('show');
@@ -211,7 +239,7 @@ Application = {
           if (fishModal.attr("id") == data.id){
             fishModal.html(modalGroup);
           }
-        });
+        });*/
       });
     },
 
