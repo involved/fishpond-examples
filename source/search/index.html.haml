@@ -1,0 +1,68 @@
+.page-header
+  %h1 Fishpond Demos
+
+#loading.container
+  .span4.offset4
+    .progress.progress-striped.active
+      .bar{:style => "width: 0%"}
+
+%section#query
+  .row
+    .span5
+      %form#fishpond.form-horizontal.well.visuallyhidden
+        %h2 Tags
+        %fieldset.tags
+          -# Sliders Dynamically added
+
+        %h2 Filters
+        %fieldset.filters
+          .control-group
+            .control-label
+              Filters
+
+
+    .span6.offset1
+      #results
+        %ul.thumbnails
+
+
+#modalTemplate.modal.fade.hide
+  .modal-body.loading
+    // Empty
+
+- content_for :css do
+  :css
+    .hidden{
+      display: none;
+    }
+
+    h1 {
+      text-align: center;
+      }
+
+    #results{
+    }
+      #results .thumbnails{
+      }
+        #results ul li .thumbnail{
+          min-height: 100px;
+          text-align: center;
+          position: relative;
+        }
+          #results ul li .thumbnail.loading{
+            background: url(/images/common/loading.gif) no-repeat center center;
+            color: #999;
+          }
+
+        .modal-body.loading{
+          background: url(/images/common/loading.gif) no-repeat center center;
+          min-height: 150px;
+        }
+
+    .js .visuallyhidden { display: none; }
+    .js .visuallyhidden.focusable:focus { clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto; }
+
+
+- content_for :javascript do
+  = javascript_include_tag "https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js"
+  = javascript_include_tag "/javascripts/search"

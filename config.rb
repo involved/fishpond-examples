@@ -9,6 +9,10 @@ page "/" do
   @demos = Dir[File.expand_path('../source/demos/*/', __FILE__)].map{ |d| File.basename(d) }
 end
 
+page "/search/" do
+  @demos = Dir[File.expand_path('../source/demos/*/', __FILE__)].map{ |d| File.basename(d) }
+end
+
 # Per-page layout changes:
 # 
 # With no layout

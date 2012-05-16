@@ -7,6 +7,7 @@ Application = {
       var pondToken = "sC8IZQ";
       var options = { debug: false };
       var fishpond = new Fishpond(apiKey, options);
+      var container = $("section#query");
 
       Application.Query.setup(fishpond);
       fishpond.init(pondToken);
@@ -22,10 +23,6 @@ Application = {
 
       //------------------------------------------------------------------------
       fishpond.ready(function(pond){
-        // Loading transitions
-        $("#loading").fadeOut(0);
-        $("#demo").fadeIn(400);
-        $("#demo h1").append(' "' + pond.name + '"');       
 
         // Generate form controls
         var formTags = $("fieldset.tags");
@@ -59,7 +56,14 @@ Application = {
         });
 
         Application.UI.sliders(fishpond);
-        fishpond.query({}, {});
+
+        // Loading transitions
+        $("#loading").fadeOut(400);
+        $("form").hide().removeClass("visuallyhidden").delay(400).fadeIn(400);
+        $("form").queue(function() {
+          fishpond.query({}, {});
+        });
+
       });
 
       //------------------------------------------------------------------------
