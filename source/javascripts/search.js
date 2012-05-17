@@ -74,6 +74,8 @@ Application = {
         var fishID;
         var resultItem;
         var resultDetails;
+        var modalGroup;
+        var fishModal;
 
         // ------------------------------------------------------------------------
         // GENERATE RESULTS
@@ -119,6 +121,44 @@ Application = {
 
           resultItem.find(".details").html(resultDetails);
           resultItem.find(".loading").removeClass("loading");
+
+          source.find("li[data-id='" + fishID + "'] .btn").click(function(e){
+            e.preventDefault();
+
+            fishModal = $('#modalTemplate').clone().attr("id",fishID);
+            fishModal.modal('show');
+            console.log(metadata);
+
+            if (metadata.thumbnail_url === ""){
+              // Backup thumbnail
+              metadata.thumbnail_url = "http://placehold.it/120x120" ;
+            }
+          
+            modalGroup = $("" +
+              "<div class='modal-header'>" +
+                "<button class='close' data-dismiss='modal'>×</button>" +
+                "<h3>" + metadata.title + "</h3>" +
+              "</div>" +
+              "<div class='modal-body'>" +
+                "<div class='row'>" + 
+                  "<div class='span2'>" + 
+                    "<img src='" + metadata.thumbnail_url + "' alt='" + metadata.title + "' />" +
+                  "</div>" + 
+                  "<div class='span4'>" + 
+                    "<p>" + metadata.description + "</p>" +
+                    "<a href='" + metadata.url + "' target='_blank'>Find out more</a>" +
+                  "</div>" +
+                "</div>" +
+              "</div>" +
+              "<div class='modal-footer'>" +
+                "<a href='#' class='btn' data-dismiss='modal'>Close</a>" +
+              "</div>");
+
+            if (fishModal.attr("id") == metadata.id){
+              fishModal.html(modalGroup);
+            }
+
+          });
         }
 
         // Load Fish's Metadata
@@ -135,13 +175,10 @@ Application = {
         }
 
         function metadataLoadedListener(){
-          $('#results li').each(function(index) {
+          source.find("li").each(function(index) {
             $.when( loadMetadata($(this).attr("id")) ).then(
               function(status){
-                console.log( status+' Metadata loaded ' ); // Resolved
-              },
-              function(status){
-                console.warn( status+' -> Metadata Not loaded ' ); // Rejected
+                console.log(status + ' Metadata loaded'); // Resolved
               }
             );                  
           });
@@ -161,6 +198,7 @@ Application = {
               metadataLoadedListener();
               console.log( '[Results] reordered ' );
 
+              
               //Application.UI.modals(fishpond);
             });
           }
