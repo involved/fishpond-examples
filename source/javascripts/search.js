@@ -76,6 +76,8 @@ Application = {
         var resultDetails;
         var modalGroup;
         var fishModal;
+        var isShortlisted;
+        var shortlistButton;
 
         // ------------------------------------------------------------------------
         // GENERATE RESULTS
@@ -83,6 +85,16 @@ Application = {
 
         $.each(results, function(position, result){ 
           fishID = result.fish.id;
+          isShortlisted = localStorage.getItem(fishID + "_shortlisted");
+
+          if (isShortlisted){
+            shortlistButton = "<a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist btn-warning icon-white shortlisted'><i class='icon-star'></i></a>"
+          } else {
+            shortlistButton = "<a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist'><i class='icon-star'></i></a>"
+          }
+
+
+          
 
           // Create empty Fish
           listItem = $("" +
@@ -91,6 +103,7 @@ Application = {
                 "<strong>" + result.fish.title + "</strong>" +
                 "<br /> " + result.fish.id +
                 "<div class='details'></div>" +
+                shortlistButton +
               "</div>" +
             "</li>");
 
@@ -107,23 +120,56 @@ Application = {
         });
 
         // ------------------------------------------------------------------------
-        // FUNCTIONS - Fish Creation
+        // FUNCTIONS
         // ------------------------------------------------------------------------
 
         // Update Fish with Metadata
         function updateTemplate(fishID, metadata){
           resultItem = $("li[data-id='" + fishID + "']");
           resultDetails = $("" +
-            "<a class='btn btn-primary' href='" + metadata.url + "'>View Demo</a>" +
-            "<a class='btn launch-modal' href='#fishInfo'>More Info</a>");
+            "<a class='btn btn-mini btn-primary' href='" + metadata.url + "'>View Demo</a>" +
+            "<a class='btn btn-mini launch-modal' href='#fishInfo'>More Info</a>");
 
           //console.log(resultItem.attr("data-id") + " - Template Updated");
 
           resultItem.find(".details").html(resultDetails);
           resultItem.find(".loading").removeClass("loading");
 
-          source.find("li[data-id='" + fishID + "'] .btn").click(function(e){
+          modalInit(fishID, metadata);      
+          shortlist(fishID);
+        }
+
+        // Shortlist Handler
+        function shortlist(fishID){
+          var shortlistButtons = $(".shortlist[data-id='" + fishID + "']");
+
+          source.find(shortlistButtons).click(function(e){
             e.preventDefault();
+
+            shortlistButtons.toggleClass("btn-warning icon-white shortlisted");
+
+            if (shortlistButtons.hasClass("shortlisted")){
+              shortlistButtons.addClass("btn-warning icon-white");
+              localStorage.setItem(fishID + "_shortlisted", true);
+            } else {
+              shortlistButtons.removeClass("shortlisted btn-warning icon-white");
+              localStorage.setItem(fishID + "_shortlisted", false);
+            }
+          });
+        }
+
+        // Modal handler
+        function modalInit(fishID, metadata){
+          var shortlistButton = $(".shortlist[data-id='" + fishID + "']");
+          var shortlisted = false;
+
+          source.find("li[data-id='" + fishID + "'] .launch-modal").click(function(e){
+            e.preventDefault();
+
+            shortlisted = shortlistButton.hasClass("shortlisted");
+            
+
+            console.log("is shortlisted? " + shortlisted);
 
             fishModal = $('#modalTemplate').clone().attr("id",fishID);
             fishModal.modal('show');
@@ -133,7 +179,8 @@ Application = {
               // Backup thumbnail
               metadata.thumbnail_url = "http://placehold.it/120x120" ;
             }
-          
+            
+            // Construct modal
             modalGroup = $("" +
               "<div class='modal-header'>" +
                 "<button class='close' data-dismiss='modal'>×</button>" +
@@ -147,6 +194,7 @@ Application = {
                   "<div class='span4'>" + 
                     "<p>" + metadata.description + "</p>" +
                     "<a href='" + metadata.url + "' target='_blank'>Find out more</a>" +
+                    "<br /><br /><a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist'><i class='icon-star'></i> Add to shortlist</a>" +
                   "</div>" +
                 "</div>" +
               "</div>" +
@@ -154,10 +202,10 @@ Application = {
                 "<a href='#' class='btn' data-dismiss='modal'>Close</a>" +
               "</div>");
 
-            if (fishModal.attr("id") == metadata.id){
+            if (fishModal.attr("id") === metadata.id){
               fishModal.html(modalGroup);
+              //shortlist(fishID);
             }
-
           });
         }
 
@@ -188,7 +236,6 @@ Application = {
           // Sorting Results with Quicksand
           if(source.find("li").length == 0) {
             source.append(list.find("li"));
-            //Application.UI.modals(fishpond);
             console.log("[Quicksand] Init - " + $("#results li").length + " results in list");
             metadataLoadedListener();
           } else {
@@ -197,9 +244,6 @@ Application = {
             }, function() {
               metadataLoadedListener();
               console.log( '[Results] reordered ' );
-
-              
-              //Application.UI.modals(fishpond);
             });
           }
         }
