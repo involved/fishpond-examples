@@ -75,7 +75,40 @@ Application = {
         var resultItem;
         var resultDetails;
 
-        // Check to see if Fish has Metadata Cached
+        // ------------------------------------------------------------------------
+        // GENERATE RESULTS
+        // ------------------------------------------------------------------------
+
+        $.each(results, function(position, result){ 
+          fishID = result.fish.id;
+
+          // Create empty Fish
+          listItem = $("" +
+            "<li class='span2' id='"+fishID+"' data-id='"+fishID+"'>" +
+              "<div class='thumbnail loading'>" +
+                "<strong>" + result.fish.title + "</strong>" +
+                "<br /> " + result.fish.id +
+                "<div class='details'></div>" +
+              "</div>" +
+            "</li>");
+
+          // Add empty fish to results
+          list.append(listItem);
+
+          // Check if Metadata is cached
+          if (result.fish.metadata.url){
+            console.warn("Already loaded");
+            updateTemplate(fishID, result.fish.metadata);
+          } else {
+            //loadMetadata(fishID);
+          };
+        });
+
+        // ------------------------------------------------------------------------
+        // FUNCTIONS - Fish Creation
+        // ------------------------------------------------------------------------
+
+        // Update Fish with Metadata
         function updateTemplate(fishID, metadata){
           resultItem = $("#results ul").find("[data-id='" + fishID + "']");
           resultDetails = $("" +
@@ -88,25 +121,18 @@ Application = {
           resultItem.find(".loading").removeClass("loading");
         }
 
-        function loadMetadata(result){
+        // Load Fish's Metadata
+        function loadMetadata(fishID){
           var fishMetadata = new $.Deferred();
-          var fishID = result.fish.id;
 
-          if (result.fish.metadata.url){
-            fishMetadata.resolve("Already loaded");
-            updateTemplate(fishID, result.fish.metadata);
-          } else {
-            fishpond.get_fish(fishID, function(data){
-              fishMetadata.resolve("Success");
-              updateTemplate(fishID, data);
-              //console.log(data.id);
-            });    
-          };
+          fishpond.get_fish(fishID, function(data){
+            fishMetadata.resolve("Success" + fishID);
+            updateTemplate(fishID, data);
+          });    
 
           // Return the Promise so caller can't change the Deferred
           return fishMetadata.promise();
         }
-
 
         function sortResults() {
           var reorderResults = new $.Deferred();
@@ -114,74 +140,60 @@ Application = {
           // Sorting Results with Quicksand
           if(source.find("li").length == 0) {
             source.append(list.find("li"));
-            reorderResults.reject("No results in list");
+            reorderResults.reject("Results Init");
+
+
             //Application.UI.modals(fishpond);
           } else {
             source.quicksand(list.find("li"), {
               // Do nothing
             }, function() {
               reorderResults.resolve("Success");
+
+
               //Application.UI.modals(fishpond);
             });
           }
           return reorderResults.promise();
         }
         
-        //------------------------------------------------------------------------
-        $.each(results, function(position, result){ 
-          fishID = result.fish.id;
+        // ------------------------------------------------------------------------
+        // CALLBACKS
+        // ------------------------------------------------------------------------
 
-          // Create empty Fish
-          listItem = $("" +
-            "<li class='span2' id='"+fishID+"' data-id='"+fishID+"'>" +
-              "<div class='thumbnail loading'>" +
-                "<strong>" + result.fish.title + "</strong>" +
-                "<div class='details'></div>" +
-              "</div>" +
-            "</li>");
+        // After Results are Sorted
+        $.when( sortResults() ).then(
+          function(status){
+            console.warn( status+' -> Results reordered ' ); // Resolve
 
-          // Add empty fish to results
-          list.append(listItem);
+            $('#results li').each(function(index) {
+              console.log((index+1) + ': ' + $(this).attr("id"));
+              //loadMetadata($(this).attr("id"));
+            });
+            //Application.UI.modals(fishpond);
 
+          },
+          function(status){
+            console.warn( status+' -> Results not reordered ' ); // Reject
+          },
+          function(status){
+            // notify
+          }
+        ); 
 
-          // Check to see if Fish Metadata has already been loaded, otherwise fetch it. Attach a done, fail, and progress handler for the asyncEvent
-          $.when( loadMetadata(result) ).then(
-            function(status){
-              // fishMetadata.resolve
+        /*
+        $.when( loadMetadata(fishID) ).then(
+          function(status){
+            console.warn( status+' -> Metadata loaded ' ); // Resolved
+          },
+          function(status){
+            console.warn( status+' -> Metadata Not loaded ' ); // Rejected
+          },
+          function(status){
+            // Notify
+          }
+        );*/
 
-              console.warn( status+' -> Metadata loaded ' );
-            },
-            function(status){
-              // fishMetadata.reject
-              console.warn( status+' -> Results reordered ' );
-            },
-            function(status){
-              // fishMetadata.notify
-            }
-          ); 
-
-          //sortResults();
-          $.when( sortResults() ).then(
-            function(status){
-              // fishMetadata.resolve
-
-              console.warn( status+' -> Results reordered ' );
-            },
-            function(status){
-              // fishMetadata.reject
-              console.warn( status+' -> Results not reordered ' );
-            },
-            function(status){
-              // fishMetadata.notify
-            }
-          ); 
-
-
-        });
-  
-        
-
-        
 
       });
     }   
