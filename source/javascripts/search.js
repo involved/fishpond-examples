@@ -110,7 +110,7 @@ Application = {
 
         // Update Fish with Metadata
         function updateTemplate(fishID, metadata){
-          resultItem = $("#results ul").find("[data-id='" + fishID + "']");
+          resultItem = $("li[data-id='" + fishID + "']");
           resultDetails = $("" +
             "<a class='btn btn-primary' href='" + metadata.url + "'>View Demo</a>" +
             "<a class='btn launch-modal' href='#fishInfo'>More Info</a>");
@@ -126,7 +126,7 @@ Application = {
           var fishMetadata = new $.Deferred();
 
           fishpond.get_fish(fishID, function(data){
-            fishMetadata.resolve("Success" + fishID);
+            fishMetadata.resolve("Success -> " + fishID);
             updateTemplate(fishID, data);
           });    
 
@@ -134,41 +134,51 @@ Application = {
           return fishMetadata.promise();
         }
 
-        function sortResults() {
-          var reorderResults = new $.Deferred();
+        function metadataLoadedListener(){
+          $('#results li').each(function(index) {
+            $.when( loadMetadata($(this).attr("id")) ).then(
+              function(status){
+                console.log( status+' Metadata loaded ' ); // Resolved
+              },
+              function(status){
+                console.warn( status+' -> Metadata Not loaded ' ); // Rejected
+              }
+            );                  
+          });
+        }
 
+        function sortResults() {
           // Sorting Results with Quicksand
           if(source.find("li").length == 0) {
             source.append(list.find("li"));
-            reorderResults.reject("Results Init");
-
-
             //Application.UI.modals(fishpond);
+            console.log("[Quicksand] Init - " + $("#results li").length + " results in list");
+            metadataLoadedListener();
           } else {
             source.quicksand(list.find("li"), {
               // Do nothing
             }, function() {
-              reorderResults.resolve("Success");
-
+              metadataLoadedListener();
+              console.log( '[Results] reordered ' );
 
               //Application.UI.modals(fishpond);
             });
           }
-          return reorderResults.promise();
         }
         
         // ------------------------------------------------------------------------
         // CALLBACKS
         // ------------------------------------------------------------------------
 
+        sortResults();
         // After Results are Sorted
-        $.when( sortResults() ).then(
+        /*$.when( sortResults() ).then(
           function(status){
             console.warn( status+' -> Results reordered ' ); // Resolve
 
             $('#results li').each(function(index) {
               console.log((index+1) + ': ' + $(this).attr("id"));
-              //loadMetadata($(this).attr("id"));
+              loadMetadata($(this).attr("id"));
             });
             //Application.UI.modals(fishpond);
 
@@ -179,7 +189,7 @@ Application = {
           function(status){
             // notify
           }
-        ); 
+        ); */
 
         /*
         $.when( loadMetadata(fishID) ).then(
