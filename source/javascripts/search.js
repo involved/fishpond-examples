@@ -4,7 +4,7 @@ Application = {
   Query: {
     init: function () {
       var apiKey = "6OqHqMf609P6tSrxuj2ANuj3S6fAUphnjyOcGWdtD";
-      var pondToken = "sC8IZQ";
+      var pondToken = "BJHnFG";// "sC8IZQ";
       var options = { debug: false };
       var fishpond = new Fishpond(apiKey, options);
       var container = $("section#query");
@@ -107,9 +107,9 @@ Application = {
           // Check if on shortlist
           if (isShortlisted == "true"){
             shortlistClass = "btn-warning icon-white";
-            console.log(fishID + " -> SL: " + isShortlisted);
+            //console.log(fishID + " -> SL: " + isShortlisted);
           } else {
-            console.log(fishID + " -> SL: false");
+            //console.log(fishID + " -> SL: false");
           }
 
           // Create empty Fish
@@ -130,7 +130,10 @@ Application = {
           if (!locache.get("metadata-"+fishID)){
             $.when( loadMetadata(fishID) ).then(
               function(status){
-                console.log(status); // Resolved
+                //console.log(status); // Resolved
+              },function(status){
+                console.log("FAILED");
+                //console.log(status); // Resolved
               }
             );
           }
@@ -153,8 +156,6 @@ Application = {
 
           resultItem.find(".details").html(resultDetails);
           resultItem.find(".loading").removeClass("loading");
-
-          console.log("LOAD NEW META: " + fishID);
 
           modalInit(fishID, metadata);      
           shortlist(fishID);
@@ -185,8 +186,7 @@ Application = {
           var shortlistButton = $(".shortlist[data-id='" + fishID + "']");
           var shortlistClass = null;
           var shortlistWording = null;
-
-          console.log("[Modal] - " + fishID);
+          //console.log("[Modal] - " + fishID);
 
           source.find("li[data-id='" + fishID + "'] .launch-modal").click(function(e){
             e.preventDefault();
@@ -201,9 +201,9 @@ Application = {
               shortlistWording = "Add to shortlist";
             }
             
+            // Clone empty Modal template and display
             fishModal = $('#modalTemplate').clone().attr("id",fishID);
             fishModal.modal('show');
-            //console.log(metadata);
 
             // Backup thumbnail
             if (metadata.thumbnail_url === ""){
@@ -239,10 +239,10 @@ Application = {
           });
         }
 
-        // Load Fish's Metadata
+        // Load Fish's Metadata then store it
         function loadMetadata(fishID){
           var fishMetadata = new $.Deferred();
-
+          console.log("loading -> " );
           fishpond.get_fish(fishID, function(metadata){
             fishMetadata.resolve("[Metadata] - " + fishID);
             locache.set("metadata-"+fishID, metadata); // Store Fish Metadata
@@ -267,9 +267,6 @@ Application = {
               // Activate Shortlist + Modals on all Results
               $('#results li').each(function(index) {
                 fishID = $(this).attr("id");
-
-                console.log(locache.get("metadata-"+fishID));
-
                 modalInit(fishID, locache.get("metadata-"+fishID));
                 shortlist(fishID);
               });
