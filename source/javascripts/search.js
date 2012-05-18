@@ -77,24 +77,21 @@ Application = {
         var modalGroup;
         var fishModal;
         var isShortlisted;
-        var shortlistButton;
 
         // ------------------------------------------------------------------------
         // GENERATE RESULTS
         // ------------------------------------------------------------------------
 
         $.each(results, function(position, result){ 
+          
+          var shortlistActiveClass = null;
+
           fishID = result.fish.id;
           isShortlisted = localStorage.getItem(fishID + "_shortlisted");
 
-          if (isShortlisted){
-            shortlistButton = "<a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist btn-warning icon-white shortlisted'><i class='icon-star'></i></a>"
-          } else {
-            shortlistButton = "<a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist'><i class='icon-star'></i></a>"
+          if (isShortlisted == "true"){
+            shortlistActiveClass = "btn-warning icon-white shortlisted";
           }
-
-
-          
 
           // Create empty Fish
           listItem = $("" +
@@ -103,7 +100,7 @@ Application = {
                 "<strong>" + result.fish.title + "</strong>" +
                 "<br /> " + result.fish.id +
                 "<div class='details'></div>" +
-                shortlistButton +
+                "<a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist "+ shortlistActiveClass +"'><i class='icon-star'></i></a>" +
               "</div>" +
             "</li>");
 
@@ -143,18 +140,27 @@ Application = {
         function shortlist(fishID){
           var shortlistButtons = $(".shortlist[data-id='" + fishID + "']");
 
+          //console.log("Shortlist " + fishID + " -> " + localStorage.getItem(fishID + "_shortlisted"));
+
           source.find(shortlistButtons).click(function(e){
             e.preventDefault();
+            isShortlisted = localStorage.getItem(fishID + "_shortlisted");
 
-            shortlistButtons.toggleClass("btn-warning icon-white shortlisted");
+            //console.log("Shortlist RAW " + fishID + " -> " + isShortlisted);
 
-            if (shortlistButtons.hasClass("shortlisted")){
-              shortlistButtons.addClass("btn-warning icon-white");
-              localStorage.setItem(fishID + "_shortlisted", true);
+            if (isShortlisted == "true"){
+              shortlistButtons.removeClass("btn-warning icon-white");
+              localStorage.setItem(fishID + "_shortlisted", "false");
+              //console.log("Shortlist Update " + fishID + " -> " + localStorage.getItem(fishID + "_shortlisted"));
+
             } else {
-              shortlistButtons.removeClass("shortlisted btn-warning icon-white");
-              localStorage.setItem(fishID + "_shortlisted", false);
+              shortlistButtons.addClass("btn-warning icon-white");
+              localStorage.setItem(fishID + "_shortlisted", "true");
+              //console.log("Shortlist Update " + fishID + " -> " + localStorage.getItem(fishID + "_shortlisted"));
             }
+
+            console.log("Shortlist Update " + fishID + " -> " + localStorage.getItem(fishID + "_shortlisted"));
+
           });
         }
 
@@ -226,7 +232,7 @@ Application = {
           source.find("li").each(function(index) {
             $.when( loadMetadata($(this).attr("id")) ).then(
               function(status){
-                console.log(status + ' Metadata loaded'); // Resolved
+              //  console.log(status + ' Metadata loaded'); // Resolved
               }
             );                  
           });
