@@ -48,6 +48,7 @@
           min-height: 100px;
           text-align: center;
           position: relative;
+          background: #fff;
         }
           #results ul li .thumbnail.loading{
             background: url(/images/common/loading.gif) no-repeat center center;
@@ -55,7 +56,7 @@
           }
 
         .modal-body.loading{
-          background: url(/images/common/loading.gif) no-repeat center center;
+          background: #fff url(/images/common/loading.gif) no-repeat center center;
           min-height: 200px;
         }
            #results ul li .thumbnail .details{
@@ -74,5 +75,5 @@
 
 - content_for :javascript do
   = javascript_include_tag "https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js"
-  = javascript_include_tag "https://raw.github.com/d0ugal/locache/master/locache.js"
+  = javascript_include_tag "https://raw.github.com/d0ugal/locache/master/build/locache.js"
   = javascript_include_tag "/javascripts/search"
