@@ -84,13 +84,13 @@ Application = {
 
         $.each(results, function(position, result){ 
           
-          var shortlistActiveClass = null;
+          var shortlistClass = null;
 
           fishID = result.fish.id;
           isShortlisted = localStorage.getItem(fishID + "_shortlisted");
 
           if (isShortlisted == "true"){
-            shortlistActiveClass = "btn-warning icon-white shortlisted";
+            shortlistClass = "btn-warning icon-white";
           }
 
           // Create empty Fish
@@ -100,7 +100,7 @@ Application = {
                 "<strong>" + result.fish.title + "</strong>" +
                 "<br /> " + result.fish.id +
                 "<div class='details'></div>" +
-                "<a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist "+ shortlistActiveClass +"'><i class='icon-star'></i></a>" +
+                "<a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist "+ shortlistClass +"'><i class='icon-star'></i></a>" +
               "</div>" +
             "</li>");
 
@@ -138,52 +138,53 @@ Application = {
 
         // Shortlist Handler
         function shortlist(fishID){
+          console.log("[Shortlist] Init");
           var shortlistButtons = $(".shortlist[data-id='" + fishID + "']");
 
-          //console.log("Shortlist " + fishID + " -> " + localStorage.getItem(fishID + "_shortlisted"));
+          console.log("Btns - " + shortlistButtons.length);
 
-          source.find(shortlistButtons).click(function(e){
+          shortlistButtons.on("click", function(e){
             e.preventDefault();
             isShortlisted = localStorage.getItem(fishID + "_shortlisted");
 
-            //console.log("Shortlist RAW " + fishID + " -> " + isShortlisted);
-
             if (isShortlisted == "true"){
-              shortlistButtons.removeClass("btn-warning icon-white");
+              shortlistButtons.removeClass("btn-warning");
               localStorage.setItem(fishID + "_shortlisted", "false");
-              //console.log("Shortlist Update " + fishID + " -> " + localStorage.getItem(fishID + "_shortlisted"));
-
             } else {
-              shortlistButtons.addClass("btn-warning icon-white");
+              shortlistButtons.addClass("btn-warning");
               localStorage.setItem(fishID + "_shortlisted", "true");
-              //console.log("Shortlist Update " + fishID + " -> " + localStorage.getItem(fishID + "_shortlisted"));
             }
 
             console.log("Shortlist Update " + fishID + " -> " + localStorage.getItem(fishID + "_shortlisted"));
-
           });
         }
 
         // Modal handler
         function modalInit(fishID, metadata){
           var shortlistButton = $(".shortlist[data-id='" + fishID + "']");
-          var shortlisted = false;
+          var shortlistClass = null;
+          var shortlistWording = null;
 
           source.find("li[data-id='" + fishID + "'] .launch-modal").click(function(e){
             e.preventDefault();
 
-            shortlisted = shortlistButton.hasClass("shortlisted");
+            isShortlisted = localStorage.getItem(fishID + "_shortlisted");
+
+            if (isShortlisted == "true"){
+              shortlistClass = "btn-warning shortlisted";
+              shortlistWording = "Remove from shortlist";
+            } else {
+              shortlistClass = "";
+              shortlistWording = "Add to shortlist";
+            }
             
-
-            console.log("is shortlisted? " + shortlisted);
-
             fishModal = $('#modalTemplate').clone().attr("id",fishID);
             fishModal.modal('show');
-            console.log(metadata);
+            //console.log(metadata);
 
+            // Backup thumbnail
             if (metadata.thumbnail_url === ""){
-              // Backup thumbnail
-              metadata.thumbnail_url = "http://placehold.it/120x120" ;
+              metadata.thumbnail_url = "http://placehold.it/120x120"; 
             }
             
             // Construct modal
@@ -200,7 +201,7 @@ Application = {
                   "<div class='span4'>" + 
                     "<p>" + metadata.description + "</p>" +
                     "<a href='" + metadata.url + "' target='_blank'>Find out more</a>" +
-                    "<br /><br /><a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist'><i class='icon-star'></i> Add to shortlist</a>" +
+                    "<br /><br /><a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist "+ shortlistClass +"'><i class='icon-star'></i> "+ shortlistWording +"</a>" +
                   "</div>" +
                 "</div>" +
               "</div>" +
@@ -210,7 +211,7 @@ Application = {
 
             if (fishModal.attr("id") === metadata.id){
               fishModal.html(modalGroup);
-              //shortlist(fishID);
+              shortlist(fishID);
             }
           });
         }
@@ -299,60 +300,6 @@ Application = {
 
   //////////////////////////////////////////////////////////////////////////
   UI: {
-    modals: function (fishpond) {
-
-      var modalGroup,
-          fishModal,
-          fishID;
-
-          console.log("[Modals] Init");
-
-      $('#results a').on('click', function(e){
-        e.preventDefault();
-        console.log("[Fish] Clicked");
-        
-        
-        /*fishID = $(this).closest('li').attr('data-id');
-        fishModal = $('#modalTemplate').clone().attr("id",fishID);
-
-        fishModal.modal('show');
-
-        fishpond.get_fish(fishID, function(data){
-          console.log("[Fish] Metadata receieved:");
-          console.log(data);
-
-          if (data.thumbnail_url === ""){
-            // Backup thumbnail
-            data.thumbnail_url = "http://placehold.it/120x120" ;
-          }
-        
-          modalGroup = $("" +
-            "<div class='modal-header'>" +
-              "<button class='close' data-dismiss='modal'>×</button>" +
-              "<h3>" + data.title + "</h3>" +
-            "</div>" +
-            "<div class='modal-body'>" +
-              "<div class='row'>" + 
-                "<div class='span2'>" + 
-                  "<img src='" + data.thumbnail_url + "' alt='" + data.title + "' />" +
-                "</div>" + 
-                "<div class='span4'>" + 
-                  "<p>" + data.description + "</p>" +
-                  "<a href='" + data.url + "' target='_blank'>Find out more</a>" +
-                "</div>" +
-              "</div>" +
-            "</div>" +
-            "<div class='modal-footer'>" +
-              "<a href='#' class='btn' data-dismiss='modal'>Close</a>" +
-            "</div>");
-
-          if (fishModal.attr("id") == data.id){
-            fishModal.html(modalGroup);
-          }
-        });*/
-      });
-    },
-
     sliders: function (fishpond) {
       // jQuery UI Slider
       $(".slider").slider({
