@@ -27,9 +27,17 @@ Application = {
         // Generate form controls
         var formTags = $("fieldset.tags");
         var formFilters = $("fieldset.filters .control-group");
-        var tagControlGroup,
-            filterControl;
+        var tagControlGroup;
+        var filterControl;
 
+        // Clear LocalStorage of fish data
+        Object.keys(localStorage).forEach(function(key){
+          if (/^(shortlisted-)|(metadata-)/.test(key)) {
+            localStorage.removeItem(key);
+          }
+        });
+
+        // Generate Tag Controls
         $.each(pond.tag_ids, function(name, token){ 
           tagControlGroup = $("" +
             "<div class='control-group'>" +
@@ -44,6 +52,7 @@ Application = {
           formTags.append(tagControlGroup);
         });
 
+        // Generate Filter Controls
         $.each(pond.filters, function(index, token){
           filterControl = $("" +
             "<div class='controls'>" +
@@ -55,6 +64,7 @@ Application = {
           formFilters.append(filterControl);
         });
 
+        // Init Input Controls styling
         Application.UI.sliders(fishpond);
 
         // Loading transitions
@@ -78,16 +88,12 @@ Application = {
         var fishModal;
         var isShortlisted;
 
-        // ------------------------------------------------------------------------
-        // GENERATE RESULTS
-        // ------------------------------------------------------------------------
-
+        // Generate Results
         $.each(results, function(position, result){ 
-          
           var shortlistClass = null;
 
           fishID = result.fish.id;
-          isShortlisted = localStorage.getItem(fishID + "_shortlisted");
+          isShortlisted = localStorage.getItem("shortlisted-"+fishID);
 
           if (isShortlisted == "true"){
             shortlistClass = "btn-warning icon-white";
@@ -126,7 +132,6 @@ Application = {
           resultDetails = $("" +
             "<a class='btn btn-mini btn-primary' href='" + metadata.url + "'>View Demo</a>" +
             "<a class='btn btn-mini launch-modal' href='#fishInfo'>More Info</a>");
-
           //console.log(resultItem.attr("data-id") + " - Template Updated");
 
           resultItem.find(".details").html(resultDetails);
@@ -138,24 +143,19 @@ Application = {
 
         // Shortlist Handler
         function shortlist(fishID){
-          console.log("[Shortlist] Init");
           var shortlistButtons = $(".shortlist[data-id='" + fishID + "']");
-
-          console.log("Btns - " + shortlistButtons.length);
 
           shortlistButtons.on("click", function(e){
             e.preventDefault();
-            isShortlisted = localStorage.getItem(fishID + "_shortlisted");
+            isShortlisted = localStorage.getItem("shortlisted-"+fishID);
 
             if (isShortlisted == "true"){
               shortlistButtons.removeClass("btn-warning");
-              localStorage.setItem(fishID + "_shortlisted", "false");
+              localStorage.setItem("shortlisted-"+fishID, "false");
             } else {
               shortlistButtons.addClass("btn-warning");
-              localStorage.setItem(fishID + "_shortlisted", "true");
+              localStorage.setItem("shortlisted-"+fishID, "true");
             }
-
-            console.log("Shortlist Update " + fishID + " -> " + localStorage.getItem(fishID + "_shortlisted"));
           });
         }
 
@@ -168,7 +168,7 @@ Application = {
           source.find("li[data-id='" + fishID + "'] .launch-modal").click(function(e){
             e.preventDefault();
 
-            isShortlisted = localStorage.getItem(fishID + "_shortlisted");
+            isShortlisted = localStorage.getItem("shortlisted-"+fishID);
 
             if (isShortlisted == "true"){
               shortlistClass = "btn-warning shortlisted";
@@ -220,9 +220,12 @@ Application = {
         function loadMetadata(fishID){
           var fishMetadata = new $.Deferred();
 
-          fishpond.get_fish(fishID, function(data){
+          fishpond.get_fish(fishID, function(metadata){
             fishMetadata.resolve("Success -> " + fishID);
-            updateTemplate(fishID, data);
+            localStorage.setItem("metadata-url-"+fishID, metadata.url);
+            console.log(localStorage.getItem("metadata-url-"+fishID));
+            
+            updateTemplate(fishID, metadata);
           });    
 
           // Return the Promise so caller can't change the Deferred
@@ -233,7 +236,8 @@ Application = {
           source.find("li").each(function(index) {
             $.when( loadMetadata($(this).attr("id")) ).then(
               function(status){
-              //  console.log(status + ' Metadata loaded'); // Resolved
+                console.log(status + ' Metadata loaded'); // Resolved
+
               }
             );                  
           });
