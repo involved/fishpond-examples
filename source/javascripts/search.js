@@ -19,6 +19,8 @@ Application = {
       fishpond.loading(function(percent){
         $("#loading .progress").removeClass("progress-striped");
         $("#loading .bar").css({width: (percent * 100) + "%"});
+        // Clear LocalStorage of fish data
+        locache.flush();
       });
 
       //------------------------------------------------------------------------
@@ -29,13 +31,6 @@ Application = {
         var formFilters = $("fieldset.filters .control-group");
         var tagControlGroup;
         var filterControl;
-
-        // Clear LocalStorage of fish data
-        Object.keys(localStorage).forEach(function(key){
-          if (/^(shortlisted-)|(metadata-)/.test(key)) {
-            localStorage.removeItem(key);
-          }
-        });
 
         // Generate Tag Controls
         $.each(pond.tag_ids, function(name, token){ 
@@ -94,7 +89,7 @@ Application = {
         $.each(results, function(position, result){ 
           var shortlistClass = null;
           fishID = result.fish.id;
-          isShortlisted = localStorage.getItem("shortlisted-"+fishID);
+          isShortlisted = locache.get("shortlisted-"+fishID);
 
           // Check if Fish metadata is cached
           if (locache.get("metadata-"+fishID)){
@@ -109,7 +104,7 @@ Application = {
             resultDetails = ("<div class='details'></div>"); 
           }
 
-          console.log(resultDetails);
+          console.log(fishID + " -> " + locache.get("shortlisted-"+fishID));
 
           // Check if on shortlist
           if (isShortlisted == "true"){
@@ -140,13 +135,16 @@ Application = {
           }
         });
 
+        // Update Results order
+        sortResults();
+
+
         // ------------------------------------------------------------------------
         // FUNCTIONS
         // ------------------------------------------------------------------------
 
         // Update Fish with Metadata
         function updateTemplate(fishID, metadata){
-          //console.log("update template -> " + metadata.url);
           resultItem = $("li[data-id='" + fishID + "']");
           resultDetails = ("" +
             "<a class='btn btn-mini btn-primary' href='" + metadata.url + "'>View Demo</a>" +
@@ -165,15 +163,16 @@ Application = {
           var shortlistButtons = $(".shortlist[data-id='" + fishID + "']");
 
           shortlistButtons.on("click", function(e){
+            console.log("Button click -> " + fishID);
             e.preventDefault();
-            isShortlisted = localStorage.getItem("shortlisted-"+fishID);
+            isShortlisted = locache.get("shortlisted-"+fishID);
 
             if (isShortlisted == "true"){
               shortlistButtons.removeClass("btn-warning");
-              localStorage.setItem("shortlisted-"+fishID, "false");
+              locache.set("shortlisted-"+fishID, "false");
             } else {
               shortlistButtons.addClass("btn-warning");
-              localStorage.setItem("shortlisted-"+fishID, "true");
+              locache.set("shortlisted-"+fishID, "true");
             }
           });
         }
@@ -187,7 +186,7 @@ Application = {
           source.find("li[data-id='" + fishID + "'] .launch-modal").click(function(e){
             e.preventDefault();
 
-            isShortlisted = localStorage.getItem("shortlisted-"+fishID);
+            isShortlisted = locache.get("shortlisted-"+fishID);
 
             if (isShortlisted == "true"){
               shortlistClass = "btn-warning shortlisted";
@@ -239,10 +238,12 @@ Application = {
         function loadMetadata(fishID){
           var fishMetadata = new $.Deferred();
 
+
+
           fishpond.get_fish(fishID, function(metadata){
             fishMetadata.resolve("Success -> " + fishID);
             locache.set("metadata-"+fishID, metadata); // Store Fish Metadata
-
+            console.log("load -> " + fishID);
             updateTemplate(fishID, metadata);
           });    
 
@@ -266,54 +267,22 @@ Application = {
             source.append(list.find("li"));
             console.log("[Quicksand] Init - " + $("#results li").length + " results in list");
             //metadataLoadedListener();
+
           } else {
             source.quicksand(list.find("li"), {
               // Do nothing
             }, function() {
-             // metadataLoadedListener();
-              console.log( '[Results] reordered ' );
+              console.log('Results] reordered');
+    
+              // Active Shortlist and Modals on all Results
+              $('#results li').each(function(index) {
+                fishID = $(this).attr("id");
+                modalInit(fishID, locache.get("shortlisted-"+fishID));
+                shortlist(fishID);
+              });
             });
           }
         }
-        
-        // ------------------------------------------------------------------------
-        // CALLBACKS
-        // ------------------------------------------------------------------------
-
-        sortResults();
-        // After Results are Sorted
-        /*$.when( sortResults() ).then(
-          function(status){
-            console.warn( status+' -> Results reordered ' ); // Resolve
-
-            $('#results li').each(function(index) {
-              console.log((index+1) + ': ' + $(this).attr("id"));
-              loadMetadata($(this).attr("id"));
-            });
-            //Application.UI.modals(fishpond);
-
-          },
-          function(status){
-            console.warn( status+' -> Results not reordered ' ); // Reject
-          },
-          function(status){
-            // notify
-          }
-        ); */
-
-        /*
-        $.when( loadMetadata(fishID) ).then(
-          function(status){
-            console.warn( status+' -> Metadata loaded ' ); // Resolved
-          },
-          function(status){
-            console.warn( status+' -> Metadata Not loaded ' ); // Rejected
-          },
-          function(status){
-            // Notify
-          }
-        );*/
-
 
       });
     }   
