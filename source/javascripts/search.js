@@ -87,14 +87,31 @@ Application = {
         var modalGroup;
         var fishModal;
         var isShortlisted;
+        var status;
+ 
 
         // Generate Results
         $.each(results, function(position, result){ 
           var shortlistClass = null;
-
           fishID = result.fish.id;
           isShortlisted = localStorage.getItem("shortlisted-"+fishID);
 
+          // Check if Fish metadata is cached
+          if (locache.get("metadata-"+fishID)){
+            status = "loaded";
+            resultDetails = ("" +
+            "<div class='details'>" +
+              "<a class='btn btn-mini btn-primary' href='" + locache.get("metadata-"+fishID).url + "'>View Demo</a>" +
+              "<a class='btn btn-mini launch-modal' href='#fishInfo'>More Info</a>" +
+            "</div>");
+          } else {
+            status = "loading";
+            resultDetails = ("<div class='details'></div>"); 
+          }
+
+          console.log(resultDetails);
+
+          // Check if on shortlist
           if (isShortlisted == "true"){
             shortlistClass = "btn-warning icon-white";
           }
@@ -102,10 +119,10 @@ Application = {
           // Create empty Fish
           listItem = $("" +
             "<li class='span2' id='"+fishID+"' data-id='"+fishID+"'>" +
-              "<div class='thumbnail loading'>" +
+              "<div class='thumbnail "+ status +"'>" +
                 "<strong>" + result.fish.title + "</strong>" +
-                "<br /> " + result.fish.id +
-                "<div class='details'></div>" +
+                "<br /> " + result.fish.id + "<br /> " +
+                resultDetails +
                 "<a href='#' data-id='"+ fishID +"' class='btn btn-mini shortlist "+ shortlistClass +"'><i class='icon-star'></i></a>" +
               "</div>" +
             "</li>");
@@ -113,13 +130,14 @@ Application = {
           // Add empty fish to results
           list.append(listItem);
 
-          // Check if Metadata is cached
-          if (result.fish.metadata.url){
-            console.warn("Already loaded");
-            updateTemplate(fishID, result.fish.metadata);
-          } else {
-            //loadMetadata(fishID);
-          };
+          // Load Metadata if not Cached
+          if (!locache.get("metadata-"+fishID)){
+            $.when( loadMetadata(fishID) ).then(
+              function(status){
+                console.log(status + ' Metadata loaded'); // Resolved
+              }
+            );
+          }
         });
 
         // ------------------------------------------------------------------------
@@ -128,8 +146,9 @@ Application = {
 
         // Update Fish with Metadata
         function updateTemplate(fishID, metadata){
+          //console.log("update template -> " + metadata.url);
           resultItem = $("li[data-id='" + fishID + "']");
-          resultDetails = $("" +
+          resultDetails = ("" +
             "<a class='btn btn-mini btn-primary' href='" + metadata.url + "'>View Demo</a>" +
             "<a class='btn btn-mini launch-modal' href='#fishInfo'>More Info</a>");
           //console.log(resultItem.attr("data-id") + " - Template Updated");
@@ -222,9 +241,8 @@ Application = {
 
           fishpond.get_fish(fishID, function(metadata){
             fishMetadata.resolve("Success -> " + fishID);
-            localStorage.setItem("metadata-url-"+fishID, metadata.url);
-            console.log(localStorage.getItem("metadata-url-"+fishID));
-            
+            locache.set("metadata-"+fishID, metadata); // Store Fish Metadata
+
             updateTemplate(fishID, metadata);
           });    
 
@@ -237,7 +255,6 @@ Application = {
             $.when( loadMetadata($(this).attr("id")) ).then(
               function(status){
                 console.log(status + ' Metadata loaded'); // Resolved
-
               }
             );                  
           });
@@ -248,12 +265,12 @@ Application = {
           if(source.find("li").length == 0) {
             source.append(list.find("li"));
             console.log("[Quicksand] Init - " + $("#results li").length + " results in list");
-            metadataLoadedListener();
+            //metadataLoadedListener();
           } else {
             source.quicksand(list.find("li"), {
               // Do nothing
             }, function() {
-              metadataLoadedListener();
+             // metadataLoadedListener();
               console.log( '[Results] reordered ' );
             });
           }
