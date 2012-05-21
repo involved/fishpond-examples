@@ -114,7 +114,7 @@ Application = {
 
           // Create empty Fish
           listItem = $("" +
-            "<li class='span2' id='"+fishID+"' data-id='"+fishID+"'>" +
+            "<li class='span2 "+ status +"' id='"+fishID+"' data-id='"+fishID+"'>" +
               "<div class='thumbnail "+ status +"'>" +
                 "<strong>" + result.fish.title + "</strong>" +
                 "<br /> " + result.fish.id + "<br /> " +
@@ -129,11 +129,20 @@ Application = {
           // Load Metadata if not Cached
           if (!locache.get("metadata-"+fishID)){
             $.when( loadMetadata(fishID) ).then(
-              function(status){
+              function(fishID, metadata){
                 //console.log(status); // Resolved
+                console.log("[Metadata] Success " + fishID);
+                updateTemplate(fishID, metadata)
+                /*$.when( updateTemplate(fishID, metadata)).then(
+                  function(fishID, status){
+                    console.log("Init: " + status + " -> " + fishID) 
+                  },function(fishID, status){
+                    console.log("Init: " + status + " -> " + fishID) 
+                  }
+                );*/
+
               },function(status){
-                console.log("FAILED");
-                //console.log(status); // Resolved
+                console.log("[Metadata] FAILED");
               }
             );
           }
@@ -149,16 +158,39 @@ Application = {
 
         // Update Fish with Metadata
         function updateTemplate(fishID, metadata){
-          resultItem = $("li[data-id='" + fishID + "']");
-          resultDetails = ("" +
-            "<a class='btn btn-mini btn-primary' href='" + metadata.url + "'>View Demo</a>" +
-            "<a class='btn btn-mini launch-modal' href='#fishInfo'>More Info</a>");
+          var templateUpdated = new $.Deferred();
+            
+          if (metadata){
+            resultItem = $("li[data-id='" + fishID + "']");
+            resultDetails = ("" +
+              "<a class='btn btn-mini btn-primary' href='" + metadata.url + "'>View Demo</a>" +
+              "<a class='btn btn-mini launch-modal' href='#fishInfo'>More Info</a>");
 
-          resultItem.find(".details").html(resultDetails);
-          resultItem.find(".loading").removeClass("loading");
+            resultItem.find(".details").html(resultDetails);
+            resultItem.find(".loading").removeClass("loading");
 
-          modalInit(fishID, metadata);      
-          shortlist(fishID);
+            resultItem.removeClass("loading");
+            resultItem.addClass("loaded");
+
+            modalInit(fishID, metadata);      
+            shortlist(fishID);
+
+            templateUpdated.resolve(fishID, "[Template Updated] Success ");
+            
+          } else {
+            templateUpdated.reject(fishID, "[Template Updated] FAIL - no metadata");
+
+            // If no Metadata loaded then go load it
+            /*$.when( loadMetadata(fishID) ).then(
+              function(fishID, metadata){
+                console.log("Reloaded [Metadata] Success " + fishID);
+                updateTemplate(fishID, metadata);
+              }
+            );*/
+          }
+
+          // Return the Promise so caller can't change the Deferred
+          return templateUpdated.promise();
         }
 
         // Shortlist Handler
@@ -242,11 +274,12 @@ Application = {
         // Load Fish's Metadata then store it
         function loadMetadata(fishID){
           var fishMetadata = new $.Deferred();
-          console.log("loading -> " );
+          console.log("loading new" );
+
           fishpond.get_fish(fishID, function(metadata){
-            fishMetadata.resolve("[Metadata] - " + fishID);
+            fishMetadata.resolve(fishID, metadata);
             locache.set("metadata-"+fishID, metadata); // Store Fish Metadata
-            updateTemplate(fishID, metadata);
+            updateTemplate(fishID, metadata);     // Holding off updating resutls until sorting has finished   
           });    
 
           // Return the Promise so caller can't change the Deferred
@@ -267,8 +300,21 @@ Application = {
               // Activate Shortlist + Modals on all Results
               $('#results li').each(function(index) {
                 fishID = $(this).attr("id");
-                modalInit(fishID, locache.get("metadata-"+fishID));
+                metadata = locache.get("metadata-"+fishID);
+                modalInit(fishID, metadata);
                 shortlist(fishID);
+                
+                // Update template fish that haven't completed loading
+                if ($(this).hasClass("loading")){
+                  $.when( updateTemplate(fishID, metadata)).then(
+                    function(fishID, status){
+                      console.log("Force: " + status + " -> " + fishID) 
+                    },function(fishID, status){
+                      console.log("Force: " + status + " -> " + fishID) 
+                    }
+                  );
+                }
+
               });
             });
           }

@@ -44,11 +44,20 @@
     }
       #results .thumbnails{
       }
+
+        #results ul li.loaded{
+          background: green;
+        }
+
+        #results ul li.loading{
+          background: red;
+        }
+
         #results ul li .thumbnail{
           min-height: 100px;
           text-align: center;
           position: relative;
-          background: #fff;
+          //background: #fff;
         }
           #results ul li .thumbnail.loading{
             background: url(/images/common/loading.gif) no-repeat center center;
