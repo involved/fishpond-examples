@@ -82,37 +82,34 @@ Application = {
         var resultDetails;
         var modalGroup;
         var fishModal;
-        var isShortlisted;
         var status;
+        var templateUpdateQueue = [];
  
         // Generate Results
         $.each(results, function(position, result){ 
           var shortlistClass = null;
           fishID = result.fish.id;
-          isShortlisted = locache.get("shortlisted-"+fishID);
 
           // Check if Fish metadata is cached
-          if (locache.get("metadata-"+fishID)){
-            status = "loaded";
+          if (metadata(fishID)){
+            status = "loaded HARDCODED";
             resultDetails = ("" +
             "<div class='details'>" +
-              "<a class='btn btn-mini btn-primary' href='" + locache.get("metadata-"+fishID).url + "'>View Demo</a>" +
+              "<a class='btn btn-mini btn-primary' href='" + metadata(fishID).url + "'>View Demo</a>" +
               "<a class='btn btn-mini launch-modal' href='#fishInfo'>More Info</a>" +
             "</div>");
           } else {
+            loadMetadata(fishID);
             status = "loading";
             resultDetails = ("<div class='details'></div>"); 
           }
 
           // Check if on shortlist
-          if (isShortlisted == "true"){
+          if (isShortlisted(fishID) == "true"){
             shortlistClass = "btn-warning icon-white";
-            //console.log(fishID + " -> SL: " + isShortlisted);
-          } else {
-            //console.log(fishID + " -> SL: false");
-          }
+          } 
 
-          // Create empty Fish
+          // Create Fish (Empty if not cached)
           listItem = $("" +
             "<li class='span2 "+ status +"' id='"+fishID+"' data-id='"+fishID+"'>" +
               "<div class='thumbnail "+ status +"'>" +
@@ -123,29 +120,8 @@ Application = {
               "</div>" +
             "</li>");
 
-          // Add empty fish to results
+          // Add fish to results
           list.append(listItem);
-
-          // Load Metadata if not Cached
-          if (!locache.get("metadata-"+fishID)){
-            $.when( loadMetadata(fishID) ).then(
-              function(fishID, metadata){
-                //console.log(status); // Resolved
-                console.log("[Metadata] Success " + fishID);
-                updateTemplate(fishID, metadata)
-                /*$.when( updateTemplate(fishID, metadata)).then(
-                  function(fishID, status){
-                    console.log("Init: " + status + " -> " + fishID) 
-                  },function(fishID, status){
-                    console.log("Init: " + status + " -> " + fishID) 
-                  }
-                );*/
-
-              },function(status){
-                console.log("[Metadata] FAILED");
-              }
-            );
-          }
         });
 
         // Update Results order
@@ -156,10 +132,29 @@ Application = {
         // FUNCTIONS
         // ------------------------------------------------------------------------
 
-        // Update Fish with Metadata
+        // STEP 1: Load Fish's Metadata then store it
+        function loadMetadata(fishID){
+          var fishMetadata = new $.Deferred();
+          console.log("New fish");
+
+          fishpond.get_fish(fishID, function(metadata){
+            fishMetadata.resolve(fishID, metadata);
+            locache.set("metadata-"+fishID, metadata);  // Store Fish Metadata 
+               
+            if ($("#results").hasClass("reordering")){
+              templateUpdateQueue.push(fishID);         // Add to the queue for updating once reordering is finished
+            } else {
+              updateTemplate(fishID, metadata);         // Update Template if results are finished reordering
+            }
+          });    
+
+          return fishMetadata.promise();                // Return the Promise so caller can't change the Deferred
+        }
+
+        // STEP 2: Update Fish with Metadata. (Only used to add Metadata to new fish that haven't been cached yet)
         function updateTemplate(fishID, metadata){
           var templateUpdated = new $.Deferred();
-            
+ 
           if (metadata){
             resultItem = $("li[data-id='" + fishID + "']");
             resultDetails = ("" +
@@ -172,49 +167,16 @@ Application = {
             resultItem.removeClass("loading");
             resultItem.addClass("loaded");
 
-            modalInit(fishID, metadata);      
-            shortlist(fishID);
-
-            templateUpdated.resolve(fishID, "[Template Updated] Success ");
-            
-          } else {
-            templateUpdated.reject(fishID, "[Template Updated] FAIL - no metadata");
-
-            // If no Metadata loaded then go load it
-            /*$.when( loadMetadata(fishID) ).then(
-              function(fishID, metadata){
-                console.log("Reloaded [Metadata] Success " + fishID);
-                updateTemplate(fishID, metadata);
-              }
-            );*/
+            console.log("[Template Updated] Success -> " + fishID);
           }
 
-          // Return the Promise so caller can't change the Deferred
-          return templateUpdated.promise();
-        }
-
-        // Shortlist Handler
-        function shortlist(fishID){
-          var shortlistButtons = $(".shortlist[data-id='" + fishID + "']");
-
-          shortlistButtons.on("click", function(e){
-            e.preventDefault();
-            isShortlisted = locache.get("shortlisted-"+fishID);
-
-            if (isShortlisted == "true"){
-              shortlistButtons.removeClass("btn-warning");
-              locache.set("shortlisted-"+fishID, "false");
-              console.log("[Sortlist] Removed " + fishID);
-            } else {
-              shortlistButtons.addClass("btn-warning");
-              locache.set("shortlisted-"+fishID, "true");
-              console.log("[Sortlist] Added " + fishID);
-            }
-          });
+          return templateUpdated.promise();               // Return the Promise so caller can't change the Deferred
         }
 
         // Modal handler
         function modalInit(fishID, metadata){
+          //console.log("[Modal] - > " + fishID + " == " + metadata.id);
+
           var shortlistButton = $(".shortlist[data-id='" + fishID + "']");
           var shortlistClass = null;
           var shortlistWording = null;
@@ -271,19 +233,25 @@ Application = {
           });
         }
 
-        // Load Fish's Metadata then store it
-        function loadMetadata(fishID){
-          var fishMetadata = new $.Deferred();
-          console.log("loading new" );
+        // Shortlist Handler
+        function shortlist(fishID){
+          console.log("shortlist init -> " + fishID);
+          var shortlistButtons = $(".shortlist[data-id='" + fishID + "']");
+          shortlistButtons.on("click", function(e){
+            e.preventDefault();
 
-          fishpond.get_fish(fishID, function(metadata){
-            fishMetadata.resolve(fishID, metadata);
-            locache.set("metadata-"+fishID, metadata); // Store Fish Metadata
-            updateTemplate(fishID, metadata);     // Holding off updating resutls until sorting has finished   
-          });    
+            isShortlisted = locache.get("shortlisted-"+fishID);
 
-          // Return the Promise so caller can't change the Deferred
-          return fishMetadata.promise();
+            if (isShortlisted == "true"){
+              shortlistButtons.removeClass("btn-warning");
+              locache.set("shortlisted-"+fishID, "false");
+              console.log("[Sortlist] Removed " + fishID);
+            } else {
+              shortlistButtons.addClass("btn-warning");
+              locache.set("shortlisted-"+fishID, "true");
+              console.log("[Sortlist] Added " + fishID);
+            }
+          });
         }
 
         function sortResults() {
@@ -291,33 +259,43 @@ Application = {
           if(source.find("li").length == 0) {
             source.append(list.find("li"));
             console.log("[Quicksand] Init - " + $("#results li").length + " results in list");
+            source.find('li').each(function() {
+                fishID = $(this).attr("id");
+                metadata = locache.get("metadata-"+fishID);
+                modalInit(fishID, metadata);      
+              });
           } else {
             source.quicksand(list.find("li"), {
               // Do nothing
             }, function() {
               console.log('[Results] reordered');
-    
-              // Activate Shortlist + Modals on all Results
-              $('#results li').each(function(index) {
-                fishID = $(this).attr("id");
-                metadata = locache.get("metadata-"+fishID);
-                modalInit(fishID, metadata);
-                shortlist(fishID);
-                
-                // Update template fish that haven't completed loading
-                if ($(this).hasClass("loading")){
-                  $.when( updateTemplate(fishID, metadata)).then(
-                    function(fishID, status){
-                      console.log("Force: " + status + " -> " + fishID) 
-                    },function(fishID, status){
-                      console.log("Force: " + status + " -> " + fishID) 
-                    }
-                  );
-                }
+              $("#results").removeClass("reordering");
 
+              // Update templates for Fish in Queue
+              $.each(templateUpdateQueue, function(index, fishID) { 
+                updateTemplate(fishID, metadata(fishID));
+              });
+
+              source.find('li').each(function() {
+                fishID = $(this).attr("id");
+                metadata = metadata(fishID);
+                //console.log("[Metadata] - " + metadata);
+                //modalInit(fishID, metadata);      
               });
             });
           }
+        }
+
+        function isShortlisted(fishID) {
+          if (locache.get("shortlisted-"+fishID)){
+            return true
+          } else {
+            return false
+          }
+        }
+
+        function metadata(fishID) {
+          locache.get("metadata-"+fishID);
         }
 
       });
@@ -347,6 +325,8 @@ Application = {
             $("form#fishpond input").each(function(){
               tags[$(this).data('slug')] = $(this).val();
             });
+
+            $("#results").addClass("reordering");
             fishpond.query(tags, filters);
           }
         }
