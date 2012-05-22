@@ -4,7 +4,7 @@ Application = {
   Query: {
     init: function () {
       var apiKey = "6OqHqMf609P6tSrxuj2ANuj3S6fAUphnjyOcGWdtD";
-      var pondToken = "BJHnFG";// "sC8IZQ";
+      var pondToken = "uhEHwd";// "sC8IZQ";
       var options = { debug: false };
       var fishpond = new Fishpond(apiKey, options);
       var container = $("section#query");
@@ -69,7 +69,6 @@ Application = {
         $("form").queue(function() {
           fishpond.query({}, {});
         });
-
       });
 
       //------------------------------------------------------------------------
@@ -82,6 +81,7 @@ Application = {
         var resultDetails;
         var modalGroup;
         var fishModal;
+        var isShortlisted;
         var status;
         var templateUpdateQueue = [];
  
@@ -89,13 +89,14 @@ Application = {
         $.each(results, function(position, result){ 
           var shortlistClass = null;
           fishID = result.fish.id;
+          isShortlisted = locache.get("shortlisted-"+fishID);
 
           // Check if Fish metadata is cached
-          if (metadata(fishID)){
-            status = "loaded HARDCODED";
+          if (locache.get("metadata-"+fishID)){
+            status = "loaded";
             resultDetails = ("" +
             "<div class='details'>" +
-              "<a class='btn btn-mini btn-primary' href='" + metadata(fishID).url + "'>View Demo</a>" +
+              "<a class='btn btn-mini btn-primary' href='" + locache.get("metadata-"+fishID).url + "'>View Demo</a>" +
               "<a class='btn btn-mini launch-modal' href='#fishInfo'>More Info</a>" +
             "</div>");
           } else {
@@ -105,7 +106,7 @@ Application = {
           }
 
           // Check if on shortlist
-          if (isShortlisted(fishID) == "true"){
+          if (isShortlisted == "true"){
             shortlistClass = "btn-warning icon-white";
           } 
 
@@ -135,7 +136,7 @@ Application = {
         // STEP 1: Load Fish's Metadata then store it
         function loadMetadata(fishID){
           var fishMetadata = new $.Deferred();
-          console.log("New fish");
+         // console.log("New fish");
 
           fishpond.get_fish(fishID, function(metadata){
             fishMetadata.resolve(fishID, metadata);
@@ -144,7 +145,7 @@ Application = {
             if ($("#results").hasClass("reordering")){
               templateUpdateQueue.push(fishID);         // Add to the queue for updating once reordering is finished
             } else {
-              updateTemplate(fishID, metadata);         // Update Template if results are finished reordering
+              updateTemplate(fishID);                   // Update Template if results are finished reordering
             }
           });    
 
@@ -152,8 +153,10 @@ Application = {
         }
 
         // STEP 2: Update Fish with Metadata. (Only used to add Metadata to new fish that haven't been cached yet)
-        function updateTemplate(fishID, metadata){
+        function updateTemplate(fishID){
           var templateUpdated = new $.Deferred();
+
+          metadata = locache.get("metadata-"+fishID);
  
           if (metadata){
             resultItem = $("li[data-id='" + fishID + "']");
@@ -167,26 +170,35 @@ Application = {
             resultItem.removeClass("loading");
             resultItem.addClass("loaded");
 
-            console.log("[Template Updated] Success -> " + fishID);
+           // console.log("[Template Updated] Success -> " + fishID);
+            
+            //modalInit(fishID, metadata); 
+           // console.log("[Shortlisted] -> New");// " + fishID);
+            modalInit(fishID); 
+            shortlist(fishID);
           }
 
           return templateUpdated.promise();               // Return the Promise so caller can't change the Deferred
         }
 
         // Modal handler
-        function modalInit(fishID, metadata){
+        function modalInit(fishID){
+          metadata = locache.get("metadata-"+fishID);
           //console.log("[Modal] - > " + fishID + " == " + metadata.id);
 
+          var modalButton = source.find("li[data-id='" + fishID + "'] .launch-modal");
           var shortlistButton = $(".shortlist[data-id='" + fishID + "']");
           var shortlistClass = null;
           var shortlistWording = null;
           //console.log("[Modal] - " + fishID);
 
-          source.find("li[data-id='" + fishID + "'] .launch-modal").click(function(e){
+          modalButton.click(function(e){
+            console.log("fishID - " + fishID);
+
             e.preventDefault();
 
             isShortlisted = locache.get("shortlisted-"+fishID);
-
+            
             if (isShortlisted == "true"){
               shortlistClass = "btn-warning shortlisted";
               shortlistWording = "Remove from shortlist";
@@ -200,7 +212,7 @@ Application = {
             fishModal.modal('show');
 
             // Backup thumbnail
-            if (metadata.thumbnail_url === ""){
+            if (metadata.thumbnail_url === null){
               metadata.thumbnail_url = "http://placehold.it/120x120"; 
             }
             
@@ -226,17 +238,21 @@ Application = {
                 "<a href='#' class='btn' data-dismiss='modal'>Close</a>" +
               "</div>");
 
+              console.log(fishModal.attr("id") + " == " + metadata.id);
             if (fishModal.attr("id") === metadata.id){
+
               fishModal.html(modalGroup);
-              shortlist(fishID);
+              //shortlist(fishID); // This is to initalise the 2nd Shortlsit button found in the modal
             }
           });
         }
 
         // Shortlist Handler
         function shortlist(fishID){
-          console.log("shortlist init -> " + fishID);
           var shortlistButtons = $(".shortlist[data-id='" + fishID + "']");
+
+          shortlistButtons.addClass("active");
+
           shortlistButtons.on("click", function(e){
             e.preventDefault();
 
@@ -259,11 +275,6 @@ Application = {
           if(source.find("li").length == 0) {
             source.append(list.find("li"));
             console.log("[Quicksand] Init - " + $("#results li").length + " results in list");
-            source.find('li').each(function() {
-                fishID = $(this).attr("id");
-                metadata = locache.get("metadata-"+fishID);
-                modalInit(fishID, metadata);      
-              });
           } else {
             source.quicksand(list.find("li"), {
               // Do nothing
@@ -273,29 +284,26 @@ Application = {
 
               // Update templates for Fish in Queue
               $.each(templateUpdateQueue, function(index, fishID) { 
-                updateTemplate(fishID, metadata(fishID));
+                metadata = locache.get("metadata-"+fishID);
+                updateTemplate(fishID);
               });
 
-              source.find('li').each(function() {
-                fishID = $(this).attr("id");
-                metadata = metadata(fishID);
-                //console.log("[Metadata] - " + metadata);
-                //modalInit(fishID, metadata);      
-              });
+               activateAllFish();
+
             });
           }
         }
 
-        function isShortlisted(fishID) {
-          if (locache.get("shortlisted-"+fishID)){
-            return true
-          } else {
-            return false
-          }
-        }
-
-        function metadata(fishID) {
-          locache.get("metadata-"+fishID);
+        function activateAllFish() {
+          console.log("Activate all fish");
+          source.find('li').each(function() {
+            fishID = $(this).attr("id");
+            if (locache.get("metadata-"+fishID)){
+              console.log("[Init Fish] -> after sort");
+              modalInit(fishID); 
+              shortlist(fishID);
+            }  
+          });
         }
 
       });
