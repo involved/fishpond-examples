@@ -186,7 +186,7 @@ Application = {
           var modalButton = source.find("li[data-id='" + fishID + "'] .launch-modal");
           var shortlistButton = $(".shortlist[data-id='" + fishID + "']");
           var shortlistClass;
-          var shortlistWording;
+          var shortlistWording = null;
 
           modalButton.click(function(e){
             metadata = locache.get("metadata-"+fishID);
