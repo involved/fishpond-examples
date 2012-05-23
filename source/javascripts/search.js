@@ -183,17 +183,14 @@ Application = {
 
         // Modal handler
         function modalInit(fishID){
-          metadata = locache.get("metadata-"+fishID);
-          //console.log("[Modal] - > " + fishID + " == " + metadata.id);
-
           var modalButton = source.find("li[data-id='" + fishID + "'] .launch-modal");
           var shortlistButton = $(".shortlist[data-id='" + fishID + "']");
           var shortlistClass = null;
           var shortlistWording = null;
-          //console.log("[Modal] - " + fishID);
+
 
           modalButton.click(function(e){
-            console.log("fishID - " + fishID);
+            metadata = locache.get("metadata-"+fishID);
 
             e.preventDefault();
 
@@ -242,7 +239,7 @@ Application = {
             if (fishModal.attr("id") === metadata.id){
 
               fishModal.html(modalGroup);
-              //shortlist(fishID); // This is to initalise the 2nd Shortlsit button found in the modal
+              shortlist(fishID); // This is to initalise the 2nd Shortlsit button found in the modal
             }
           });
         }
