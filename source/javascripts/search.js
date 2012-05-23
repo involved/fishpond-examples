@@ -4,7 +4,7 @@ Application = {
   Query: {
     init: function () {
       var apiKey = "6OqHqMf609P6tSrxuj2ANuj3S6fAUphnjyOcGWdtD";
-      var pondToken = "BJHnFG";// "sC8IZQ";
+      var pondToken = "uhEHwd";// "sC8IZQ";
       var options = { debug: false };
       var fishpond = new Fishpond(apiKey, options);
       var container = $("section#query");
@@ -60,6 +60,7 @@ Application = {
           formFilters.append(filterControl);
         });
 
+
         // Init Input Controls styling
         Application.UI.sliders(fishpond);
 
@@ -75,6 +76,7 @@ Application = {
       fishpond.resultsUpdated(function(results){
         var source = $("#results ul", "#query");
         var list = $("<ul></ul>");
+        var shortlistMaster = $("#shortlist");
         var listItem;
         var fishID;
         var resultItem;
@@ -91,7 +93,7 @@ Application = {
           fishID = result.fish.id;
           isShortlisted = locache.get("shortlisted-"+fishID);
 
-          // Check if Fish metadata is cached
+          // Check if Fish metadata is cached. If so then inject that data into the result.
           if (locache.get("metadata-"+fishID)){
             status = "loaded";
             resultDetails = ("" +
@@ -149,7 +151,7 @@ Application = {
             }
           });    
 
-          return fishMetadata.promise();                // Return the Promise so caller can't change the Deferred
+          return fishMetadata.promise();
         }
 
         // STEP 2: Update Fish with Metadata. (Only used to add Metadata to new fish that haven't been cached yet)
@@ -176,15 +178,15 @@ Application = {
             shortlist(fishID);
           }
 
-          return templateUpdated.promise();               // Return the Promise so caller can't change the Deferred
+          return templateUpdated.promise();
         }
 
         // Modal handler
         function modalInit(fishID){
           var modalButton = source.find("li[data-id='" + fishID + "'] .launch-modal");
           var shortlistButton = $(".shortlist[data-id='" + fishID + "']");
-          var shortlistClass = null;
-          var shortlistWording = null;
+          var shortlistClass;
+          var shortlistWording;
 
           modalButton.click(function(e){
             metadata = locache.get("metadata-"+fishID);
@@ -254,13 +256,28 @@ Application = {
             if (isShortlisted == "true"){
               shortlistButtons.removeClass("btn-warning");
               locache.set("shortlisted-"+fishID, "false");
+              shortlistManager(fishID, "remove");
+
               console.log("[Sortlist] Removed " + fishID);
             } else {
               shortlistButtons.addClass("btn-warning");
               locache.set("shortlisted-"+fishID, "true");
+              shortlistManager(fishID, "add");
+
               console.log("[Sortlist] Added " + fishID);
             }
           });
+        }
+
+        function shortlistManager(fishID, action){
+          metadata = locache.get("metadata-"+fishID);
+          var shortlistItem = shortlistMaster.find("li[data-id='" + fishID + "']");
+
+          if (action === "add" && shortlistItem.length === 0){
+            shortlistMaster.append("<li data-id='"+ fishID +"'>"+metadata.title+"</li>");
+          } else {
+             shortlistItem.remove();
+          }
         }
 
         function sortResults() {
@@ -276,8 +293,7 @@ Application = {
               $("#results").removeClass("reordering");
 
               // Update templates for Fish in Queue
-              $.each(templateUpdateQueue, function(index, fishID) { 
-                metadata = locache.get("metadata-"+fishID);
+              $.each(templateUpdateQueue, function(index, fishID) {
                 updateTemplate(fishID);
               });
 
@@ -289,13 +305,13 @@ Application = {
         function activateAllFish() {
           source.find('li').each(function() {
             fishID = $(this).attr("id");
-            if (locache.get("metadata-"+fishID)){
+            metadata = locache.get("metadata-"+fishID);
+            if (metadata){
               modalInit(fishID); 
               shortlist(fishID);
             }  
           });
         }
-
       });
     }   
   },

@@ -20,6 +20,15 @@
             .control-label
               Filters
 
+            .controls
+              %label.checkbox
+                %input#query_filter_w14{"data-slug" => "shortlisted", :name => "query[filters][shortlisted]", :type => "checkbox", :value => "0"} Shortlisted
+
+
+      .row
+        .span5
+          %h3 Shortlisted
+          %ul#shortlist
 
     .span6.offset1
       #results
