@@ -44,22 +44,23 @@
     }
 
     #results.reordering{
-      background: yellow;
+      //background: yellow;
     }
 
-      #results .thumbnails{
+      #results ul li.loaded{
+        //background: green;
       }
 
-        #results ul li.loaded{
-          background: green;
-        }
+      #results ul li.loading{
+        //background: red;
+      }
 
-        #results ul li.loading{
-          background: red;
+        .loading .shortlist{
+          display: none;
         }
         
         .loaded .shortlist{
-          border: orange 1px solid;
+          display: block;
         }
 
         .shortlist.active{

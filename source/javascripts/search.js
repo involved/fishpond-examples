@@ -4,7 +4,7 @@ Application = {
   Query: {
     init: function () {
       var apiKey = "6OqHqMf609P6tSrxuj2ANuj3S6fAUphnjyOcGWdtD";
-      var pondToken = "uhEHwd";// "sC8IZQ";
+      var pondToken = "BJHnFG";// "sC8IZQ";
       var options = { debug: false };
       var fishpond = new Fishpond(apiKey, options);
       var container = $("section#query");
@@ -136,7 +136,7 @@ Application = {
         // STEP 1: Load Fish's Metadata then store it
         function loadMetadata(fishID){
           var fishMetadata = new $.Deferred();
-         // console.log("New fish");
+          console.log("New fish");
 
           fishpond.get_fish(fishID, function(metadata){
             fishMetadata.resolve(fishID, metadata);
@@ -170,10 +170,8 @@ Application = {
             resultItem.removeClass("loading");
             resultItem.addClass("loaded");
 
-           // console.log("[Template Updated] Success -> " + fishID);
+            console.log("[Template Updated] Success -> " + fishID);
             
-            //modalInit(fishID, metadata); 
-           // console.log("[Shortlisted] -> New");// " + fishID);
             modalInit(fishID); 
             shortlist(fishID);
           }
@@ -188,14 +186,13 @@ Application = {
           var shortlistClass = null;
           var shortlistWording = null;
 
-
           modalButton.click(function(e){
             metadata = locache.get("metadata-"+fishID);
 
             e.preventDefault();
 
+            // Check if fish is shortlisted
             isShortlisted = locache.get("shortlisted-"+fishID);
-            
             if (isShortlisted == "true"){
               shortlistClass = "btn-warning shortlisted";
               shortlistWording = "Remove from shortlist";
@@ -234,10 +231,8 @@ Application = {
               "<div class='modal-footer'>" +
                 "<a href='#' class='btn' data-dismiss='modal'>Close</a>" +
               "</div>");
-
-              console.log(fishModal.attr("id") + " == " + metadata.id);
+            
             if (fishModal.attr("id") === metadata.id){
-
               fishModal.html(modalGroup);
               shortlist(fishID); // This is to initalise the 2nd Shortlsit button found in the modal
             }
@@ -248,13 +243,14 @@ Application = {
         function shortlist(fishID){
           var shortlistButtons = $(".shortlist[data-id='" + fishID + "']");
 
-          shortlistButtons.addClass("active");
+          // Reset all bindings
+          shortlistButtons.off();
 
           shortlistButtons.on("click", function(e){
             e.preventDefault();
 
+            // Apply classes to shorlisted fish
             isShortlisted = locache.get("shortlisted-"+fishID);
-
             if (isShortlisted == "true"){
               shortlistButtons.removeClass("btn-warning");
               locache.set("shortlisted-"+fishID, "false");
@@ -286,17 +282,14 @@ Application = {
               });
 
                activateAllFish();
-
             });
           }
         }
 
         function activateAllFish() {
-          console.log("Activate all fish");
           source.find('li').each(function() {
             fishID = $(this).attr("id");
             if (locache.get("metadata-"+fishID)){
-              console.log("[Init Fish] -> after sort");
               modalInit(fishID); 
               shortlist(fishID);
             }  
