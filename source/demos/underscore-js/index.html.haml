@@ -81,7 +81,7 @@
         {{ fish.id }}
 
         .details
-          {[ if (metadata) { ]}
+          {[ if (!_.isEmpty(metadata)) { ]}
           %a.btn.btn-mini.btn-primary{ :href => "" } View Demo
           %a.btn.btn-mini.launch-modal{ :href => "#fishInfo" } More Info
           {[ } ]}
@@ -149,7 +149,7 @@
               var tags = {};
               var filters = {};
               $("form#fishpond input").each(function(){
-                console.error($(this).data('slug'));
+                //console.error($(this).data('slug'));
                 tags[$(this).data('slug')] = $(this).val();
               });
               fishpond.query(tags, filters);
@@ -161,25 +161,27 @@
       });
 
       fishpond.resultsUpdated(function(results){
-   
+        // Clear old results
+        $("#results li").remove(); 
+
+        // Change underscore.js tenplate settings to use moustache syntax
         _.templateSettings = {
           evaluate : /\{\[([\s\S]+?)\]\}/g,
           interpolate : /\{\{(.+?)\}\}/g
         };
 
-
-        var compiledTemplate = _.template($( "#fishTemplate" ).html());
+        var fishTemplate = _.template($( "#fishTemplate" ).html());
         var status;
+        var metadata = {};
 
-        $("#results li").remove(); // Clear old results
         for(var i = 0; i < results.length; i++){
           var result = { 
             fish : results[i].fish, 
-            status : "loading",
-            metadata : ""
+            status : status,
+            metadata : metadata
           }
 
-          $('#results ul').append( compiledTemplate( result ));
+          $('#results ul').append( fishTemplate( result ));
         }
 
 
