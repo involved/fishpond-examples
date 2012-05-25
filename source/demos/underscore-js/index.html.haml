@@ -80,15 +80,13 @@
         %strong {{ fish.title }}      
         %br 
         {{ fish.id }}
-        %br 
-        -#
-          {{ metadata.url }}
-
-          .details
-            {[ if (!_.isEmpty(metadata)) { ]}
-            %a.btn.btn-mini.btn-primary{ :href => "" } View Demo
-            %a.btn.btn-mini.launch-modal{ :href => "#fishInfo" } More Info
-            {[ } ]}
+        .details
+          {[ if (!_.isEmpty(metadata)) { ]}
+          %i > {{ metadata.description }} <
+          %br
+          %a.btn.btn-mini.btn-primary{ :href => "" } View Demo
+          %a.btn.btn-mini.launch-modal{ :href => "#fishInfo" } More Info
+          {[ } ]}
 
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
@@ -98,7 +96,7 @@
         $("#loading .bar").css({width: (percent * 100) + "%"});
 
         // Clear LocalStorage of fish data
-        locache.flush();
+        //locache.flush();
       });
 
       fishpond.ready(function(pond){
@@ -169,23 +167,24 @@
 
       fishpond.resultsUpdated(function(results){
         var storage = function (fishID) {
+          
           return {
             loadMetadata: function () {
-              var defered = new $.Deferred();
-              fishpond.get_fish(fishID, function(data){
-                fish.setMetadata(data);
-              });    
-              return defered.promise();
+                var defered = new $.Deferred();
+                fishpond.get_fish(fishID, function(data){
+                  fish.setMetadata(data);
+                  console.log("META 1 - " + fishID + "  " + fish.getMetadata());
+                });    
+                return defered.promise();
             },
             setMetadata: function (metadata) {
-              return locache.set("metadata-"+fishID, metadata); 
+              return locache.set("metadata-"+fishID, metadata);
             },
             getMetadata: function () {
               return locache.get("metadata-"+fishID);
             }
           };
         };  
-
 
         // Change underscore.js tenplate settings to use moustache syntax
         _.templateSettings = {
@@ -203,16 +202,21 @@
           var fishTemplate = _.template($( "#fishTemplate" ).html());
           var status;
           
+          /*console.log("META - " + fishID + "  " + fish.getMetadata());
           if (fish.getMetadata() === null){
             fish.loadMetadata();
-          }
 
-          //console.log(fish.getMetadata());
+          } else {
+            console.log("[Metadata cached] " + fishID);
+            console.log(fish.getMetadata());
+          }*/
+
+
 
           var result = { 
             fish : results[i].fish, 
-            status : status//,
-            //metadata : fish.getMetadata()
+            status : status,
+            metadata : fish.getMetadata()
           }
 
           // Update Results list
