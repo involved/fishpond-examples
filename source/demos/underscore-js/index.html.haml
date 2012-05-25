@@ -90,13 +90,19 @@
 
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+        
+      // Change underscore.js tenplate settings to use moustache syntax
+      _.templateSettings = {
+        evaluate : /\{\[([\s\S]+?)\]\}/g,
+        interpolate : /\{\{(.+?)\}\}/g
+      };
 
       fishpond.loading(function(percent){
         $("#loading .progress").removeClass("progress-striped");
         $("#loading .bar").css({width: (percent * 100) + "%"});
 
         // Clear LocalStorage of fish data
-        //locache.flush();
+        locache.flush();
       });
 
       fishpond.ready(function(pond){
@@ -165,52 +171,42 @@
         fishpond.query({}, {});
       });
 
-      fishpond.resultsUpdated(function(results){
-        var storage = function (fishID) {
-          
-          return {
-            loadMetadata: function () {
-                var defered = new $.Deferred();
-                fishpond.get_fish(fishID, function(data){
-                  fish.setMetadata(data);
-                  console.log("META 1 - " + fishID + "  " + fish.getMetadata());
-                });    
-                return defered.promise();
-            },
-            setMetadata: function (metadata) {
-              return locache.set("metadata-"+fishID, metadata);
-            },
-            getMetadata: function () {
-              return locache.get("metadata-"+fishID);
-            }
-          };
-        };  
+      var storage = function (result) {
+        var fishID = result.fish.id;
 
-        // Change underscore.js tenplate settings to use moustache syntax
-        _.templateSettings = {
-          evaluate : /\{\[([\s\S]+?)\]\}/g,
-          interpolate : /\{\{(.+?)\}\}/g
+        return {
+          setMetadata: function () {
+            var defered = new $.Deferred();
+            fishpond.get_fish(fishID, function(data){
+              locache.set("metadata-"+fishID, data);
+            });    
+            return defered.promise();
+          },
+          getMetadata: function () {
+            return locache.get("metadata-"+fishID);
+          }
         };
+      };  
 
+      fishpond.resultsUpdated(function(results){
         // Clear old results
         $("#results li").remove();
 
         // Generate Results
         for(var i = 0; i < results.length; i++){
           var fishID = results[i].fish.id;
-          var fish = storage(fishID);
+          var fish = storage(results[i]);
           var fishTemplate = _.template($( "#fishTemplate" ).html());
           var status;
           
-          /*console.log("META - " + fishID + "  " + fish.getMetadata());
+          //console.log("META - " + fishID + "  " + fish.getMetadata());
           if (fish.getMetadata() === null){
-            fish.loadMetadata();
-
+            console.log("[Metadata load] " + fishID);
+            fish.setMetadata();
           } else {
             console.log("[Metadata cached] " + fishID);
-            console.log(fish.getMetadata());
-          }*/
-
+            fish.getMetadata();
+          }
 
 
           var result = { 
