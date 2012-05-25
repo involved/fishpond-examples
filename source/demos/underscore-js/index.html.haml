@@ -71,6 +71,7 @@
 
 
 - content_for :javascript do
+  = javascript_include_tag "https://raw.github.com/d0ugal/locache/master/build/locache.js"
   = javascript_include_tag "http://underscorejs.org/underscore.js"
 
   %script{:id => "fishTemplate", :type => "text/html"}
@@ -79,6 +80,8 @@
         %strong {{ fish.title }}      
         %br 
         {{ fish.id }}
+        %br 
+        {{ metadata.url }}
 
         .details
           {[ if (!_.isEmpty(metadata)) { ]}
@@ -92,6 +95,9 @@
       fishpond.loading(function(percent){
         $("#loading .progress").removeClass("progress-striped");
         $("#loading .bar").css({width: (percent * 100) + "%"});
+
+        // Clear LocalStorage of fish data
+        locache.flush();
       });
 
       fishpond.ready(function(pond){
@@ -161,8 +167,16 @@
       });
 
       fishpond.resultsUpdated(function(results){
-        // Clear old results
-        $("#results li").remove(); 
+        var storage = function (fishID) {
+          return {
+            setMetadata: function (metadata) {
+              return locache.set("metadata-"+fishID, metadata); 
+            },
+            getMetadata: function () {
+              return locache.get("metadata-"+fishID);
+            }
+          };
+        };    
 
         // Change underscore.js tenplate settings to use moustache syntax
         _.templateSettings = {
@@ -170,21 +184,33 @@
           interpolate : /\{\{(.+?)\}\}/g
         };
 
-        var fishTemplate = _.template($( "#fishTemplate" ).html());
-        var status;
-        var metadata = {};
+        // Clear old results
+        $("#results li").remove();
 
+        // Generate Results
         for(var i = 0; i < results.length; i++){
+          var fish = storage(results[i].fish.id);
+          var fishTemplate = _.template($( "#fishTemplate" ).html());
+          var status;
+          
+          if (fish.getMetadata() === null){
+            fish.setMetadata({ url : "http://google.com"+i });
+          }
+
+          console.log(fish.getMetadata());
+
           var result = { 
             fish : results[i].fish, 
             status : status,
-            metadata : metadata
+            metadata : fish.getMetadata()
           }
 
+          
+
+
+          // Update Results list
           $('#results ul').append( fishTemplate( result ));
         }
-
-
       });
 
     };
