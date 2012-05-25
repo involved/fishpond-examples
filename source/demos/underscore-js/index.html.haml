@@ -81,13 +81,14 @@
         %br 
         {{ fish.id }}
         %br 
-        {{ metadata.url }}
+        -#
+          {{ metadata.url }}
 
-        .details
-          {[ if (!_.isEmpty(metadata)) { ]}
-          %a.btn.btn-mini.btn-primary{ :href => "" } View Demo
-          %a.btn.btn-mini.launch-modal{ :href => "#fishInfo" } More Info
-          {[ } ]}
+          .details
+            {[ if (!_.isEmpty(metadata)) { ]}
+            %a.btn.btn-mini.btn-primary{ :href => "" } View Demo
+            %a.btn.btn-mini.launch-modal{ :href => "#fishInfo" } More Info
+            {[ } ]}
 
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
@@ -169,6 +170,13 @@
       fishpond.resultsUpdated(function(results){
         var storage = function (fishID) {
           return {
+            loadMetadata: function () {
+              var defered = new $.Deferred();
+              fishpond.get_fish(fishID, function(data){
+                fish.setMetadata(data);
+              });    
+              return defered.promise();
+            },
             setMetadata: function (metadata) {
               return locache.set("metadata-"+fishID, metadata); 
             },
@@ -176,7 +184,8 @@
               return locache.get("metadata-"+fishID);
             }
           };
-        };    
+        };  
+
 
         // Change underscore.js tenplate settings to use moustache syntax
         _.templateSettings = {
@@ -189,24 +198,22 @@
 
         // Generate Results
         for(var i = 0; i < results.length; i++){
-          var fish = storage(results[i].fish.id);
+          var fishID = results[i].fish.id;
+          var fish = storage(fishID);
           var fishTemplate = _.template($( "#fishTemplate" ).html());
           var status;
           
           if (fish.getMetadata() === null){
-            fish.setMetadata({ url : "http://google.com"+i });
+            fish.loadMetadata();
           }
 
-          console.log(fish.getMetadata());
+          //console.log(fish.getMetadata());
 
           var result = { 
             fish : results[i].fish, 
-            status : status,
-            metadata : fish.getMetadata()
+            status : status//,
+            //metadata : fish.getMetadata()
           }
-
-          
-
 
           // Update Results list
           $('#results ul').append( fishTemplate( result ));
