@@ -85,8 +85,8 @@
         .details
           {[ if (!_.isEmpty(metadata)) { ]}
           %br
-          %a.btn.btn-mini.btn-primary{ :href => "{{ metadata.description }}" } Open
-          %a.btn.btn-mini.launch-modal{ :href => "#fishInfo" } More Info
+          = link_to "Open", "{{ metadata.url }}", :class => "btn btn-mini btn-primary"
+          = link_to "More Info", "#fishInfo", :class => "btn btn-mini launch-modal"
           {[ } ]}
 
   %script{:id => "tagsTemplate", :type => "text/html"}
@@ -105,7 +105,7 @@
         {{ token.name }}
 
   %script{:id => "fishDetailsTemplate", :type => "text/html"}
-    = link_to "View Demo", "{{ metadata.url }}", :class => "btn btn-mini btn-primary"
+    = link_to "Open", "{{ metadata.url }}", :class => "btn btn-mini btn-primary"
     = link_to "More Info", "#fishInfo", :class => "btn btn-mini launch-modal"
 
 
@@ -212,7 +212,7 @@
 
       fishpond.resultsUpdated(function(results){
         // Clear old results
-        $("#results li").remove();
+        $("#results ul").empty();
 
         // Generate Results
         for(var i = 0; i < results.length; i++){
