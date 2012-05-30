@@ -74,6 +74,8 @@
   = javascript_include_tag "https://raw.github.com/d0ugal/locache/master/build/locache.js"
   = javascript_include_tag "http://underscorejs.org/underscore.js"
 
+
+  // JAVSCRIPT TEMPLATES
   %script{:id => "fishTemplate", :type => "text/html"}
     %li{ :data => { :id => "{{ fish.id }}" }, :class => "{{ status }} span2" }
       .thumbnail
@@ -86,6 +88,26 @@
           %a.btn.btn-mini.btn-primary{ :href => "{{ metadata.description }}" } Open
           %a.btn.btn-mini.launch-modal{ :href => "#fishInfo" } More Info
           {[ } ]}
+
+  %script{:id => "tagsTemplate", :type => "text/html"}
+    .control-group
+      %label.control-label
+        {{ name }}
+        %output (10)
+      .controls
+        %input{ :id => "query_tag_{{ token }}", :name => "query[tags][{{ token }}]", :type => "hidden", :value => "10", :data => { :slug => "{{ name }}" } }
+        .slider.span2{ :data => { :target => "query[tags][{{ token }}]" } }
+
+  %script{:id => "filtersTemplate", :type => "text/html"}
+    .control
+      %label.checkbox
+        %input{ :id => "query_filter_{{ token.id }}", :name => "query[filters][{{ token.id }}]", :type => "checkbox", :value => "0", :data => { :slug => "{{ token.slug }}" } }
+        {{ token.name }}
+
+  %script{:id => "fishDetailsTemplate", :type => "text/html"}
+    = link_to "View Demo", "{{ metadata.url }}", :class => "btn btn-mini btn-primary"
+    = link_to "More Info", "#fishInfo", :class => "btn btn-mini launch-modal"
+
 
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
@@ -111,34 +133,25 @@
         $("#demo h1").append(' "' + pond.name + '"');       
 
         // Generate form controls
-        var formTags = $("fieldset.tags");
-        var formFilters = $("fieldset.filters .control-group");
-        var tagControlGroup,
-            filterControl;
+        var tagsTemplate = _.template($( "#tagsTemplate" ).html());
+        var filtersTemplate = _.template($( "#filtersTemplate" ).html());
 
+        // Form Tags
         $.each(pond.tag_ids, function(name, token){ 
-          tagControlGroup = $("" +
-            "<div class='control-group'>" +
-              "<label class='control-label'>" +
-                name + " <output>(10)</output>" +
-              "</label>" +
-              "<div class='controls'>" +
-                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
-                "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
-              "</div>" +
-            "</div>");
-          formTags.append(tagControlGroup);
+          var tagsData = { 
+            name : name, 
+            token : token
+          }
+          $("fieldset.tags").append( tagsTemplate( tagsData ));
         });
 
+        // Form Filters
         $.each(pond.filters, function(index, token){
-          filterControl = $("" +
-            "<div class='controls'>" +
-              "<label class='checkbox'>" +
-                "<input id='query_filter_"+token.id+"' data-slug='"+token.slug+"' name='query[filters]["+token.id+"]' type='checkbox' value='0'>" +
-                token.name + 
-              "</label>" +
-            "</div>");
-          formFilters.append(filterControl);
+          var filtersData = { 
+            token : token
+          }
+          $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
+          console.log($("fieldset.filters .control-group"));
         });
 
         // jQuery UI Slider
