@@ -75,7 +75,7 @@
   = javascript_include_tag "http://underscorejs.org/underscore.js"
 
   %script{:id => "fishTemplate", :type => "text/html"}
-    %li{ :id => "{{ print(fish.id) }}'", :class => "{{ status }} span2" }
+    %li{ :data => { :id => "{{ fish.id }}" }, :class => "{{ status }} span2" }
       .thumbnail
         %strong {{ fish.title }}      
         %br 
@@ -170,7 +170,7 @@
         fishpond.query({}, {});
       });
 
-      var storage = function (result) {
+      var resultManager = function (result) {
         var fishID = result.fish.id;
 
         return {
@@ -187,15 +187,11 @@
             return locache.get("metadata-"+fishID);
           },
           updateTemplate: function (metadata) {
-            var resultItem = $("li[data-id='" + fishID + "']");
+            var resultItem = $("#results").find("li[data-id='" + fishID + "']");
             var resultDetails = ("" +
               "<a class='btn btn-mini btn-primary' href='" + metadata.url + "'>View Demo</a>" +
               "<a class='btn btn-mini launch-modal' href='#fishInfo'>More Info</a>");
-            console.log("Updated Template -> " + metadata.description);
             return resultItem.find(".details").html(resultDetails);
-          },
-          id: function () {
-            return fishID;
           }
         };
       };  
@@ -206,7 +202,7 @@
 
         // Generate Results
         for(var i = 0; i < results.length; i++){
-          var fish = storage(results[i]);
+          var fish = resultManager(results[i]);
           var fishID = results[i].fish.id;
           var fishTemplate = _.template($( "#fishTemplate" ).html());
           var status;
@@ -216,21 +212,21 @@
           
           if (fish.getMetadata() === null){
             $.when( fish.setMetadata() ).then( function(result){
-              fish = storage(result);
+              fish = resultManager(result);
               fish.updateTemplate(metadata());
             });
           } else {
             fish.getMetadata();
           }
 
-          var result = { 
+          var resultData = { 
             fish : results[i].fish, 
             status : status,
             metadata : fish.getMetadata()
           }
 
           // Update Results list
-          $('#results ul').append( fishTemplate( result ));
+          $('#results ul').append( fishTemplate( resultData ));
         }
       });
 
