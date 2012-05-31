@@ -84,9 +84,7 @@
         {{ fish.id }}
         .details
           {[ if (!_.isEmpty(metadata)) { ]}
-          %br
-          = link_to "Open", "{{ metadata.url }}", :class => "btn btn-mini btn-primary"
-          = link_to "More Info", "#fishInfo", :class => "btn btn-mini launch-modal"
+          {{ fishDetailsData }}
           {[ } ]}
 
   %script{:id => "tagsTemplate", :type => "text/html"}
@@ -132,11 +130,11 @@
         $("#demo").fadeIn(400);
         $("#demo h1").append(' "' + pond.name + '"');       
 
-        // Generate form controls
+        // Setup Templates
         var tagsTemplate = _.template($( "#tagsTemplate" ).html());
         var filtersTemplate = _.template($( "#filtersTemplate" ).html());
 
-        // Form Tags
+        // Generate Tags
         $.each(pond.tag_ids, function(name, token){ 
           var tagsData = { 
             name : name, 
@@ -145,13 +143,12 @@
           $("fieldset.tags").append( tagsTemplate( tagsData ));
         });
 
-        // Form Filters
+        // Generate Filters
         $.each(pond.filters, function(index, token){
           var filtersData = { 
             token : token
           }
           $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
-          console.log($("fieldset.filters .control-group"));
         });
 
         // jQuery UI Slider
@@ -183,9 +180,55 @@
         fishpond.query({}, {});
       });
 
+      fishpond.resultsUpdated(function(results){
+        // Clear old results
+        $("#results ul").empty();
+
+        // Generate Results
+        for(var i = 0; i < results.length; i++){
+          var fish = resultManager(results[i]);
+          var fishID = results[i].fish.id;
+          var fishDetails;
+          var status = "loading";
+          var metadata = function () {
+            return fish.getMetadata();
+          };
+          
+          if (fish.getMetadata() === null){
+            $.when( fish.setMetadata() ).then( function(result){
+              fish = resultManager(result);
+              fish.updateTemplate(metadata());
+            });
+          } else {
+            fish.getMetadata();
+            status = "loaded";
+
+            // Inject cached Metadata into Template
+            var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
+            var fishDetailsData = { 
+              metadata : fish.getMetadata()
+            }
+            fishDetails = fishDetailsTemplate( fishDetailsData );
+          }      
+
+          // Create Fish from Template
+          var fishTemplate = _.template($( "#fishTemplate" ).html());
+          var resultData = { 
+            fish : results[i].fish, 
+            status : status,
+            metadata : fish.getMetadata(),
+            fishDetailsData : fishDetails
+          }
+
+          // Update Results list
+          $('#results ul').append( fishTemplate( resultData ));
+        }
+      });
+
       var resultManager = function (result) {
         var fishID = result.fish.id;
-
+        var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
+        
         return {
           setMetadata: function () {
             console.log("Result -> " + result.fish.id);
@@ -200,49 +243,14 @@
             return locache.get("metadata-"+fishID);
           },
           updateTemplate: function (metadata) {
-            var resultItem = $("#results").find("li[data-id='" + fishID + "']");
-            var resultDetails = ("" +
-              "<a class='btn btn-mini btn-primary' href='" + metadata.url + "'>View Demo</a>" +
-              "<a class='btn btn-mini launch-modal' href='#fishInfo'>More Info</a>");
-            resultItem.removeClass("loading").addClass("loaded");
-            return resultItem.find(".details").html(resultDetails);
+            var fishResult = $("#results").find("li[data-id='" + fishID + "']");
+            var fishDetailsData = { 
+              metadata : metadata
+            }
+            fishResult.removeClass("loading").addClass("loaded");
+            return fishResult.find(".details").html( fishDetailsTemplate( fishDetailsData ));
           }
         };
       };  
-
-      fishpond.resultsUpdated(function(results){
-        // Clear old results
-        $("#results ul").empty();
-
-        // Generate Results
-        for(var i = 0; i < results.length; i++){
-          var fish = resultManager(results[i]);
-          var fishID = results[i].fish.id;
-          var fishTemplate = _.template($( "#fishTemplate" ).html());
-          var status = "loading";
-          var metadata = function () {
-            return fish.getMetadata();
-          };
-          
-          if (fish.getMetadata() === null){
-            $.when( fish.setMetadata() ).then( function(result){
-              fish = resultManager(result);
-              fish.updateTemplate(metadata());
-            });
-          } else {
-            fish.getMetadata();
-            status = "loaded";
-          }
-
-          var resultData = { 
-            fish : results[i].fish, 
-            status : status,
-            metadata : fish.getMetadata()
-          }
-
-          // Update Results list
-          $('#results ul').append( fishTemplate( resultData ));
-        }
-      });
 
     };
