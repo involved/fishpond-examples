@@ -28,6 +28,10 @@
     #results
       %ul.thumbnails
 
+#emptyModal.modal.hide
+  .modal-body.loading
+    // Empty
+
 
 - content_for :css do
   :css
@@ -97,6 +101,7 @@
           {{ fishDetailsData }}
           {[ } ]}
 
+
   %script{:id => "tagsTemplate", :type => "text/html"}
     .control-group
       %label.control-label
@@ -106,17 +111,40 @@
         %input{ :id => "query_tag_{{ token }}", :name => "query[tags][{{ token }}]", :type => "hidden", :value => "10", :data => { :slug => "{{ name }}" } }
         .slider.span2{ :data => { :target => "query[tags][{{ token }}]" } }
 
+
   %script{:id => "filtersTemplate", :type => "text/html"}
     .control
       %label.checkbox
         %input{ :id => "query_filter_{{ token.id }}", :name => "query[filters][{{ token.id }}]", :type => "checkbox", :value => "0", :data => { :slug => "{{ token.slug }}" } }
         {{ token.name }}
 
+
   %script{:id => "fishDetailsTemplate", :type => "text/html"}
-    %a{ :href => "#" }
+    %a{ :href => "#", :class => "launch-modalZZZZ", :data => { :toggle => "modal" } }
       %img{ :src => "{{ metadata.thumbnail_url }}", :alt => "{{ metadata.title }}", :class => "profile" }
     = #link_to "Open", "{{ metadata.url }}", :class => "btn btn-mini btn-primary"
     = #link_to "More Info", "#fishInfo", :class => "btn btn-mini launch-modal"
+
+
+  %script{:id => "modalTemplate", :type => "text/html"}
+    .modal
+      .modal-header
+        %button.close{"data-dismiss" => "modal"} ×
+        %h3 {{ fish.title }}
+      .modal-body.loading
+        .row
+          .span2
+            %img{:alt => "{{ fish.title }}", :src => "{{ metadata.thumbnail_url }}"}/
+          .span4
+            %p {{ metadata.description }}
+            = link_to "Find out more", "{{ metadata.url }}", :target => "_blank"
+            %br
+            %br
+            %a{ :href => "#", :class => "btn btn-mini shortlist {{ shortlist.class }}", :data => { :id => "{{ fish.id }}"} }
+              %i.icon-star
+              {{ shortlist.wording }}
+      .modal-footer
+        %a.btn{"data-dismiss" => "modal", :href => "#"} Close
 
 
   :javascript
@@ -214,13 +242,11 @@
           } else {
             fish.getMetadata();
             status = "loaded";
-
-            // Inject cached Metadata into Template
+            // Populate Fish Details Template
             var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
             var fishDetailsData = { 
               metadata : fish.getMetadata()
             }
-            console.log(fish.getMetadata())
             fishDetails = fishDetailsTemplate( fishDetailsData );
           }      
 
@@ -264,6 +290,29 @@
             return fishResult.find(".details").html( fishDetailsTemplate( fishDetailsData ));
           }
         };
-      };  
+      };
+
+      var modalManager = function () {
+        
+
+        $("#results").on("click", "[data-toggle='modal']", function(event){
+          event.preventDefault();
+          var fishID = $(this).closest("li").data('id');
+
+          // Clone empty Modal template and display
+          var fishModal = $('#emptyModal').clone().attr("id",fishID);
+          fishModal.modal('show');
+
+          // Load data into empty Modal.
+          var modalTemplate = _.template($( "#modalTemplate" ).html());
+          var modalData = { 
+            fish : "fish",
+            metadata : "metadata()",
+            shortlist : "shortlist"
+          }
+          console.log(modalTemplate( modalData ));
+          fishModal.append( modalTemplate( modalData ));
+        });
+      }();
 
     };
