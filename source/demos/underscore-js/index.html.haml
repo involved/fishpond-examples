@@ -120,29 +120,30 @@
 
 
   %script{:id => "fishDetailsTemplate", :type => "text/html"}
-    %a{ :href => "#", :class => "launch-modalZZZZ", :data => { :toggle => "modal" } }
+    %a{ :href => "#", :data => { :toggle => "modal" } }
       %img{ :src => "{{ metadata.thumbnail_url }}", :alt => "{{ metadata.title }}", :class => "profile" }
-    = #link_to "Open", "{{ metadata.url }}", :class => "btn btn-mini btn-primary"
-    = #link_to "More Info", "#fishInfo", :class => "btn btn-mini launch-modal"
+      %a{ :href => "#", :class => "btn btn-mini", :data => { :id => "{{ metadata.id }}", :toggle => "shortlist" } }
+        %i.icon-star
+        shortlist.wording 
 
 
   %script{:id => "modalTemplate", :type => "text/html"}
     .modal
       .modal-header
         %button.close{"data-dismiss" => "modal"} ×
-        %h3 {{ fish.title }}
-      .modal-body.loading
+        %h3 {{ metadata.title }}
+      .modal-body
         .row
           .span2
-            %img{:alt => "{{ fish.title }}", :src => "{{ metadata.thumbnail_url }}"}/
+            %img{:alt => "{{ metadata.title }}", :src => "{{ metadata.thumbnail_url }}"}/
           .span4
             %p {{ metadata.description }}
             = link_to "Find out more", "{{ metadata.url }}", :target => "_blank"
             %br
             %br
-            %a{ :href => "#", :class => "btn btn-mini shortlist {{ shortlist.class }}", :data => { :id => "{{ fish.id }}"} }
+            %a{ :href => "#", :class => "btn btn-mini ", :data => { :id => "{{ metadata.id }}", :toggle => "shortlist" } }
               %i.icon-star
-              {{ shortlist.wording }}
+              shortlist.wording 
       .modal-footer
         %a.btn{"data-dismiss" => "modal", :href => "#"} Close
 
@@ -217,6 +218,11 @@
           }
         });
 
+        // Init Shorlist Manager
+        var shortlist = shortlistManager();
+        shortlist.init();
+
+        // Run Query
         fishpond.query({}, {});
       });
 
@@ -226,37 +232,44 @@
 
         // Generate Results
         for(var i = 0; i < results.length; i++){
-          var fish = resultManager(results[i]);
           var fishID = results[i].fish.id;
+          var fish = fishManager(fishID);
           var fishDetails;
-          var status = "loading";
+          var shortlistStatus = locache.get("shortlist-"+fishID);
+          var metadataStatus = "loading";
           var metadata = function () {
             return fish.getMetadata();
           };
           
+          //var shortlist = shortlistManager();
+          //shortlist.init();
+          
           if (fish.getMetadata() === null){
-            $.when( fish.setMetadata() ).then( function(result){
-              fish = resultManager(result);
+            // Load Metadata then update template
+            $.when( fish.setMetadata(results[i]) ).then( function(result){
+              fish = fishManager(result.fish.id);
               fish.updateTemplate(metadata());
             });
           } else {
+            // Use cached Metadata and populate Fish Details Template
             fish.getMetadata();
-            status = "loaded";
-            // Populate Fish Details Template
+            metadataStatus = "loaded";
+
             var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
             var fishDetailsData = { 
               metadata : fish.getMetadata()
             }
             fishDetails = fishDetailsTemplate( fishDetailsData );
-          }      
+          }
 
           // Create Fish from Template
           var fishTemplate = _.template($( "#fishTemplate" ).html());
-          var resultData = { 
+          var resultData = {
             fish : results[i].fish, 
-            status : status,
+            status : metadataStatus,
             metadata : fish.getMetadata(),
-            fishDetailsData : fishDetails
+            fishDetailsData : fishDetails,
+            shortlist : shortlistStatus
           }
 
           // Update Results list
@@ -264,13 +277,15 @@
         }
       });
 
-      var resultManager = function (result) {
-        var fishID = result.fish.id;
+      var fishManager = function (fishID) {
+        var fishID = fishID;
         var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
+        var shortlisted;
         
         return {
-          setMetadata: function () {
-            console.log("Result -> " + result.fish.id);
+          setMetadata: function (result) {
+            //console.log("Result -> " + fishID);
+            //console.log(fishID);
             var defered = new $.Deferred();
             fishpond.get_fish(fishID, function(data){
               locache.set("metadata-"+fishID, data);
@@ -288,16 +303,24 @@
             }
             fishResult.removeClass("loading").addClass("loaded");
             return fishResult.find(".details").html( fishDetailsTemplate( fishDetailsData ));
+          },
+          getShortlistStatus: function () {
+            shortlisted = locache.get("shortlist-"+fishID);
+            if (shortlisted === "" || _.isNull(shortlisted) || _.isUndefined(shortlisted)){
+              console.log("No status set -> " + fishID);
+              return shortlisted = false;
+            }
+            console.log(fishID + "Shortlisted Status: [" + shortlisted + "]");
+            return shortlisted;
           }
         };
       };
 
       var modalManager = function () {
-        
-
         $("#results").on("click", "[data-toggle='modal']", function(event){
           event.preventDefault();
           var fishID = $(this).closest("li").data('id');
+          var metadata = locache.get("metadata-"+fishID);
 
           // Clone empty Modal template and display
           var fishModal = $('#emptyModal').clone().attr("id",fishID);
@@ -306,13 +329,49 @@
           // Load data into empty Modal.
           var modalTemplate = _.template($( "#modalTemplate" ).html());
           var modalData = { 
-            fish : "fish",
-            metadata : "metadata()",
+            metadata : metadata,
             shortlist : "shortlist"
           }
-          console.log(modalTemplate( modalData ));
-          fishModal.append( modalTemplate( modalData ));
+          if (fishModal.attr("id") === metadata.id){
+            fishModal.append( modalTemplate( modalData ));
+          }
         });
       }();
+
+      var shortlistManager = function () {
+        var fishID;
+        var status;
+
+        return {
+          init: function () {
+            $("body").off();
+            $("body").on("click", "[data-toggle='shortlist']", function(event){
+              event.preventDefault();
+
+              fishID = $(this).closest("[data-id]").data("id");
+
+              // Update all instanaces of shortlist button
+              $("[data-id='"+ fishID +"'][data-toggle='shortlist'] ").each(function(index) {
+                $(this).toggleClass("shortlisted", status);
+                $(this).toggleClass("btn-warning", status);
+              });
+              
+              // Toggle Shortlisted status
+              var shortlisted = locache.get("shortlist-"+fishID);
+              if (shortlisted === "" || _.isNull(shortlisted) || _.isUndefined(shortlisted)){
+                console.log("[" + fishID + "] Shortlist Not Set");
+                shortlisted = true;
+              } else {
+                shortlisted = !shortlisted;  
+              }
+              // Save new Shortlist status
+              console.log("[" + fishID + "] Shortlist Updated: " + shortlisted);
+              locache.set("shortlist-"+fishID, shortlisted);
+            });
+            
+          }
+          
+        }
+      }
 
     };
