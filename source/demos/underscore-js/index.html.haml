@@ -223,8 +223,7 @@
         });
 
         // Init Shorlist Manager
-        var shortlist = shortlistManager();
-        shortlist.init();
+        shortlistListener();
 
         // Run Query
         fishpond.query({}, {});
@@ -238,9 +237,8 @@
         for(var i = 0; i < results.length; i++){
           var fishID = results[i].fish.id;
           var fish = fishManager(fishID);
+          var shortlist = shortlistManager(fishID);
           var fishDetails;
-          var shortlistStatus = fish.shortlistTemplate();
-          console.log(shortlistStatus);
 
           var metadataStatus = "loading";
           var metadata = function () {
@@ -260,7 +258,7 @@
             var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
             var fishDetailsData = { 
               metadata : fish.getMetadata(),
-              shortlist : shortlistStatus
+              shortlist : shortlist.template()
             }
             fishDetails = fishDetailsTemplate( fishDetailsData );
           }
@@ -270,9 +268,9 @@
           var resultData = {
             fish : results[i].fish, 
             status : metadataStatus,
-            metadata : fish.getMetadata(),
             fishDetailsData : fishDetails,
-            shortlist : shortlistStatus
+            metadata : fish.getMetadata(),
+            shortlist : shortlist.template()
           }
 
           // Update Results list
@@ -283,9 +281,6 @@
       var fishManager = function (fishID) {
         var fishID = fishID;
         var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
-        var shortlisted;
-        var shortlistButton;
-        var shortlistClass;
         
         return {
           setMetadata: function (result) {
@@ -303,21 +298,12 @@
           updateTemplate: function (metadata) {
             var fishResult = $("#results").find("li[data-id='" + fishID + "']");
             var fishDetailsData = { 
-              metadata : metadata
+              metadata : metadata,
+              shortlist : shortlist.template()
             }
             fishResult.removeClass("loading").addClass("loaded");
             return fishResult.find(".details").html( fishDetailsTemplate( fishDetailsData ));
-          },
-          isShortlisted: function () {
-            shortlisted = locache.get("shortlist-"+fishID);
-            if (shortlisted === "" || _.isNull(shortlisted) || _.isUndefined(shortlisted)){
-              console.log("No status set -> " + fishID);
-              return shortlisted = false;
-            }
-            console.log(fishID + "Shortlisted Status: [" + shortlisted + "]");
-            return shortlisted;
-          }
-          
+          }      
         };
       };
 
@@ -326,7 +312,7 @@
           event.preventDefault();
           var fishID = $(this).closest("li").data('id');
           var metadata = locache.get("metadata-"+fishID);
-          var shortlistStatus = fish.shortlistTemplate();
+          var shortlist = shortlistManager(fishID);
 
           // Clone empty Modal template and display
           var fishModal = $('#emptyModal').clone().attr("id",fishID);
@@ -336,7 +322,7 @@
           var modalTemplate = _.template($( "#modalTemplate" ).html());
           var modalData = { 
             metadata : metadata,
-            shortlist : shortlistStatus
+            shortlist : shortlist.template()
           }
           if (fishModal.attr("id") === metadata.id){
             fishModal.append( modalTemplate( modalData ));
@@ -344,39 +330,22 @@
         });
       }();
 
-      var shortlistManager = function () {
-        var fishID;
-        var shortlisted;
+      var shortlistManager = function(fishID) {
+        var isShortlisted;
 
         return {
-          init: function () {
-            $("body").off();
-            $("body").on("click", "[data-toggle='shortlist']", function(event){
-              event.preventDefault();
-
-              fishID = $(this).closest("[data-id]").data("id");
-            
-              // Toggle Shortlisted status
-              shortlisted = locache.get("shortlist-"+fishID);
-              if (shortlisted === "" || _.isNull(shortlisted) || _.isUndefined(shortlisted)){
-                console.log("[" + fishID + "] Shortlist Not Set");
-                shortlisted = true;
-              } else {
-                shortlisted = !shortlisted;  
-              }
-              // Save new Shortlist status
-              console.log("[" + fishID + "] Shortlist Updated: " + shortlisted);
-              locache.set("shortlist-"+fishID, shortlisted);
-
-              // Update all instances of Shortlist button
-              $("[data-id='"+ fishID +"'][data-toggle='shortlist'] ").each(function(index) {
-                $(this).toggleClass("shortlisted", shortlisted);
-                $(this).toggleClass("btn-warning", shortlisted);
-              });
-            });
+          isShortlisted: function () {
+            isShortlisted = locache.get("shortlist-"+fishID);
+            if (isShortlisted === "" || _.isNull(isShortlisted) || _.isUndefined(isShortlisted)){
+              console.log("No status set -> " + fishID);
+              return isShortlisted = false;
+            }
+            console.log(fishID + "Shortlisted Status: [" + isShortlisted + "]");
+            return isShortlisted;
+            console.log("shortlistManager.isShortlisted()")
           },
-          shortlistTemplate: function (fishID) {
-            var currentFish = fishID;
+          template: function () {
+            var currentFish = this;
 
             if (currentFish.isShortlisted()){
               shortlistClass = true;
@@ -393,4 +362,34 @@
           }
         }
       }
+
+      function shortlistListener() {
+        $("body").off();
+        $("body").on("click", "[data-toggle='shortlist']", function(event){
+          event.preventDefault();
+
+          fishID = $(this).closest("[data-id]").data("id");
+        
+          // Toggle Shortlisted status
+          isShortlisted = locache.get("shortlist-"+fishID);
+          if (isShortlisted === "" || _.isNull(isShortlisted) || _.isUndefined(isShortlisted)){
+            console.log("[" + fishID + "] Shortlist Not Set");
+            isShortlisted = true;
+          } else {
+            console.log(fishID + "SL b4 - " + isShortlisted);
+            isShortlisted = !isShortlisted;  
+            console.log(fishID + "SL After - " + isShortlisted);
+          }
+          // Save new Shortlist status
+          //console.log("[" + fishID + "] Shortlist Updated: " + isShortlisted);
+          locache.set("shortlist-"+fishID, isShortlisted);
+
+          // Update all instances of Shortlist button
+          $("[data-id='"+ fishID +"'][data-toggle='shortlist'] ").each(function(index) {
+            $(this).toggleClass("shortlisted", isShortlisted);
+            $(this).toggleClass("btn-warning", isShortlisted  );
+          });
+        });
+      }
+
     };
