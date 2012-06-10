@@ -90,8 +90,11 @@
   = javascript_include_tag "https://raw.github.com/d0ugal/locache/master/build/locache.js"
   = javascript_include_tag "http://underscorejs.org/underscore.js"
 
-
+  /////////////////////////////////////////
   // JAVSCRIPT TEMPLATES
+  /////////////////////////////////////////
+
+  // Fish Template
   %script{:id => "fishTemplate", :type => "text/html"}
     %li{ :data => { :id => "{{ fish.id }}" }, :class => "{{ status }} span2" }
       .thumbnail
@@ -102,6 +105,7 @@
           {[ } ]}
 
 
+  // Tags Template
   %script{:id => "tagsTemplate", :type => "text/html"}
     .control-group
       %label.control-label
@@ -112,6 +116,7 @@
         .slider.span2{ :data => { :target => "query[tags][{{ token }}]" } }
 
 
+  // Filters Template
   %script{:id => "filtersTemplate", :type => "text/html"}
     .control
       %label.checkbox
@@ -119,6 +124,7 @@
         {{ token.name }}
 
 
+  // Fish Details Template
   %script{:id => "fishDetailsTemplate", :type => "text/html"}
     %a{ :href => "#", :data => { :toggle => "modal" } }
       %img{ :src => "{{ metadata.thumbnail_url }}", :alt => "{{ metadata.title }}", :class => "profile" }
@@ -129,6 +135,7 @@
       {[ } ]}
 
 
+  // Modal Template
   %script{:id => "modalTemplate", :type => "text/html"}
     .modal
       .modal-header
@@ -161,6 +168,9 @@
         interpolate : /\{\{(.+?)\}\}/g
       };
 
+      /////////////////////////////////////////
+      // Fishpond loading
+      /////////////////////////////////////////
       fishpond.loading(function(percent){
         $("#loading .progress").removeClass("progress-striped");
         $("#loading .bar").css({width: (percent * 100) + "%"});
@@ -169,6 +179,10 @@
         locache.flush();
       });
 
+
+      /////////////////////////////////////////
+      // Fishpond Ready
+      /////////////////////////////////////////
       fishpond.ready(function(pond){
         // Loading transitions
         $("#loading").fadeOut(0);
@@ -229,58 +243,57 @@
         fishpond.query({}, {});
       });
 
+
+      /////////////////////////////////////////
+      // Results Updated
+      /////////////////////////////////////////
       fishpond.resultsUpdated(function(results){
         // Clear old results
         $("#results ul").empty();
 
+        /////////////////////////////////////////
         // Generate Results
+        /////////////////////////////////////////
         for(var i = 0; i < results.length; i++){
-          var fishID = results[i].fish.id;
+          var result = results[i]
+          var fishID = result.fish.id;
           var fish = fishManager(fishID);
-          var shortlist = shortlistManager(fishID);
-          var fishDetails;
-
-          var metadataStatus = "loading";
+          
+          //var metadataStatus = "loading";
           var metadata = function () {
             return fish.getMetadata();
           };
           
           if (fish.getMetadata() === null){
-            // If Metadata is not cached, load Metadata then update template
-            $.when( fish.setMetadata(results[i]) ).then( function(result){
-              fish = fishManager(result.fish.id);           
+            console.log("[" + fishID + "] CACHED - false");
+            // [If Metadata is NOT cached] - Then go away and load Metadata and update template dynamically on completion
+            $.when( fish.setMetadata(results[i]) ).then( function(result){ 
+              fish = fishManager(result.fish.id); // After Metadata has loaded then passback 'result/fish' into queue
+              console.log("[" + result.fish.id + "] METADATA - loaded - Time to update template");
+              
+              fish.updateTemplate();
             });
           } else {
-            // If Metadata is cached populate Fish Details Template
-            fish.getMetadata();
-            metadataStatus = "loaded";
+            // [If Metadata IS cached] - populate Fish the 'Details' of the static Template
+            console.log("[" + fishID + "] CACHED - true");
+            console.log(fish.getMetadata());
 
-            var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
-            var fishDetailsData = { 
-              metadata  : fish.getMetadata(),
-              shortlist : shortlist.template()
-            }
-            fishDetails = fishDetailsTemplate( fishDetailsData );
+            
           }
-
+          
           // Create Fish from Template
-          var fishTemplate = _.template($( "#fishTemplate" ).html());
-          var resultData = {
-            fish            : results[i].fish, 
-            status          : metadataStatus,
-            fishDetailsData : fishDetails,  // Pass a template into a template
-            metadata        : fish.getMetadata(),
-            shortlist       : shortlist.template()
-          }
-
-          // Update Results list
-          $('#results ul').append( fishTemplate( resultData ));
+          fish.generateTemplate(result);
         }
       });
 
+
+      /////////////////////////////////////////
+      // Fish Manager
+      /////////////////////////////////////////
       var fishManager = function (fishID) {
         var fishID = fishID;
         var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
+        var shortlist = shortlistManager(fishID);
         
         return {
           setMetadata: function (result) {
@@ -295,8 +308,22 @@
           getMetadata: function () {
             return locache.get("metadata-"+fishID);
           },
-          updateTemplate: function (metadata) {
-            var fishResult = $("#results").find("li[data-id='" + fishID + "']");
+          generateTemplate: function (result) {
+            var currentFish = this;
+            var fishTemplate = _.template($( "#fishTemplate" ).html());
+            var resultData = {
+              fish            : result.fish, 
+              status          : "loaded",
+              fishDetailsData : currentFish.fishDetails(),  // Pass a template into a template
+              metadata        : currentFish.getMetadata(),
+              shortlist       : shortlist.template()
+            }
+            // Update Results list
+            $('#results ul').append( fishTemplate( resultData ));
+          },
+          updateTemplate: function () {
+            console.log("[" + fishID + "] UPDATE TEMPLATE");
+            /*var fishResult = $("#results").find("li[data-id='" + fishID + "']");
             var fishDetailsData = { 
               metadata  : metadata,
               shortlist : shortlist.template()
@@ -305,10 +332,28 @@
 
             // Once Metadata is loaded then inject it into result.
             return fishResult.find(".details").html( fishDetailsTemplate( fishDetailsData ));
-          }      
+            */
+          },
+          fishDetails: function () {
+            var currentFish = this;
+            var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
+            var fishDetailsData;
+
+            if (currentFish.getMetadata) {
+              fishDetailsData = { 
+                metadata  : currentFish.getMetadata(),
+                shortlist : shortlist.template()
+              }
+            }
+            return fishDetailsTemplate( fishDetailsData );
+          } 
         };
       };
 
+
+      /////////////////////////////////////////
+      // Modal Manager
+      /////////////////////////////////////////
       var modalManager = function () {
         $("#results").on("click", "[data-toggle='modal']", function(event){
           event.preventDefault();
@@ -323,7 +368,7 @@
           // Load data into empty Modal.
           var modalTemplate = _.template($( "#modalTemplate" ).html());
           var modalData = { 
-            metadata : metadata,
+            metadata  : metadata,
             shortlist : shortlist.template()
           }
           if (fishModal.attr("id") === metadata.id){
@@ -332,39 +377,44 @@
         });
       }();
 
+
+      /////////////////////////////////////////
+      // Shortlist Manager
+      /////////////////////////////////////////
       var shortlistManager = function(fishID) {
         var isShortlisted;
 
         return {
           isShortlisted: function () {
+            //console.log("Is shortlisted called " + fishID);
             isShortlisted = locache.get("shortlist-"+fishID);
             if (isShortlisted === "" || _.isNull(isShortlisted) || _.isUndefined(isShortlisted)){
-              console.log("No status set -> " + fishID);
+              //console.log("No status set -> " + fishID);
               return isShortlisted = false;
             }
-            console.log(fishID + "Shortlisted Status: [" + isShortlisted + "]");
+            //console.log(fishID + "Shortlisted Status: [" + isShortlisted + "]");
             return isShortlisted;
-            console.log("shortlistManager.isShortlisted()")
+            //console.log("shortlistManager.isShortlisted()")
           },
           template: function () {
             var currentFish = this;
-
-            if (currentFish.isShortlisted()){
-              shortlistClass = true;
-            } else {
-              shortlistClass = false;
-            }
+            var shortlistClass = currentFish.isShortlisted() ? true : false;
 
             var shortlistButton = {
               status : currentFish.isShortlisted(),
               wording : "Toggle Shortlist",
               shortlistClass : shortlistClass
             }
+            console.log("Shortlist Template - " + fishID + " [" + shortlistClass + "]");
             return shortlistButton;
           }
         }
       }
 
+
+      /////////////////////////////////////////
+      // Shortlist Listeners
+      /////////////////////////////////////////
       function shortlistListener() {
         $("body").off();
         $("body").on("click", "[data-toggle='shortlist']", function(event){
