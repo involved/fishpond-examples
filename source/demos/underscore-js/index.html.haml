@@ -182,7 +182,7 @@
         // Generate Tags
         $.each(pond.tag_ids, function(name, token){ 
           var tagsData = { 
-            name : name, 
+            name  : name, 
             token : token
           }
           $("fieldset.tags").append( tagsTemplate( tagsData ));
@@ -246,18 +246,18 @@
           };
           
           if (fish.getMetadata() === null){
-            // Load Metadata then update template
+            // If Metadata is not cached, load Metadata then update template
             $.when( fish.setMetadata(results[i]) ).then( function(result){
               fish = fishManager(result.fish.id);           
             });
           } else {
-            // Use cached Metadata and populate Fish Details Template
+            // If Metadata is cached populate Fish Details Template
             fish.getMetadata();
             metadataStatus = "loaded";
 
             var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
             var fishDetailsData = { 
-              metadata : fish.getMetadata(),
+              metadata  : fish.getMetadata(),
               shortlist : shortlist.template()
             }
             fishDetails = fishDetailsTemplate( fishDetailsData );
@@ -266,11 +266,11 @@
           // Create Fish from Template
           var fishTemplate = _.template($( "#fishTemplate" ).html());
           var resultData = {
-            fish : results[i].fish, 
-            status : metadataStatus,
-            fishDetailsData : fishDetails,
-            metadata : fish.getMetadata(),
-            shortlist : shortlist.template()
+            fish            : results[i].fish, 
+            status          : metadataStatus,
+            fishDetailsData : fishDetails,  // Pass a template into a template
+            metadata        : fish.getMetadata(),
+            shortlist       : shortlist.template()
           }
 
           // Update Results list
@@ -298,10 +298,12 @@
           updateTemplate: function (metadata) {
             var fishResult = $("#results").find("li[data-id='" + fishID + "']");
             var fishDetailsData = { 
-              metadata : metadata,
+              metadata  : metadata,
               shortlist : shortlist.template()
             }
             fishResult.removeClass("loading").addClass("loaded");
+
+            // Once Metadata is loaded then inject it into result.
             return fishResult.find(".details").html( fishDetailsTemplate( fishDetailsData ));
           }      
         };
