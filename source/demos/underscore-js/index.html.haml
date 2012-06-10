@@ -258,30 +258,17 @@
           var result = results[i]
           var fishID = result.fish.id;
           var fish = fishManager(fishID);
-          
-          //var metadataStatus = "loading";
-          var metadata = function () {
-            return fish.getMetadata();
-          };
-          
+                    
           if (fish.getMetadata() === null){
             console.log("[" + fishID + "] CACHED - false");
-            // [If Metadata is NOT cached] - Then go away and load Metadata and update template dynamically on completion
+            // [If Metadata is NOT cached] - This will go away and load Metadata and update template on completion
             $.when( fish.setMetadata(results[i]) ).then( function(result){ 
-              fish = fishManager(result.fish.id); // After Metadata has loaded then passback 'result/fish' into queue
-              console.log("[" + result.fish.id + "] METADATA - loaded - Time to update template");
-              
+              fish = fishManager(result.fish.id); // After Metadata has loaded then passback 'result/fish' into queue             
               fish.updateTemplate();
             });
-          } else {
-            // [If Metadata IS cached] - populate Fish the 'Details' of the static Template
-            console.log("[" + fishID + "] CACHED - true");
-            console.log(fish.getMetadata());
+          } 
 
-            
-          }
-          
-          // Create Fish from Template
+          // Gerenate Fish - This will create an empty shell or a complete Fish (depending if the Metadata is loaded). The empty shell will by dynamically updated after Metadata has loaded.
           fish.generateTemplate(result);
         }
       });
@@ -291,7 +278,6 @@
       // Fish Manager
       /////////////////////////////////////////
       var fishManager = function (fishID) {
-        var fishID = fishID;
         var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
         var shortlist = shortlistManager(fishID);
         
@@ -311,41 +297,42 @@
           generateTemplate: function (result) {
             var currentFish = this;
             var fishTemplate = _.template($( "#fishTemplate" ).html());
+            var metadata = currentFish.getMetadata();
             var resultData = {
               fish            : result.fish, 
-              status          : "loaded",
               fishDetailsData : currentFish.fishDetails(),  // Pass a template into a template
-              metadata        : currentFish.getMetadata(),
-              shortlist       : shortlist.template()
+              metadata        : metadata,
+              status          : metadata ? "loaded" : "loading",
+              shortlist       : shortlist.template()        // Pass in shortlistButton Object
             }
             // Update Results list
             $('#results ul').append( fishTemplate( resultData ));
           },
           updateTemplate: function () {
-            console.log("[" + fishID + "] UPDATE TEMPLATE");
-            /*var fishResult = $("#results").find("li[data-id='" + fishID + "']");
+            var currentFish = this;
+            var fishResult = $("#results").find("li[data-id='" + fishID + "']");
             var fishDetailsData = { 
-              metadata  : metadata,
-              shortlist : shortlist.template()
+              metadata        : currentFish.getMetadata(),
+              shortlist       : shortlist.template()
             }
             fishResult.removeClass("loading").addClass("loaded");
 
             // Once Metadata is loaded then inject it into result.
             return fishResult.find(".details").html( fishDetailsTemplate( fishDetailsData ));
-            */
           },
           fishDetails: function () {
             var currentFish = this;
             var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
             var fishDetailsData;
 
-            if (currentFish.getMetadata) {
+            // If Metadata is loaded then populate 'Details Template'
+            if (currentFish.getMetadata()) {
               fishDetailsData = { 
-                metadata  : currentFish.getMetadata(),
-                shortlist : shortlist.template()
+                metadata      : currentFish.getMetadata(),
+                shortlist     : shortlist.template()
               }
+              return fishDetailsTemplate( fishDetailsData );
             }
-            return fishDetailsTemplate( fishDetailsData );
           } 
         };
       };
@@ -401,9 +388,9 @@
             var shortlistClass = currentFish.isShortlisted() ? true : false;
 
             var shortlistButton = {
-              status : currentFish.isShortlisted(),
-              wording : "Toggle Shortlist",
-              shortlistClass : shortlistClass
+              status          : currentFish.isShortlisted(),
+              wording         : "Toggle Shortlist",
+              shortlistClass  : shortlistClass
             }
             console.log("Shortlist Template - " + fishID + " [" + shortlistClass + "]");
             return shortlistButton;
