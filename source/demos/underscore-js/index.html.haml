@@ -85,13 +85,18 @@
         left: -5px;
       }
 
+  /////////////////////////////////////////
+  // REQUIRED EXTERNAL JAVASCRIPT
+  /////////////////////////////////////////
 
 - content_for :javascript do
   = javascript_include_tag "https://raw.github.com/d0ugal/locache/master/build/locache.js"
   = javascript_include_tag "http://underscorejs.org/underscore.js"
 
+
   /////////////////////////////////////////
-  // JAVSCRIPT TEMPLATES
+  // JAVASCRIPT TEMPLATES 
+  // Powered by Underscore.js 'Templates'
   /////////////////////////////////////////
 
   // Fish Template
@@ -262,14 +267,14 @@
           var fish = fishManager(fishID);
                     
           if (fish.getMetadata() === null){
-            // [If Metadata is NOT cached] - This will go away and load Metadata and update template on completion
-            $.when( fish.setMetadata(results[i]) ).then( function(result){ 
-              fish = fishManager(result.fish.id); // After Metadata has loaded then passback 'result/fish' into queue             
-              fish.updateTemplate();
+            // If Metadata is NOT cached
+            $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
+              fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
+              fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
             });
           } 
           
-          fish.generateTemplate(result); // Gerenate Fish - This will create an empty shell or a complete Fish (depending if the Metadata is loaded). The empty shell will by dynamically updated after Metadata has loaded.
+          fish.generateTemplate(result); // Generate Fish - This will create either an empty shell - or - a complete Fish (depending if the Metadata is loaded). In the event the Metadata is not loaded the empty shell will be dynamically updated later after Metadata has loaded.
         }
       });
 
@@ -352,8 +357,6 @@
           var fishModal = $('#emptyModal').clone().attr("id",fishID);
           fishModal.modal('show');
 
-          console.log("[" + fishID + "] - " + shortlist.isShortlisted());
-
           // Load data into empty Modal.
           var modalTemplate = _.template($( "#modalTemplate" ).html());
           var modalData = { 
@@ -375,12 +378,11 @@
 
         return {
           isShortlisted: function () {
-            // Check if Shortlist status has been set. If not then set it to false otherwise return the cached value.
+            // Check if Shortlist status has been set. If not then set it to False, otherwise return the cached value.
 
             shortlistStatus = locache.get("shortlist-"+fishID);
             if (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)){
-              // Cache Shortlist status
-              locache.set("shortlist-"+fishID, false);
+              locache.set("shortlist-"+fishID, false); // Cache Shortlist status
               return shortlistStatus = false;
             }
             return shortlistStatus;
@@ -414,11 +416,7 @@
         
           // Toggle Shortlist status
           var shortlistStatus = locache.get("shortlist-"+fishID);
-          if (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)){
-            shortlistStatus = true;
-          } else {
-            shortlistStatus = !shortlistStatus;
-          }
+          shortlistStatus = (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)) ? true : !shortlistStatus;  // If Shortlist status is empty, null or undefined then set it to True, otherwise toggle current status.
 
           // Cache new Shortlist status
           locache.set("shortlist-"+fishID, shortlistStatus);
@@ -431,5 +429,4 @@
           });
         });
       }
-
     };
