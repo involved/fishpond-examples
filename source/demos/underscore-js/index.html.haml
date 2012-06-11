@@ -131,7 +131,8 @@
       {[ if (!_.isEmpty(shortlist)) { ]}          
       %a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :toggle => "shortlist" } }
         %i.icon-star
-        {{ shortlist.wording }}
+        %span
+          {{ shortlist.wording }}
       {[ } ]}
 
 
@@ -153,7 +154,8 @@
             {[ if (!_.isEmpty(shortlist)) { ]}
             %a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :toggle => "shortlist" } }
               %i.icon-star
-              {{ shortlist.wording }}
+              %span
+                {{ shortlist.wording }}
             {[ } ]}
       .modal-footer
         %a.btn{"data-dismiss" => "modal", :href => "#"} Close
@@ -260,16 +262,14 @@
           var fish = fishManager(fishID);
                     
           if (fish.getMetadata() === null){
-            console.log("[" + fishID + "] CACHED - false");
             // [If Metadata is NOT cached] - This will go away and load Metadata and update template on completion
             $.when( fish.setMetadata(results[i]) ).then( function(result){ 
               fish = fishManager(result.fish.id); // After Metadata has loaded then passback 'result/fish' into queue             
               fish.updateTemplate();
             });
           } 
-
-          // Gerenate Fish - This will create an empty shell or a complete Fish (depending if the Metadata is loaded). The empty shell will by dynamically updated after Metadata has loaded.
-          fish.generateTemplate(result);
+          
+          fish.generateTemplate(result); // Gerenate Fish - This will create an empty shell or a complete Fish (depending if the Metadata is loaded). The empty shell will by dynamically updated after Metadata has loaded.
         }
       });
 
@@ -325,7 +325,7 @@
             var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
             var fishDetailsData;
 
-            // If Metadata is loaded then populate 'Details Template'
+            // If Metadata has loaded then populate 'Details Template'
             if (currentFish.getMetadata()) {
               fishDetailsData = { 
                 metadata      : currentFish.getMetadata(),
@@ -352,6 +352,8 @@
           var fishModal = $('#emptyModal').clone().attr("id",fishID);
           fishModal.modal('show');
 
+          console.log("[" + fishID + "] - " + shortlist.isShortlisted());
+
           // Load data into empty Modal.
           var modalTemplate = _.template($( "#modalTemplate" ).html());
           var modalData = { 
@@ -369,64 +371,63 @@
       // Shortlist Manager
       /////////////////////////////////////////
       var shortlistManager = function(fishID) {
-        var isShortlisted;
+        var shortlistStatus;
 
         return {
           isShortlisted: function () {
-            //console.log("Is shortlisted called " + fishID);
-            isShortlisted = locache.get("shortlist-"+fishID);
-            if (isShortlisted === "" || _.isNull(isShortlisted) || _.isUndefined(isShortlisted)){
-              //console.log("No status set -> " + fishID);
-              return isShortlisted = false;
+            // Check if Shortlist status has been set. If not then set it to false otherwise return the cached value.
+
+            shortlistStatus = locache.get("shortlist-"+fishID);
+            if (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)){
+              // Cache Shortlist status
+              locache.set("shortlist-"+fishID, false);
+              return shortlistStatus = false;
             }
-            //console.log(fishID + "Shortlisted Status: [" + isShortlisted + "]");
-            return isShortlisted;
-            //console.log("shortlistManager.isShortlisted()")
+            return shortlistStatus;
           },
           template: function () {
-            var currentFish = this;
-            var shortlistClass = currentFish.isShortlisted() ? true : false;
-
+            this.isShortlisted();
             var shortlistButton = {
-              status          : currentFish.isShortlisted(),
-              wording         : "Toggle Shortlist",
-              shortlistClass  : shortlistClass
+              status          : shortlistStatus,
+              wording         : shortlistWording(shortlistStatus),
+              shortlistClass  : shortlistStatus ? "shortlisted btn-warning" : ""
             }
-            console.log("Shortlist Template - " + fishID + " [" + shortlistClass + "]");
             return shortlistButton;
           }
         }
       }
 
+      function shortlistWording(shortlistStatus) {
+        return shortlistStatus ? "Remove" : "Shortlist";
+      }
 
       /////////////////////////////////////////
-      // Shortlist Listeners
+      // Shortlist Listener
       /////////////////////////////////////////
       function shortlistListener() {
         $("body").off();
         $("body").on("click", "[data-toggle='shortlist']", function(event){
           event.preventDefault();
 
+          // Determine Fish ID
           fishID = $(this).closest("[data-id]").data("id");
         
-          // Toggle Shortlisted status
-          isShortlisted = locache.get("shortlist-"+fishID);
-          if (isShortlisted === "" || _.isNull(isShortlisted) || _.isUndefined(isShortlisted)){
-            console.log("[" + fishID + "] Shortlist Not Set");
-            isShortlisted = true;
+          // Toggle Shortlist status
+          var shortlistStatus = locache.get("shortlist-"+fishID);
+          if (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)){
+            shortlistStatus = true;
           } else {
-            console.log(fishID + "SL b4 - " + isShortlisted);
-            isShortlisted = !isShortlisted;  
-            console.log(fishID + "SL After - " + isShortlisted);
+            shortlistStatus = !shortlistStatus;
           }
-          // Save new Shortlist status
-          //console.log("[" + fishID + "] Shortlist Updated: " + isShortlisted);
-          locache.set("shortlist-"+fishID, isShortlisted);
+
+          // Cache new Shortlist status
+          locache.set("shortlist-"+fishID, shortlistStatus);
 
           // Update all instances of Shortlist button
           $("[data-id='"+ fishID +"'][data-toggle='shortlist'] ").each(function(index) {
-            $(this).toggleClass("shortlisted", isShortlisted);
-            $(this).toggleClass("btn-warning", isShortlisted  );
+            $(this).toggleClass("shortlisted", shortlistStatus);
+            $(this).toggleClass("btn-warning", shortlistStatus);
+            $(this).find("span").html(shortlistWording(shortlistStatus));
           });
         });
       }
