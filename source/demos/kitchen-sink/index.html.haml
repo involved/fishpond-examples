@@ -1,11 +1,30 @@
 .page-header
-  %h1 Javascript Templates
+  %h1 Kitchen Sink - Demo
   %br
   .row
     .span9
       %p
-        %strong Powered by: 
-        = link_to "Underscore JS", "http://underscorejs.org/", :target => "_blank"
+        %strong Powered by:
+        %ul
+          %li 
+            = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
+            (Javascript Templates)
+          %li
+            = link_to "Locache", "http://locachejs.org/", :target => "_blank"
+            (Javascript client-side caching)
+          %li
+            = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
+            (Filtering and Animation)
+          %li
+            = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+            (Form UI controls)
+          %li
+            = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
+            (Allows asynchronous javascript functions)
+    .span2.offset1
+      %span.label.label-success Metadata enabled
+      %br 
+      %span.label.label-important Filters disabled
 
 .row
   .span5
@@ -274,7 +293,7 @@
             });
           } 
           
-          fish.generateTemplate(result); // Generate Fish - This will create either an empty shell - or - a complete Fish (depending if the Metadata is loaded). In the event the Metadata is not loaded the empty shell will be dynamically updated later after Metadata has loaded.
+          fish.generateTemplate(result); // Generate Fish - This will create either an 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded the partial Fish will be dynamically updated later after Metadata has loaded.
         }
       });
 
@@ -288,7 +307,7 @@
         
         return {
           setMetadata: function (result) {
-            //console.log("Result -> " + fishID);
+            // Uses jQuery deferred to load Fish Metadata and then pass it back on completion.
             var defered = new $.Deferred();
             fishpond.get_fish(fishID, function(data){
               locache.set("metadata-"+fishID, data);
@@ -305,10 +324,10 @@
             var metadata = currentFish.getMetadata();
             var resultData = {
               fish            : result.fish, 
-              fishDetailsData : currentFish.fishDetails(),  // Pass a template into a template
+              fishDetailsData : currentFish.fishDetails(),  // Pass 'details' template into this template
               metadata        : metadata,
               status          : metadata ? "loaded" : "loading",
-              shortlist       : shortlist.template()        // Pass in shortlistButton Object
+              shortlist       : shortlist.template()        // Pass in 'shortlistButton' Object
             }
             // Update Results list
             $('#results ul').append( fishTemplate( resultData ));
