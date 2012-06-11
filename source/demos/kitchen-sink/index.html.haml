@@ -169,9 +169,9 @@
         %h3 {{ metadata.title }}
       .modal-body
         .row
-          .span2
-            %img{:alt => "{{ metadata.title }}", :src => "{{ metadata.thumbnail_url }}"}/
-          .span4
+          .span3
+            %img{:alt => "{{ metadata.title }}", :src => "{{ metadata.image_url }}"}/
+          .span3
             %p {{ metadata.description }}
             = link_to "Find out more", "{{ metadata.url }}", :target => "_blank"
             %br
@@ -188,18 +188,17 @@
 
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      // Setup global variables
+      var resultsList = $("#results ul");
+      var quicksandEnabled = true;
+      var quicksandList;
         
       // Change underscore.js tenplate settings to use moustache syntax
       _.templateSettings = {
         evaluate : /\{\[([\s\S]+?)\]\}/g,
         interpolate : /\{\{(.+?)\}\}/g
       };
-
-      // Setup global variables
-      var resultsList = $("#results ul");
-      var quicksandEnabled = true;
-      var quicksandList;
-
 
       /////////////////////////////////////////
       // Fishpond loading
@@ -261,7 +260,6 @@
               var tags = {};
               var filters = {};
               $("form#fishpond input").each(function(){
-                //console.error($(this).data('slug'));
                 tags[$(this).data('slug')] = $(this).val();
               });
               fishpond.query(tags, filters);
@@ -283,10 +281,11 @@
       fishpond.resultsUpdated(function(results){
         
         // Clear old results
-        if (!quicksandEnabled) resultsList.empty();
-
-        // Prepare Quicksand for animated filtering 
-        quicksandList = $("<ul></ul>");  
+        if (quicksandEnabled){
+          quicksandList = $("<ul></ul>");  
+        } else {
+          resultsList.empty(); 
+        }
 
         /////////////////////////////////////////
         // Generate Results
@@ -304,7 +303,7 @@
             });
           } 
           
-          fish.generateTemplate(result); // Generate Fish - This will create either an 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded the partial Fish will be dynamically updated later after Metadata has loaded.
+          fish.generateTemplate(result); // Generate Fish - This will either create a 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded then the partial Fish will be dynamically updated later after Metadata has loaded.
         }
 
         // Check for animation/filtering method
@@ -321,10 +320,20 @@
         
         return {
           setMetadata: function (result) {
-            // Uses jQuery deferred to load Fish Metadata and then pass it back on completion.
-            var defered = new $.Deferred();
-            fishpond.get_fish(fishID, function(data){
-              locache.set("metadata-"+fishID, data);
+            var defered = new $.Deferred();  // Uses jQuery deferred to load Fish Metadata and then pass it back on completion.
+            fishpond.get_fish(fishID, function(metadata){
+
+              // Clean Metadata and provide fallbacks to avoide breakages
+              var parsedMetadata = {
+                description   : _.isNull(metadata.description) ? "No description set" : metadata.description,
+                image_url     : _.isNull(metadata.image_url) ? "http://placehold.it/300x300" : metadata.image_url,
+                thumbnail_url : _.isNull(metadata.thumbnail_url) ? "http://placehold.it/120x120" : metadata.thumbnail_url,
+                url           : metadata.url === "" ? "#" : metadata.url,
+                id            : metadata.id,
+                title         : metadata.title
+              }
+              
+              locache.set("metadata-"+fishID, parsedMetadata);
               defered.resolve(result);
             });    
             return defered.promise();
@@ -346,11 +355,9 @@
 
             // Update Results list
             if (quicksandEnabled){
-              // Use Quicksand plug to handle filtering + animations.
-              quicksandList.append( fishTemplate( resultData ));              
+              quicksandList.append( fishTemplate( resultData ));  // Use Quicksand plug to handle filtering + animations.         
             } else {
-              // Fall back to non-animated filtering.
-              resultsList.append( fishTemplate( resultData ));
+              resultsList.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
             }
           },
           updateTemplate: function () {
@@ -394,8 +401,8 @@
           var shortlist = shortlistManager(fishID);
 
           // Clone empty Modal template and display
-          var fishModal = $('#emptyModal').clone().attr("id",fishID);
-          fishModal.modal('show');
+          var fishModal = $("#emptyModal").clone().attr("id",fishID);
+          fishModal.modal("show");
 
           // Load data into empty Modal.
           var modalTemplate = _.template($( "#modalTemplate" ).html());
