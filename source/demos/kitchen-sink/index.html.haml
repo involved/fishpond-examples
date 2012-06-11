@@ -47,6 +47,10 @@
     #results
       %ul.thumbnails
 
+.row
+  .span12
+    #disqus_thread
+
 #emptyModal.modal.hide
   .modal-body.loading
     // Empty
@@ -112,7 +116,7 @@
   = javascript_include_tag "https://raw.github.com/d0ugal/locache/master/build/locache.js"
   = javascript_include_tag "http://underscorejs.org/underscore.js"
   = javascript_include_tag "https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js"
-
+  =# javascript_include_tag "http://ifish.disqus.com/embed.js"
 
   /////////////////////////////////////////
   // JAVASCRIPT TEMPLATES 
@@ -163,27 +167,31 @@
 
   // Modal Template
   %script{:id => "modalTemplate", :type => "text/html"}
-    .modal
-      .modal-header
-        %button.close{"data-dismiss" => "modal"} ×
-        %h3 {{ metadata.title }}
-      .modal-body
-        .row
-          .span3
-            %img{:alt => "{{ metadata.title }}", :src => "{{ metadata.image_url }}"}/
-          .span3
-            %p {{ metadata.description }}
-            = link_to "Find out more", "{{ metadata.url }}", :target => "_blank"
-            %br
-            %br
-            {[ if (!_.isEmpty(shortlist)) { ]}
-            %a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :toggle => "shortlist" } }
-              %i.icon-star
-              %span
-                {{ shortlist.wording }}
-            {[ } ]}
-      .modal-footer
-        %a.btn{"data-dismiss" => "modal", :href => "#"} Close
+    .modal-header
+      %button.close{"data-dismiss" => "modal"} ×
+      %h3 {{ metadata.title }}
+    .modal-body
+      .row
+        .span3
+          %img{:alt => "{{ metadata.title }}", :src => "{{ metadata.image_url }}"}/
+        .span3
+          %p {{ metadata.description }}
+          = link_to "Find out more", "{{ metadata.url }}", :target => "_blank"
+          %br
+          %br
+          {[ if (!_.isEmpty(shortlist)) { ]}
+          %a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :toggle => "shortlist" } }
+            %i.icon-star
+            %span
+              {{ shortlist.wording }}
+          {[ } ]}
+      .row
+        .comments.span6
+          {{ comments }}
+          
+        
+    .modal-footer
+      %a.btn{"data-dismiss" => "modal", :href => "#"} Close
 
 
   :javascript
@@ -270,6 +278,9 @@
         // Init Shorlist Manager
         shortlistListener();
 
+        // Init Comments Manager
+        commentsManager(pond);
+
         // Run Query
         fishpond.query({}, {});
       });
@@ -323,12 +334,12 @@
             var defered = new $.Deferred();  // Uses jQuery deferred to load Fish Metadata and then pass it back on completion.
             fishpond.get_fish(fishID, function(metadata){
 
-              // Clean Metadata and provide fallbacks to avoide breakages
+              // Parse Metadata and provide fallbacks to avoid breakages
               var parsedMetadata = {
                 description   : _.isNull(metadata.description) ? "No description set" : metadata.description,
                 image_url     : _.isNull(metadata.image_url) ? "http://placehold.it/300x300" : metadata.image_url,
                 thumbnail_url : _.isNull(metadata.thumbnail_url) ? "http://placehold.it/120x120" : metadata.thumbnail_url,
-                url           : metadata.url === "" ? "#" : metadata.url,
+                url           : (metadata.url === "" || _.isNull(metadata.url)) ? "#" : metadata.url,
                 id            : metadata.id,
                 title         : metadata.title
               }
@@ -408,10 +419,11 @@
           var modalTemplate = _.template($( "#modalTemplate" ).html());
           var modalData = { 
             metadata  : metadata,
-            shortlist : shortlist.template()
+            shortlist : shortlist.template(),
+            comments : "http://ifish.disqus.com/combination_widget.js?num_items=5&hide_mods=0&color=blue&default_tab=people&excerpt_length=200"
           }
           if (fishModal.attr("id") === metadata.id){
-            fishModal.append( modalTemplate( modalData ));
+            fishModal.empty().append( modalTemplate( modalData ));
           }
         });
       }();
@@ -482,12 +494,11 @@
       function sortResults() {
         if(resultsList.find("li").length == 0) {
           resultsList.append(quicksandList.find("li"));
-          console.log("[Quicksand] Init - " + $("#results li").length + " results in list");
         } else {
           resultsList.quicksand(quicksandList.find("li"), {
             // Do nothing
           }, function() {
-            console.log('[Results] reordered');
+            //console.log('[Results] reordered');
             $("#results").removeClass("reordering");
 
             // Update templates for Fish in Queue
@@ -496,5 +507,25 @@
             //});
           });
         }
+      }
+
+      /////////////////////////////////////////
+      // Comments Manager
+      /////////////////////////////////////////
+      
+      function commentsManager(pond) {
+        // Powered by Disqus
+        var disqus_shortname = 'ifish';
+        var disqus_developer = 1;
+        var disqus_identifier = pond.id;
+        var disqus_title = pond.name;
+        var disqus_category_id = '1234'
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
       }
     };
