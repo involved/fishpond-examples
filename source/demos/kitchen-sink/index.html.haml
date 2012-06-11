@@ -50,6 +50,7 @@
 .row
   .span12
     #disqus_thread
+    .fb-comments{"data-href" => "http://involved.github.com/fishpond-examples/", "data-num-posts" => "2", "data-width" => "470"}
 
 #emptyModal.modal.hide
   .modal-body.loading
@@ -290,6 +291,7 @@
       // Results Updated
       /////////////////////////////////////////
       fishpond.resultsUpdated(function(results){
+        var templateUpdateQueue = [];
         
         // Clear old results
         if (quicksandEnabled){
@@ -521,7 +523,6 @@
         var disqus_title = pond.name;
         var disqus_category_id = '1234'
 
-        /* * * DON'T EDIT BELOW THIS LINE * * */
         (function() {
             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
             dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
