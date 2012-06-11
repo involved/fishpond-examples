@@ -71,7 +71,7 @@
       min-height: 100px;
       text-align: center;
       position: relative;
-      //background: #fff;
+      background: #fff;
     }
       #results ul li.loading .thumbnail{
         background: url(/images/common/loading.gif) no-repeat center center;
@@ -111,6 +111,7 @@
 - content_for :javascript do
   = javascript_include_tag "https://raw.github.com/d0ugal/locache/master/build/locache.js"
   = javascript_include_tag "http://underscorejs.org/underscore.js"
+  = javascript_include_tag "https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js"
 
 
   /////////////////////////////////////////
@@ -194,6 +195,12 @@
         interpolate : /\{\{(.+?)\}\}/g
       };
 
+      // Setup global variables
+      var resultsList = $("#results ul");
+      var quicksandEnabled = true;
+      var quicksandList;
+
+
       /////////////////////////////////////////
       // Fishpond loading
       /////////////////////////////////////////
@@ -274,8 +281,12 @@
       // Results Updated
       /////////////////////////////////////////
       fishpond.resultsUpdated(function(results){
+        
         // Clear old results
-        $("#results ul").empty();
+        if (!quicksandEnabled) resultsList.empty();
+
+        // Prepare Quicksand for animated filtering 
+        quicksandList = $("<ul></ul>");  
 
         /////////////////////////////////////////
         // Generate Results
@@ -284,7 +295,7 @@
           var result = results[i]
           var fishID = result.fish.id;
           var fish = fishManager(fishID);
-                    
+
           if (fish.getMetadata() === null){
             // If Metadata is NOT cached
             $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
@@ -295,6 +306,9 @@
           
           fish.generateTemplate(result); // Generate Fish - This will create either an 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded the partial Fish will be dynamically updated later after Metadata has loaded.
         }
+
+        // Check for animation/filtering method
+        if (quicksandEnabled) sortResults();
       });
 
 
@@ -329,12 +343,19 @@
               status          : metadata ? "loaded" : "loading",
               shortlist       : shortlist.template()        // Pass in 'shortlistButton' Object
             }
+
             // Update Results list
-            $('#results ul').append( fishTemplate( resultData ));
+            if (quicksandEnabled){
+              // Use Quicksand plug to handle filtering + animations.
+              quicksandList.append( fishTemplate( resultData ));              
+            } else {
+              // Fall back to non-animated filtering.
+              resultsList.append( fishTemplate( resultData ));
+            }
           },
           updateTemplate: function () {
             var currentFish = this;
-            var fishResult = $("#results").find("li[data-id='" + fishID + "']");
+            var fishResult = resultsList.find("li[data-id='" + fishID + "']");
             var fishDetailsData = { 
               metadata        : currentFish.getMetadata(),
               shortlist       : shortlist.template()
@@ -387,7 +408,6 @@
           }
         });
       }();
-
 
       /////////////////////////////////////////
       // Shortlist Manager
@@ -447,5 +467,27 @@
             $(this).find("span").html(shortlistWording(shortlistStatus));
           });
         });
+      }
+
+      /////////////////////////////////////////
+      // Sort Results (quicksand)
+      /////////////////////////////////////////
+      function sortResults() {
+        if(resultsList.find("li").length == 0) {
+          resultsList.append(quicksandList.find("li"));
+          console.log("[Quicksand] Init - " + $("#results li").length + " results in list");
+        } else {
+          resultsList.quicksand(quicksandList.find("li"), {
+            // Do nothing
+          }, function() {
+            console.log('[Results] reordered');
+            $("#results").removeClass("reordering");
+
+            // Update templates for Fish in Queue
+           // $.each(templateUpdateQueue, function(index, fishID) {
+              //updateTemplate(fishID);
+            //});
+          });
+        }
       }
     };
