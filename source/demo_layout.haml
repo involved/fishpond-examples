@@ -26,13 +26,16 @@
     = yield_content :css
 
   %body
-    =# partial "shared/facebook-sdk"
     = partial "shared/navbar"
 
     #loading.container
       .span4.offset4
         .progress.progress-striped.active
           .bar{:style => "width: 100%"}
+
+    .row
+      .span12
+        = partial "shared/disqus-comments"
 
     #auth.container.hide
       .span6.offset3

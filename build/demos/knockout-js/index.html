@@ -77,90 +77,44 @@
     </div>
     <div class='container hide' id='demo'>
       <div class='page-header'>
-        <h1>Basic (Static) Demo</h1>
+        <h1>Data Bindings</h1>
         <br />
         <div class='row'>
           <div class='span9'>
-            <div class='alert alert-error'>
-              <strong>Note:</strong>
-              The form for this demo has been hardcoded for demonstration purposes. Results filtering will only work with the 'Science Majors' pond `uhEHwd`.
-            </div>
             <p>
               <strong>Powered by:</strong>
-              <a target="_blank" href="http://jqueryui.com/demos/slider/">jQuery UI Slider</a>
+              <a target="_blank" href="http://www.knockoutjs.com">Knockout JS</a>
             </p>
-          </div>
-          <div class='span2 offset1'>
-            <span class='label label-important'>Metadata disabled</span>
-            <br />
-            <span class='label label-important'>Filters disabled</span>
           </div>
         </div>
       </div>
       <div class='row'>
         <div class='span5'>
-          <div class='well'>
+          <form class='form-horizontal well' id='fishpond'>
             <h2>Tags</h2>
-            <form class='form-horizontal'>
-              <fieldset>
-                <div class='control-group'>
-                  <label class='control-label'>Quantitative (10)</label>
-                  <div class='controls'>
-                    <input data-slug='quantitative' id='query_tags_quantitative' name='query[tags][quantitative]' type='hidden' value='10' />
-                    <div class='slider span2' data-target='query[tags][quantitative]'></div>
-                  </div>
+            <fieldset class='tags'>
+            </fieldset>
+            <h2>Filters</h2>
+            <fieldset class='filters'>
+              <div class='control-group'>
+                <div class='control-label'>
+                  Only show:
                 </div>
-                <div class='control-group'>
-                  <label class='control-label'>Biological (10)</label>
-                  <div class='controls'>
-                    <input data-slug='biological' id='query_tags_biological' name='query[tags][biological]' type='hidden' value='10' />
-                    <div class='slider span2' data-target='query[tags][biological]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Pure (10)</label>
-                  <div class='controls'>
-                    <input data-slug='pure' id='query_tags_pure' name='query[tags][pure]' type='hidden' value='10' />
-                    <div class='slider span2' data-target='query[tags][pure]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Indoors (10)</label>
-                  <div class='controls'>
-                    <input data-slug='indoors' id='query_tags_indoors' name='query[tags][indoors]' type='hidden' value='10' />
-                    <div class='slider span2' data-target='query[tags][indoors]'></div>
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label'>Dunno (10)</label>
-                  <div class='controls'>
-                    <input data-slug='dunno' id='query_tags_dunno' name='query[tags][dunno]' type='hidden' value='10' />
-                    <div class='slider span2' data-target='query[tags][dunno]'></div>
-                  </div>
-                </div>
-              </fieldset>
-              <h2>Filters</h2>
-              <fieldset class='filters'>
-                <div class='control-group'>
-                  <div class='control-label'>
-                    Only show:
-                  </div>
-                  <div class='controls'>
-                    <label class='checkbox'>
-                      <input data-slug='maths-prerequisite' id='query_filter_sgH' name='query[filters][sgH]' type='checkbox' value='0'>Maths Prerequisite</input>
-                    </label>
-                  </div>
-                </div>
-                <span class='label'>
-                  Filters not included in this demo
-                </span>
-              </fieldset>
-            </form>
-          </div>
+              </div>
+            </fieldset>
+            <span class='label'>
+              Filters currently not hooked up.
+            </span>
+          </form>
         </div>
         <div class='span6 offset1'>
           <h2>Results</h2>
-          <ul class='results'></ul>
+          <ul class='results' data-bind='foreach: results'>
+            <li>
+              <h4 data-bind='text: title'></h4>
+              <p data-bind='text: id'></p>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -176,66 +130,138 @@
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
     <script src="https://raw.github.com/yeco/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
+    <script src="http://cloud.github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.js" type="text/javascript"></script>
     <script type='text/javascript'>
       //<![CDATA[
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
-        
-          fishpond.resultsUpdated(function(results){
-            //console.log(results);
-        
-            $(".results li").remove(); // Clear old results
-        
-            for(var i = 0; i < results.length; i++){
-              var li = $("<li></li>");
-              var thumbnail = $("<div></div>");
-              thumbnail.html(results[i].fish.title);
-              li.append(thumbnail);
-              $(".results").append(li);
-            }
-          });
-        
-          fishpond.ready(function(pond){
-            $("#loading").fadeOut(0);
-            $("#demo").fadeIn(400);
-            $("#demo h1").append(' "' + pond.name + '"');
-            fishpond.query({}, {});
-          });
         
           fishpond.loading(function(percent){
             $("#loading .progress").removeClass("progress-striped");
             $("#loading .bar").css({width: (percent * 100) + "%"});
           });
         
-          $(".slider").slider({
-            value: 10,
-            min: 0,
-            max: 20,
-            step: 1,
-            slide: function(e, ui){
-              var label = $(this).parents('.control-group').find('label');
-              var hiddenField = $("input[name='" + $(this).data('target') + "']");
-              var value = ui['value'];
+          fishpond.ready(function(pond){
+            // Loading transitions
+            $("#loading").fadeOut(0);
+            $("#demo").fadeIn(400);
+            $("#demo h1").append(' "' + pond.name + '"');       
         
-              if(value.toString() != hiddenField.val().toString()){
-                hiddenField.val(value);
-                label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
+            // Generate form controls
+            var formTags = $("fieldset.tags");
+            var formFilters = $("fieldset.filters .control-group");
+            var tagControlGroup,
+                filterControl;
         
-                var tags = {};
-                var filters = {};
-                $("form input").each(function(){
-                  tags[$(this).data('slug')] = $(this).val();
-                });
-                fishpond.query({
-                  quantitative: $("#query_tags_quantitative").val(),
-                  biological: $("#query_tags_biological").val(),
-                  pure: $("#query_tags_pure").val(),
-                  indoors: $("#query_tags_indoors").val(),
-                  dunno: $("#query_tags_dunno").val()
-                },
-                {/* no filters, yet */});
+            $.each(pond.tag_ids, function(name, token){ 
+              tagControlGroup = $("" +
+                "<div class='control-group'>" +
+                  "<label class='control-label'>" +
+                    name + " <output>(10)</output>" +
+                  "</label>" +
+                  "<div class='controls'>" +
+                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                    "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+                  "</div>" +
+                "</div>");
+              formTags.append(tagControlGroup);
+            });
+        
+            $.each(pond.filters, function(index, token){
+              filterControl = $("" +
+                "<div class='controls'>" +
+                  "<label class='checkbox'>" +
+                    "<input id='query_filter_"+token.id+"' data-slug='"+token.slug+"' name='query[filters]["+token.id+"]' type='checkbox' value='0'>" +
+                    token.name + 
+                  "</label>" +
+                "</div>");
+              formFilters.append(filterControl);
+            });
+        
+            // jQuery UI Slider
+            $(".slider").slider({
+              value: 10,
+              min: 0,
+              max: 20,
+              step: 1,
+              slide: function(e, ui){
+                var output = $(this).parents('.control-group').find('output');
+                var hiddenField = $("input[name='" + $(this).data('target') + "']");
+                var value = ui['value'];
+        
+                if(value.toString() != hiddenField.val().toString()){
+                  hiddenField.val(value);
+                  output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+        
+                  var tags = {};
+                  var filters = {};
+                  $("form#fishpond input").each(function(){
+                    console.error($(this).data('slug'));
+                    tags[$(this).data('slug')] = $(this).val();
+                  });
+                  fishpond.query(tags, filters);
+                }
               }
-            }
+            });
+        
+            fishpond.query({}, {});
           });
+        
+          fishpond.resultsUpdated(function(results){
+        
+            function Result(data) {
+              this.title = ko.observable(data.fish.title);
+              this.id = ko.observable(data.fish.id);
+              this.isDone = ko.observable(data.isDone);
+            }
+        
+            function ResultListViewModel() {
+              // Data
+              var self = this;
+              self.results = ko.observableArray([]);
+              self.newTaskText = ko.observable();
+              self.incompleteTasks = ko.computed(function() {
+                  return ko.utils.arrayFilter(self.results(), function(task) { return !task.isDone() });
+              });
+        
+              // Load initial state from server, convert it to Results instances, then populate self.metadata
+              var mappedResults = $.map(results, function(item) { return new Result(item) });
+              self.results(mappedResults);
+        
+            }
+        
+            ko.applyBindings(new ResultListViewModel());
+        
+        
+        
+           /* // Class to represent a Fish in the Results
+            function SeatReservation(name, initialMeal) {
+              var self = this;
+              self.title = name;
+              self.metadata = ko.observable(initialMeal);
+            }
+        
+            // Overall viewmodel for this screen, along with initial state
+            function FishModel() {
+              var self = this;
+        
+              // Non-editable catalog data - would come from the server
+              self.metadata = [
+                { mealName: "Standard (sandwich)", price: 0 },
+                { mealName: "Premium (lobster)", price: 34.95 },
+                { mealName: "Ultimate (whole zebra)", price: 290 }
+              ];    
+        
+              // Editable data
+              self.fish = ko.observableArray([
+                new SeatReservation("Steve", self.metadata[0]),
+                new SeatReservation("Bert", self.metadata[0])
+              ]);
+            }
+        
+            ko.applyBindings(new FishModel());
+            */
+          });
+        
         };
       //]]>
     </script>

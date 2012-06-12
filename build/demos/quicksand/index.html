@@ -48,11 +48,13 @@
     </style>
   </head>
   <body>
+    
     <div class='navbar navbar-fixed-top'>
       <div class='navbar-inner'>
         <div class='container'>
           <a class='brand' href='/'>Fishpond Examples</a>
           <ul class='nav'>
+            <li><a href="/fishpond-examples/search">Expore Demos</a></li>
             <li class='dropdown'>
               <a class='dropdown-toggle' data-toggle='dropdown' href='#'>
                 Demos
@@ -63,11 +65,14 @@
                 <li><a href="/fishpond-examples/demos/basic-dynamic">basic-dynamic</a></li>
                 <li><a href="/fishpond-examples/demos/basic-html5">basic-html5</a></li>
                 <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
-                <li><a href="/fishpond-examples/demos/dial">dial</a></li>
                 <li><a href="/fishpond-examples/demos/flotr">flotr</a></li>
+                <li><a href="/fishpond-examples/demos/jquery-knob">jquery-knob</a></li>
+                <li><a href="/fishpond-examples/demos/kitchen-sink">kitchen-sink</a></li>
+                <li><a href="/fishpond-examples/demos/knockout-js">knockout-js</a></li>
                 <li><a href="/fishpond-examples/demos/quicksand">quicksand</a></li>
                 <li><a href="/fishpond-examples/demos/scaffold">scaffold</a></li>
                 <li><a href="/fishpond-examples/demos/spider-graph">spider-graph</a></li>
+                <li><a href="/fishpond-examples/demos/yui-dial">yui-dial</a></li>
               </ul>
             </li>
           </ul>
@@ -97,6 +102,22 @@
     <div class='container hide' id='demo'>
       <div class='page-header'>
         <h1>Quicksand Demo</h1>
+        <br />
+        <div class='row'>
+          <div class='span9'>
+            <p>
+              <strong>Powered by:</strong>
+              <a target="_blank" href="http://razorjack.net/quicksand/">jQuery Quicksand Plugin</a>
+              by
+              <a target="_blank" href="https://github.com/razorjack">razorjack</a>
+            </p>
+          </div>
+          <div class='span2 offset1'>
+            <span class='label label-success'>Metadata enabled</span>
+            <br />
+            <span class='label label-important'>Filters disabled</span>
+          </div>
+        </div>
       </div>
       <section id='query'>
         <div class='row'>
@@ -108,9 +129,9 @@
                 </fieldset>
               </form>
               <h2>Filters</h2>
-              <p>
-                <em>No filters defined.</em>
-              </p>
+              <span class='label'>
+                Filters not included in this demo
+              </span>
             </div>
           </div>
           <div class='span6 offset1'>
@@ -122,15 +143,8 @@
         </div>
       </section>
       <div class='modal fade hide' id='modalTemplate'>
-        <div class='modal-header'>
-          <button class='close' data-dismiss='modal'>×</button>
-          <h3></h3>
-        </div>
         <div class='modal-body loading'>
           <!-- / Empty -->
-        </div>
-        <div class='modal-footer'>
-          <a class='btn' data-dismiss='modal' href='#'>Close</a>
         </div>
       </div>
     </div>
@@ -334,7 +348,7 @@
                 localStorage.setItem("fishpond_api_key", apiKey);
                 localStorage.setItem("fishpond_pond_token", pondToken);
         
-                var options = { debug: true };
+                var options = { debug: false };
                 var fishpond = new Fishpond(apiKey, options);
                 setupFishpond(fishpond);
                 fishpond.init(pondToken);

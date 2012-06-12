@@ -47,10 +47,6 @@
     #results
       %ul.thumbnails
 
-.row
-  .span12
-    #disqus_thread
-    .fb-comments{"data-href" => "http://involved.github.com/fishpond-examples/", "data-num-posts" => "2", "data-width" => "470"}
 
 #emptyModal.modal.hide
   .modal-body.loading
@@ -117,7 +113,7 @@
   = javascript_include_tag "https://raw.github.com/d0ugal/locache/master/build/locache.js"
   = javascript_include_tag "http://underscorejs.org/underscore.js"
   = javascript_include_tag "https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js"
-  =# javascript_include_tag "http://ifish.disqus.com/embed.js"
+  
 
   /////////////////////////////////////////
   // JAVASCRIPT TEMPLATES 
@@ -188,11 +184,16 @@
           {[ } ]}
       .row
         .comments.span6
-          {{ comments }}
-          
+          //{{ comments }}
+          // disqus comments
+          = link_to "Comments", "./kitchen-sink/comments.html#disqus_thread", :class => "dq_comment", :id => "{{ metadata.id }}"
+          .comment_box{ :id => "comment_{{ metadata.id }}" }
+                
         
     .modal-footer
       %a.btn{"data-dismiss" => "modal", :href => "#"} Close
+
+
 
 
   :javascript
@@ -216,7 +217,7 @@
         $("#loading .progress").removeClass("progress-striped");
         $("#loading .bar").css({width: (percent * 100) + "%"});
 
-        // Clear LocalStorage of fish data
+        // Clear LocalStorage of fish data. This is optional but is in here for Development purposes
         locache.flush();
       });
 
@@ -368,7 +369,7 @@
 
             // Update Results list
             if (quicksandEnabled){
-              quicksandList.append( fishTemplate( resultData ));  // Use Quicksand plug to handle filtering + animations.         
+              quicksandList.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
             } else {
               resultsList.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
             }
@@ -407,7 +408,7 @@
       // Modal Manager
       /////////////////////////////////////////
       var modalManager = function () {
-        $("#results").on("click", "[data-toggle='modal']", function(event){
+        resultsList.on("click", "[data-toggle='modal']", function(event){
           event.preventDefault();
           var fishID = $(this).closest("li").data('id');
           var metadata = locache.get("metadata-"+fishID);
@@ -517,16 +518,47 @@
       
       function commentsManager(pond) {
         // Powered by Disqus
-        var disqus_shortname = 'ifish';
+        $("body").off();
+        $("body").on("click", ".dq_comment", function(event){
+          event.preventDefault();
+          console.log("comments clicked");
+
+          var id = $(this).attr("id");
+          var href = $(this).attr("href");
+          var src = href.substring(0,href.length-14); // Remove #disqus_thread
+
+          if ($("#comment_"+id).is(':visible'))
+            $("#comment_"+id).html('');
+          else
+            $("#comment_"+id).append('<iframe scrolling="yes" frameborder="0" width="100%" height="400" src="'+src+'" class="comment_frame"></iframe>');
+
+          $("#comment_"+id).toggle('slow');
+        })
+      
+
+       /* var disqus_shortname = 'ifish';
         var disqus_developer = 1;
         var disqus_identifier = pond.id;
         var disqus_title = pond.name;
         var disqus_category_id = '1234'
-
-        (function() {
-            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-            dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        */
+   
+        /*(function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
+
+        function disqus_config() {
+          this.callbacks.onReady = [function() {
+            var frameHeight = $(document).height();
+            $('iframe.comment_frame', top.document).attr("height", frameHeight)
+          }];
+          this.callbacks.onNewComment = [function() {
+            var frameHeight = $(document).height();
+            $('iframe.comment_frame', top.document).attr("height", frameHeight)
+          }];
+        }*/
+        
       }
     };

@@ -23,11 +23,6 @@
     </style>
     <style type='text/css'>
       /*<![CDATA[*/
-        .page-header h1,
-        .page-header p{
-          text-align: center;
-        }
-        
         output:before {
           content: "(";
         }
@@ -43,11 +38,13 @@
     </style>
   </head>
   <body>
+    
     <div class='navbar navbar-fixed-top'>
       <div class='navbar-inner'>
         <div class='container'>
           <a class='brand' href='/'>Fishpond Examples</a>
           <ul class='nav'>
+            <li><a href="/fishpond-examples/search">Expore Demos</a></li>
             <li class='dropdown'>
               <a class='dropdown-toggle' data-toggle='dropdown' href='#'>
                 Demos
@@ -58,11 +55,14 @@
                 <li><a href="/fishpond-examples/demos/basic-dynamic">basic-dynamic</a></li>
                 <li><a href="/fishpond-examples/demos/basic-html5">basic-html5</a></li>
                 <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
-                <li><a href="/fishpond-examples/demos/dial">dial</a></li>
                 <li><a href="/fishpond-examples/demos/flotr">flotr</a></li>
+                <li><a href="/fishpond-examples/demos/jquery-knob">jquery-knob</a></li>
+                <li><a href="/fishpond-examples/demos/kitchen-sink">kitchen-sink</a></li>
+                <li><a href="/fishpond-examples/demos/knockout-js">knockout-js</a></li>
                 <li><a href="/fishpond-examples/demos/quicksand">quicksand</a></li>
                 <li><a href="/fishpond-examples/demos/scaffold">scaffold</a></li>
                 <li><a href="/fishpond-examples/demos/spider-graph">spider-graph</a></li>
+                <li><a href="/fishpond-examples/demos/yui-dial">yui-dial</a></li>
               </ul>
             </li>
           </ul>
@@ -93,66 +93,41 @@
       <div class='page-header'>
         <h1>Basic HTML5 Demo</h1>
         <br />
-        <p>Pure HTML5 form elements, no fallbacks or polyfils used. Hardcoded for use with the 'Science Majors' pond.</p>
+        <div class='row'>
+          <div class='span9'>
+            <p>
+              <strong>Powered by:</strong>
+              Pure HTML5 form elements (no fallbacks or polyfils used).
+              <br />
+              <strong>Requires:</strong>
+              HTML5 enabled browsers
+            </p>
+          </div>
+          <div class='span2 offset1'>
+            <span class='label label-important'>Metadata disabled</span>
+            <br />
+            <span class='label label-warning'>Filters to be hooked up</span>
+          </div>
+        </div>
       </div>
       <div class='row'>
         <div class='span5'>
-          <div class='well'>
+          <form class='form-horizontal well' id='fishpond'>
             <h2>Tags</h2>
-            <form class='form-horizontal'>
-              <fieldset>
-                <div class='control-group'>
-                  <label class='control-label' for='quantitative'>
-                    Quantitative
-                    <output>6</output>
-                  </label>
-                  <div class='controls'>
-                    <input id='quantitative' max='11' min='1' step='1' type='range' value='6' />
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label' for='biological'>
-                    Biological
-                    <output>6</output>
-                  </label>
-                  <div class='controls'>
-                    <input id='biological' max='11' min='1' step='1' type='range' value='6' />
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label' for='pure'>
-                    Pure
-                    <output>6</output>
-                  </label>
-                  <div class='controls'>
-                    <input id='pure' max='11' min='1' step='1' type='range' value='6' />
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label' for='indoors'>
-                    Indoors
-                    <output>6</output>
-                  </label>
-                  <div class='controls'>
-                    <input id='indoors' max='11' min='1' step='1' type='range' value='6' />
-                  </div>
-                </div>
-                <div class='control-group'>
-                  <label class='control-label' for='dunno'>
-                    Dunno
-                    <output>6</output>
-                  </label>
-                  <div class='controls'>
-                    <input id='dunno' max='11' min='1' step='1' type='range' value='6' />
-                  </div>
-                </div>
-              </fieldset>
-            </form>
+            <fieldset class='tags'>
+            </fieldset>
             <h2>Filters</h2>
-            <p>
-              <em>No filters defined.</em>
-            </p>
-          </div>
+            <fieldset class='filters'>
+              <div class='control-group'>
+                <div class='control-label'>
+                  Only show:
+                </div>
+              </div>
+            </fieldset>
+            <span class='label'>
+              Filters currently not hooked up.
+            </span>
+          </form>
         </div>
         <div class='span6 offset1'>
           <h2>Results</h2>
@@ -176,6 +151,70 @@
       //<![CDATA[
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
         
+          fishpond.loading(function(percent){
+            $("#loading .progress").removeClass("progress-striped");
+            $("#loading .bar").css({width: (percent * 100) + "%"});
+          });
+        
+          fishpond.ready(function(pond){
+            $("#loading").fadeOut(0);
+            $("#demo").fadeIn(400);
+            $("#demo h1").append(' "' + pond.name + '"');
+        
+            // Generate form controls
+            var formTags = $("fieldset.tags");
+            var formFilters = $("fieldset.filters .control-group");
+            var tagControlGroup,
+                filterControl;
+        
+            $.each(pond.tag_ids, function(name, token){ 
+              tagControlGroup = $("" +
+                "<div class='control-group'>" +
+                  "<label class='control-label' for='"+name+"'>" +
+                    name + "&nbsp;<output data-slug='"+name+"'>6</output>" +
+                  "</label>" +
+                  "<div class='controls'>" +
+                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' max='20' min='0' step='1' type='range' value='10'>" +
+                  "</div>" +
+                "</div>");
+              formTags.append(tagControlGroup);
+            });
+        
+            $.each(pond.filters, function(index, token){
+              filterControl = $("" +
+                "<div class='controls'>" +
+                  "<label class='checkbox'>" +
+                    "<input id='query_filter_"+token.id+"' data-slug='"+token.slug+"' name='query[filters]["+token.id+"]' type='checkbox' value='0'>" +
+                    token.name + 
+                  "</label>" +
+                "</div>");
+              formFilters.append(filterControl);
+            });
+        
+            // Setup Query Arrays
+            var tags = {};
+            var filters = {};
+            
+            $('input[type=range]').change(function() {
+              // Update Slider Output field
+              var sliderValue = $(this).val();
+              var name = $(this).data('slug');
+              $("output[data-slug='"+name+"']").html(sliderValue);
+        
+        
+              // Update Query
+              $('input[type=range]').each(function(){
+                tags[$(this).data('slug')] = $(this).val();
+              });
+        
+              // Run Query
+              fishpond.query(tags, filters);
+            });
+        
+            // Run Initial Query
+            fishpond.query(tags, filters);
+          });
+        
           fishpond.resultsUpdated(function(results){
             //console.log(results);
         
@@ -190,38 +229,6 @@
             }
           });
         
-          fishpond.ready(function(pond){
-            $("#loading").fadeOut(0);
-            $("#demo").fadeIn(400);
-            $("#demo h1").append(' "' + pond.name + '"');
-            fishpond.query({}, {});
-          });
-        
-          fishpond.loading(function(percent){
-            $("#loading .progress").removeClass("progress-striped");
-            $("#loading .bar").css({width: (percent * 100) + "%"});
-          });
-        
-          var tag_range,
-              tag_id,
-              tag_output;
-         
-          $('input[type=range]').change(function() {
-            tag_range = $(this).val();
-            tag_id = $(this).attr("id");
-            tag_output = $('label[for="'+tag_id+'"] output');
-        
-            tag_output.html(tag_range);
-        
-            fishpond.query({
-              quantitative: $("#quantitative").val(),
-              biological: $("#biological").val(),
-              pure: $("#pure").val(),
-              indoors: $("#indoors").val(),
-              dunno: $("#dunno").val()
-            },
-            {/* no filters, yet */});
-          });
         };
       //]]>
     </script>
@@ -265,7 +272,7 @@
                 localStorage.setItem("fishpond_api_key", apiKey);
                 localStorage.setItem("fishpond_pond_token", pondToken);
         
-                var options = { debug: true };
+                var options = { debug: false };
                 var fishpond = new Fishpond(apiKey, options);
                 setupFishpond(fishpond);
                 fishpond.init(pondToken);

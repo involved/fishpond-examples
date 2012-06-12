@@ -24,11 +24,13 @@
     
   </head>
   <body>
+    
     <div class='navbar navbar-fixed-top'>
       <div class='navbar-inner'>
         <div class='container'>
           <a class='brand' href='/'>Fishpond Examples</a>
           <ul class='nav'>
+            <li><a href="/fishpond-examples/search">Expore Demos</a></li>
             <li class='dropdown'>
               <a class='dropdown-toggle' data-toggle='dropdown' href='#'>
                 Demos
@@ -39,11 +41,14 @@
                 <li><a href="/fishpond-examples/demos/basic-dynamic">basic-dynamic</a></li>
                 <li><a href="/fishpond-examples/demos/basic-html5">basic-html5</a></li>
                 <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
-                <li><a href="/fishpond-examples/demos/dial">dial</a></li>
                 <li><a href="/fishpond-examples/demos/flotr">flotr</a></li>
+                <li><a href="/fishpond-examples/demos/jquery-knob">jquery-knob</a></li>
+                <li><a href="/fishpond-examples/demos/kitchen-sink">kitchen-sink</a></li>
+                <li><a href="/fishpond-examples/demos/knockout-js">knockout-js</a></li>
                 <li><a href="/fishpond-examples/demos/quicksand">quicksand</a></li>
                 <li><a href="/fishpond-examples/demos/scaffold">scaffold</a></li>
                 <li><a href="/fishpond-examples/demos/spider-graph">spider-graph</a></li>
+                <li><a href="/fishpond-examples/demos/yui-dial">yui-dial</a></li>
               </ul>
             </li>
           </ul>
@@ -74,22 +79,62 @@
       <div class='page-header'>
         <h1>Spider Graph Demo</h1>
         <br />
-        <p>using <a href="https://github.com/jmstriegel/jquery.spidergraph">jmstriegel spidergraph</a>. Relies on Canvas</p>
-      </div>
-      <div class='row'>
-        <div class='span6' id='radar'></div>
-        <div class='span5 offset7' id='results'>
-          <h2>Results</h2>
-          <ul class='thumbnails results'></ul>
+        <div class='row'>
+          <div class='span9'>
+            <p>
+              <strong>Powered by:</strong>
+              <a target="_blank" href="https://github.com/jmstriegel/jquery.spidergraph">Spidergraph</a>
+              jQuery Plugin by
+              <a target="_blank" href="https://github.com/jmstriegel">jmstriegel</a>
+              <br />
+              <strong>Requires:</strong>
+              Canvas capable
+              <a target="_blank" href="http://caniuse.com/#feat=canvas">browser</a>
+              <br />
+              <span class='label label-info'>iOS compatible</span>
+            </p>
+          </div>
+          <div class='span2 offset1'>
+            <span class='label label-important'>Metadata disabled</span>
+            <br />
+            <span class='label label-important'>Filters disabled</span>
+          </div>
         </div>
       </div>
+      <section id='query'>
+        <div class='row'>
+          <div class='span7'>
+            <div class='well'>
+              <h2>Tags</h2>
+              <div class='span6'>
+                <div id='radar'></div>
+                <br />
+                <br />
+                <h2>Filters</h2>
+                <span class='label'>
+                  Filters not included in this demo
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class='span4 offset1'>
+            <h2>Results</h2>
+            <ul class='thumbnails results'></ul>
+          </div>
+        </div>
+      </section>
       <style type='text/css'>
         /*<![CDATA[*/
-          #radar{
-            position: fixed;
-            top: 200px;
-            height: 500px;
-          }
+          .well{
+            overflow: auto
+            }
+            #radar{
+              position: relative;;
+              height: 500px;
+            }
+          .results{
+            min-height: 550px;
+            }
         /*]]>*/
       </style>
     </div>
@@ -138,7 +183,7 @@
             // Create Array for Spidergraph
             $.each(pond.tag_ids, function(name, token){
               tagList.push(name);
-              tagValues.push(6); // Inital value
+              tagValues.push(10); // Inital value
             });
         
             spidergraph(tagList, tagValues);
@@ -154,7 +199,7 @@
                     name + " <output>(6)</output>" +
                   "</label>" +
                   "<div class='controls'>" +
-                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='10'>" +
                     "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
                   "</div>" +
                 "</div>");
@@ -163,7 +208,6 @@
             });
         
             fishpond.query({}, {});
-        
           });
         
           fishpond.loading(function(percent){
@@ -177,7 +221,7 @@
                 'fields': tagList,
                 'strokewidth': 2,
                 'handlewidth': 4,
-                'increments': 11,
+                'increments': 20,
                 'minrad': 0,
                 'gridcolor': 'rgba(20,20,20,1)'   
             });
@@ -247,7 +291,7 @@
                 localStorage.setItem("fishpond_api_key", apiKey);
                 localStorage.setItem("fishpond_pond_token", pondToken);
         
-                var options = { debug: true };
+                var options = { debug: false };
                 var fishpond = new Fishpond(apiKey, options);
                 setupFishpond(fishpond);
                 fishpond.init(pondToken);
