@@ -33,24 +33,34 @@
 
 .row
   .span5
-    %form#fishpond.form-horizontal.well
-      %h2 Tags
-      %fieldset.tags
-        -# Sliders Dynamically added
+    .row
+      .span5
+        %form#fishpond.form-horizontal.well
+          %h2 Tags
+          %fieldset.tags
+            -# Sliders Dynamically added
 
-      %h2 Filters     
-      %fieldset.filters
-        .control-group
-          .control-label
-            Only show:
+          %h2 Filters     
+          %fieldset.filters
+            .control-group
+              .control-label
+                Only show:
 
-      %span.label
-        Filters currently not hooked up.
+          %span.label
+            Filters currently not hooked up.
+
+      .span5
+        %h3 Shortlisted
+        %ul#shortlist-master
+        -#
+          .btn.btn-danger
+            Clear Shortlist
 
   .span6.offset1
     %h2 Results
     #results
       %ul.thumbnails
+
 
 
 #emptyModal.modal.hide
@@ -143,7 +153,7 @@
 
   // Fish Template
   %script{:id => "fishTemplate", :type => "text/html"}
-    %li{ :data => { :id => "{{ fish.id }}" }, :class => "{{ status }} span2" }
+    %li{ :data => { :id => "{{ fish.id }}", :title => "{{ fish.title }}" }, :class => "{{ status }} span2" }
       .thumbnail
         %strong.title {{ fish.title }}      
         .details
@@ -198,7 +208,7 @@
           %br
           %br
           {[ if (!_.isEmpty(shortlist)) { ]}
-          %a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :toggle => "shortlist" } }
+          %a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :title => "{{ metadata.title }}", :toggle => "shortlist" } }
             %i.icon-star
             %span
               {{ shortlist.wording }}
@@ -491,13 +501,18 @@
       // Shortlist Listener
       /////////////////////////////////////////
       function shortlistListener() {
+        var shortlistMaster = $("#shortlist-master");
+        var fishID;
+        var fishTitle;
+
         $("body").off();
         $("body").on("click", "[data-toggle='shortlist']", function(event){
           event.preventDefault();
 
           // Determine Fish ID
           fishID = $(this).closest("[data-id]").data("id");
-        
+          fishTitle = $(this).closest("[data-title]").data("title");
+
           // Toggle Shortlist status
           var shortlistStatus = locache.get("shortlist-"+fishID);
           shortlistStatus = (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)) ? true : !shortlistStatus;  // If Shortlist status is empty, null or undefined then set it to True, otherwise toggle current status.
@@ -511,6 +526,15 @@
             $(this).toggleClass("btn-warning", shortlistStatus);
             $(this).find("span").html(shortlistWording(shortlistStatus));
           });
+
+
+          // Update Master list
+          if (shortlistStatus){
+            shortlistMaster.append("<li data-id='"+ fishID +"'>"+fishTitle+"</li>");
+          } else {
+            shortlistMaster.find("[data-id='"+ fishID +"']").remove();
+          }
+
         });
       }
 
