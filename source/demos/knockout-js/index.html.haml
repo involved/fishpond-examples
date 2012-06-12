@@ -1,0 +1,166 @@
+.page-header
+  %h1 Data Bindings
+  %br
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "Knockout JS", "http://www.knockoutjs.com", :target => "_blank"
+
+.row
+  .span5
+    %form#fishpond.form-horizontal.well
+      %h2 Tags
+      %fieldset.tags
+        -# Sliders Dynamically added
+
+      %h2 Filters     
+      %fieldset.filters
+        .control-group
+          .control-label
+            Only show:
+
+      %span.label
+        Filters currently not hooked up.
+
+  .span6.offset1
+    %h2 Results
+    %ul.results{ :data => { :bind => "foreach: results" }}
+      %li
+        %h4{ :data => { :bind => "text: title" }}
+        %p{ :data => { :bind => "text: id" }}
+
+- content_for :javascript do
+  = javascript_include_tag "http://cloud.github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.js"
+
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+      fishpond.ready(function(pond){
+        // Loading transitions
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');       
+
+        // Generate form controls
+        var formTags = $("fieldset.tags");
+        var formFilters = $("fieldset.filters .control-group");
+        var tagControlGroup,
+            filterControl;
+
+        $.each(pond.tag_ids, function(name, token){ 
+          tagControlGroup = $("" +
+            "<div class='control-group'>" +
+              "<label class='control-label'>" +
+                name + " <output>(10)</output>" +
+              "</label>" +
+              "<div class='controls'>" +
+                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+              "</div>" +
+            "</div>");
+          formTags.append(tagControlGroup);
+        });
+
+        $.each(pond.filters, function(index, token){
+          filterControl = $("" +
+            "<div class='controls'>" +
+              "<label class='checkbox'>" +
+                "<input id='query_filter_"+token.id+"' data-slug='"+token.slug+"' name='query[filters]["+token.id+"]' type='checkbox' value='0'>" +
+                token.name + 
+              "</label>" +
+            "</div>");
+          formFilters.append(filterControl);
+        });
+
+        // jQuery UI Slider
+        $(".slider").slider({
+          value: 10,
+          min: 0,
+          max: 20,
+          step: 1,
+          slide: function(e, ui){
+            var output = $(this).parents('.control-group').find('output');
+            var hiddenField = $("input[name='" + $(this).data('target') + "']");
+            var value = ui['value'];
+
+            if(value.toString() != hiddenField.val().toString()){
+              hiddenField.val(value);
+              output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+
+              var tags = {};
+              var filters = {};
+              $("form#fishpond input").each(function(){
+                console.error($(this).data('slug'));
+                tags[$(this).data('slug')] = $(this).val();
+              });
+              fishpond.query(tags, filters);
+            }
+          }
+        });
+
+        fishpond.query({}, {});
+      });
+
+      fishpond.resultsUpdated(function(results){
+
+        function Result(data) {
+          this.title = ko.observable(data.fish.title);
+          this.id = ko.observable(data.fish.id);
+          this.isDone = ko.observable(data.isDone);
+        }
+
+        function ResultListViewModel() {
+          // Data
+          var self = this;
+          self.results = ko.observableArray([]);
+          self.newTaskText = ko.observable();
+          self.incompleteTasks = ko.computed(function() {
+              return ko.utils.arrayFilter(self.results(), function(task) { return !task.isDone() });
+          });
+
+          // Load initial state from server, convert it to Results instances, then populate self.metadata
+          var mappedResults = $.map(results, function(item) { return new Result(item) });
+          self.results(mappedResults);
+    
+        }
+
+        ko.applyBindings(new ResultListViewModel());
+
+
+
+       /* // Class to represent a Fish in the Results
+        function SeatReservation(name, initialMeal) {
+          var self = this;
+          self.title = name;
+          self.metadata = ko.observable(initialMeal);
+        }
+
+        // Overall viewmodel for this screen, along with initial state
+        function FishModel() {
+          var self = this;
+
+          // Non-editable catalog data - would come from the server
+          self.metadata = [
+            { mealName: "Standard (sandwich)", price: 0 },
+            { mealName: "Premium (lobster)", price: 34.95 },
+            { mealName: "Ultimate (whole zebra)", price: 290 }
+          ];    
+
+          // Editable data
+          self.fish = ko.observableArray([
+            new SeatReservation("Steve", self.metadata[0]),
+            new SeatReservation("Bert", self.metadata[0])
+          ]);
+        }
+
+        ko.applyBindings(new FishModel());
+        */
+      });
+
+    };
