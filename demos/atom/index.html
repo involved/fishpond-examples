@@ -19,6 +19,9 @@
         body{
           padding-top: 100px;
         }
+        .hidden{
+          display: none;
+        }
       /*]]>*/
     </style>
     <style type='text/css'>
@@ -107,6 +110,8 @@
                 <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
                 <li><a href="/fishpond-examples/demos/flotr">flotr</a></li>
                 <li><a href="/fishpond-examples/demos/jquery-knob">jquery-knob</a></li>
+                <li><a href="/fishpond-examples/demos/kitchen-sink">kitchen-sink</a></li>
+                <li><a href="/fishpond-examples/demos/knockout-js">knockout-js</a></li>
                 <li><a href="/fishpond-examples/demos/quicksand">quicksand</a></li>
                 <li><a href="/fishpond-examples/demos/scaffold">scaffold</a></li>
                 <li><a href="/fishpond-examples/demos/spider-graph">spider-graph</a></li>
@@ -122,6 +127,36 @@
         <div class='progress progress-striped active'>
           <div class='bar' style='width: 100%'></div>
         </div>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='span12'>
+        <div class='hidden'>
+          <div id='disqus_thread'></div>
+        </div>
+        <script type='text/javascript'>
+          //<![CDATA[
+            var disqus_shortname = 'ifishdemos'; 
+            var disqus_developer = 1;
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+            
+            function disqus_config() {
+              this.callbacks.onReady = [function() {
+                var frameHeight = $(document).height();
+                $('iframe.comment_frame', top.document).attr("height", frameHeight)
+              }];
+              this.callbacks.onNewComment = [function() {
+                var frameHeight = $(document).height();
+                $('iframe.comment_frame', top.document).attr("height", frameHeight)
+              }];
+            }
+          //]]>
+        </script>
       </div>
     </div>
     <div class='container hide' id='auth'>
@@ -426,7 +461,7 @@
                 localStorage.setItem("fishpond_api_key", apiKey);
                 localStorage.setItem("fishpond_pond_token", pondToken);
         
-                var options = { debug: true };
+                var options = { debug: false };
                 var fishpond = new Fishpond(apiKey, options);
                 setupFishpond(fishpond);
                 fishpond.init(pondToken);
