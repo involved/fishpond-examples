@@ -235,6 +235,8 @@
       // Setup global variables
       var resultsList = $("#results ul");
       var quicksandEnabled = true;
+      var quicksandAnimating = false;
+      var quicksandUpdateQueue = [];
       var quicksandList;
         
       // Change underscore.js tenplate settings to use moustache syntax
@@ -325,8 +327,8 @@
       // Results Updated
       /////////////////////////////////////////
       fishpond.resultsUpdated(function(results){
-        var templateUpdateQueue = [];
-        
+        quicksandUpdateQueue = []; // Clear update queue
+
         // Clear old results
         if (quicksandEnabled){
           quicksandList = $("<ul></ul>");  
@@ -346,7 +348,12 @@
             // If Metadata is NOT cached
             $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
               fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
-              fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
+              
+              if (quicksandEnabled && quicksandAnimating){
+                quicksandUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
+              } else {
+                fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
+              }
             });
           } 
           
@@ -355,6 +362,7 @@
 
         // Check for animation/filtering method
         if (quicksandEnabled) sortResults();
+        console.log('[Results] reordering. Animating? - ' + quicksandAnimating);
       });
 
 
@@ -435,7 +443,6 @@
           } 
         };
       };
-
 
       /////////////////////////////////////////
       // Modal Manager
@@ -527,7 +534,6 @@
             $(this).find("span").html(shortlistWording(shortlistStatus));
           });
 
-
           // Update Master list
           if (shortlistStatus){
             shortlistMaster.append("<li data-id='"+ fishID +"'>"+fishTitle+"</li>");
@@ -541,19 +547,20 @@
       // Sort Results (Quicksand)
       /////////////////////////////////////////
       function sortResults() {
+        quicksandAnimating = true;
         if(resultsList.find("li").length == 0) {
           resultsList.append(quicksandList.find("li"));
+          quicksandAnimating = false;
         } else {
           resultsList.quicksand(quicksandList.find("li"), {
             // Do nothing
           }, function() {
-            //console.log('[Results] reordered');
-            $("#results").removeClass("reordering");
-
+            quicksandAnimating = false;
             // Update templates for Fish in Queue
-           // $.each(templateUpdateQueue, function(index, fishID) {
-              //updateTemplate(fishID);
-            //});
+            $.each(quicksandUpdateQueue, function(index, fishID) {
+              fish = fishManager(fishID);
+              fish.updateTemplate();
+            });
           });
         }
       }
