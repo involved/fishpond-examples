@@ -1,3 +1,7 @@
+---
+layout: demo_layout
+---
+
 .page-header
   %h1 Kitchen Sink - Demo
   %br
@@ -83,11 +87,7 @@
         height: 20px;
         display: block;
       }
-
-    .modal-body.loading{
-      background: #fff url(/images/common/loading.gif) no-repeat center center;
-      min-height: 200px;
-    }
+       
        #results ul li .thumbnail .details{
         padding-top: 10px;
        }
@@ -104,6 +104,22 @@
         top: -5px;
         left: -5px;
       }
+
+    /* Modal */
+    .modal{
+      width:940px;
+      margin-left:-470px;
+      top: 40%;
+    }
+      .modal-body{
+        max-height: 800px;
+      }
+        .modal-body.loading{
+          background: #fff url(/images/common/loading.gif) no-repeat center center;
+          min-height: 200px;
+        }
+
+
 
   /////////////////////////////////////////
   // REQUIRED EXTERNAL JAVASCRIPT
@@ -171,7 +187,7 @@
       .row
         .span3
           %img{:alt => "{{ metadata.title }}", :src => "{{ metadata.image_url }}"}/
-        .span3
+        .span8
           %p {{ metadata.description }}
           = link_to "Find out more", "{{ metadata.url }}", :target => "_blank"
           %br
@@ -182,11 +198,15 @@
             %span
               {{ shortlist.wording }}
           {[ } ]}
+          
+          %a{ :href => "./kitchen-sink/comments.html#disqus_thread", :class => "dq_comment btn btn-mini", :data => { :id => "{{ metadata.id }}", :toggle => "shortlist" } }
+            %i.icon-comment
+            %span
+              View Comments
+          
       .row
-        .comments.span6
-          //{{ comments }}
+        .comments.span11
           // disqus comments
-          = link_to "Comments", "./kitchen-sink/comments.html#disqus_thread", :class => "dq_comment", :id => "{{ metadata.id }}"
           .comment_box{ :id => "comment_{{ metadata.id }}" }
                 
         
@@ -523,7 +543,7 @@
           event.preventDefault();
           console.log("comments clicked");
 
-          var id = $(this).attr("id");
+          var id = $(this).data("id");
           var href = $(this).attr("href");
           var src = href.substring(0,href.length-14); // Remove #disqus_thread
 

@@ -1,4 +1,17 @@
 %html
   %head
+    = javascript_include_tag "https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"
+    :css
+      body{
+        font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+        padding: 30px 10px 10px 10px;
+        margin: 0;
+      }
+      body a{
+        color: #333;
+      }
+        body a:hover{
+          color: #666;
+        }
   %body
     = yield
