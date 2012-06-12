@@ -477,7 +477,7 @@
             // Load data into empty Modal
             var modalTemplate = _.template($( "#modalTemplate" ).html());
             var modalData = {
-              metadata  : locache.get("metadata-"+fishID);,
+              metadata  : locache.get("metadata-"+fishID),
               shortlist : shortlist.template()
             }; 
             fishModal.empty().append( modalTemplate( modalData ));
