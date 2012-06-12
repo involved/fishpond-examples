@@ -519,7 +519,7 @@ layout: demo_layout
       }
 
       /////////////////////////////////////////
-      // Sort Results (quicksand)
+      // Sort Results (Quicksand)
       /////////////////////////////////////////
       function sortResults() {
         if(resultsList.find("li").length == 0) {
@@ -540,34 +540,29 @@ layout: demo_layout
       }
 
       /////////////////////////////////////////
-      // Comments Manager
+      // Comments Manager (Disqus)
       /////////////////////////////////////////
       
       function commentsManager(pond) {
-        // Powered by Disqus
-        
-        var disqus_shortname = 'ifish';
-        var disqus_developer = 1;
-        var disqus_identifier = pond.id;
-        var disqus_title = pond.name;
-        var disqus_category_id = '9999'
-
         $("body").on("click", "[data-toggle='comments']", function(event){
           event.preventDefault();
-          console.log("comments clicked");
 
           var id = $(this).data("id");
-          var href = $(this).attr("href");
-          var src = href.substring(0,href.length-14); // Remove #disqus_thread
+          var comments = $("#comment_"+id);
+        
+          // Check to see if comments are already loaded for current fish
+          if (comments.find("#disqus_thread").length === 0){
+            $("#disqus_thread").appendTo("#comment_"+id); // Move comments into current modal
 
-          console.log("source: " + src);
-
-          if ($("#comment_"+id).is(':visible'))
-            $("#comment_"+id).html('');
-          else
-            $("#comment_"+id).append('<iframe scrolling="yes" frameborder="0" width="100%" height="400" src="'+src+'" class="comment_frame"></iframe>');
-
-          $("#comment_"+id).toggle('slow');
+            DISQUS.reset({
+              reload: true,
+              config: function () {
+                this.page.identifier = pond.id+"-"+id;
+                this.page.url = "http://involved.github.com/fishpond-examples/demos/kitchensink/#!"+id;
+              }
+            });
+          }
+          comments.toggle('slow');
         })        
       }
     };
