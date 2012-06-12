@@ -1,71 +1,72 @@
-.page-header
-  %h1 Kitchen Sink - Demo
-  %br
-  .row
-    .span9
-      %p
-        %strong Powered by:
-        %ul
-          %li 
-            = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
-            (Javascript Templates)
-          %li
-            = link_to "Locache", "http://locachejs.org/", :target => "_blank"
-            (Javascript client-side caching)
-          %li
-            = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
-            (Filtering and Animation)
-          %li
-            = link_to "Disqus", "http://disqus.com", :target => "_blank"
-            (Commenting engine)
-          %li
-            = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
-            (Form UI controls)
-          %li
-            = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
-            (Allows asynchronous javascript functions)
-    .span2.offset1
-      %span.label.label-success Metadata enabled
-      %br 
-      %span.label.label-success Comments enabled
-      %br 
-      %span.label.label-important Filters disabled
-
-.row
-  .span5
+#query
+  .page-header
+    %h1 Kitchen Sink - Demo
+    %br
     .row
-      .span5
-        %form#fishpond.form-horizontal.well
-          %h2 Tags
-          %fieldset.tags
-            -# Sliders Dynamically added
+      .span9
+        %p
+          %strong Powered by:
+          %ul
+            %li 
+              = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
+              (Javascript Templates)
+            %li
+              = link_to "Locache", "http://locachejs.org/", :target => "_blank"
+              (Javascript client-side caching)
+            %li
+              = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
+              (Filtering and Animation)
+            %li
+              = link_to "Disqus", "http://disqus.com", :target => "_blank"
+              (Commenting engine)
+            %li
+              = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+              (Form UI controls)
+            %li
+              = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
+              (Allows asynchronous javascript functions)
+      .span2.offset1
+        %span.label.label-success Metadata enabled
+        %br 
+        %span.label.label-success Comments enabled
+        %br 
+        %span.label.label-important Filters disabled
 
-          %h2 Filters     
-          %fieldset.filters
-            .control-group
-              .control-label
-                Only show:
+  .row
+    .span5
+      .row
+        .span5
+          %form#fishpond.form-horizontal.well
+            %h2 Tags
+            %fieldset.tags
+              -# Sliders Dynamically added
 
-          %span.label
-            Filters currently not hooked up.
+            %h2 Filters     
+            %fieldset.filters
+              .control-group
+                .control-label
+                  Only show:
 
-      .span5
-        %h3 Shortlisted
-        %ul#shortlist-master
-        -#
-          .btn.btn-danger
-            Clear Shortlist
+            %span.label
+              Filters currently not hooked up.
 
-  .span6.offset1
-    %h2 Results
-    #results
-      %ul.thumbnails
+        .span5
+          %h3 Shortlisted
+          %ul#shortlist-master
+          -#
+            .btn.btn-danger
+              Clear Shortlist
+
+    .span6.offset1
+      %h2 Results
+      #results
+        %ul.thumbnails
 
 
 
-#emptyModal.modal.hide
-  .modal-body.loading
-    // Empty
+  #emptyModal.modal.hide
+    .modal-body.loading
+      // Empty
 
 
 - content_for :css do
@@ -134,11 +135,22 @@
           display: none;
         }
 
+    /* Shortlist Master */
+    #shortlist-master{
+      list-style: none;
+      float: left;
+      margin: 0;
+      padding: 0;
+    }
+      #shortlist-master li{
+        float: left;
+        padding: 3px;
+      }
 
 
-  /////////////////////////////////////////
-  // REQUIRED EXTERNAL JAVASCRIPT
-  /////////////////////////////////////////
+/////////////////////////////////////////
+// REQUIRED EXTERNAL JAVASCRIPT
+/////////////////////////////////////////
 
 - content_for :javascript do
   = javascript_include_tag "https://raw.github.com/d0ugal/locache/master/build/locache.js"
@@ -153,7 +165,7 @@
 
   // Fish Template
   %script{:id => "fishTemplate", :type => "text/html"}
-    %li{ :data => { :id => "{{ fish.id }}", :title => "{{ fish.title }}" }, :class => "{{ status }} span2" }
+    %li{ :data => { :id => "{{ fish.id }}" }, :class => "{{ status }} span2" }
       .thumbnail
         %strong.title {{ fish.title }}      
         .details
@@ -186,7 +198,7 @@
     %a{ :href => "#", :data => { :toggle => "modal" } }
       %img{ :src => "{{ metadata.thumbnail_url }}", :alt => "{{ metadata.title }}", :class => "profile" }
       {[ if (!_.isEmpty(shortlist)) { ]}          
-      %a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :toggle => "shortlist" } }
+      %a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :title => "{{ metadata.title }}", :thumbnail => "{{ metadata.thumbnail_url }}", :toggle => "shortlist" } }
         %i.icon-star
         %span
           {{ shortlist.wording }}
@@ -208,23 +220,27 @@
           %br
           %br
           {[ if (!_.isEmpty(shortlist)) { ]}
-          %a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :title => "{{ metadata.title }}", :toggle => "shortlist" } }
+          %a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :title => "{{ metadata.title }}", :thumbnail => "{{ metadata.thumbnail_url }}", :toggle => "shortlist" } }
             %i.icon-star
             %span
               {{ shortlist.wording }}
           {[ } ]}
-          
           %a{ :href => "./kitchen-sink/comments/?1234#disqus_thread", :class => "btn btn-mini", :data => { :id => "{{ metadata.id }}", :toggle => "comments" } }
             %i.icon-comment
             %span
               View Comments
-          
       .row
         .span11
           .comment_box{ :id => "comment_{{ metadata.id }}" }
-                
     .modal-footer
       %a.btn{"data-dismiss" => "modal", :href => "#"} Close
+
+  // Shortlist (Master) Template
+  %script{:id => "shortlistTemplate", :type => "text/html"}
+    %li{ :data => { :id => "{{ fishID }}" } }
+      %a{ :href => "#", :data => { :toggle => "modal" } }
+        %img{ :src => "{{ thumbnail_url }}", :alt => "{{ title }}", :class => "profile" }
+
 
 
   :javascript
@@ -259,7 +275,7 @@
       // Fishpond Ready
       /////////////////////////////////////////
       fishpond.ready(function(pond){
-        // Loading transitions
+        // Loading transitions (Demo site purposes)
         $("#loading").fadeOut(0);
         $("#demo").fadeIn(400);
         $("#demo h1").append(' "' + pond.name + '"');       
@@ -310,10 +326,10 @@
           }
         });
 
-        // Init Shorlist Manager
+        // Init Shorlists
         shortlistListener();
 
-        // Init Comments Manager
+        // Init Comments
         commentsManager(pond);
 
         // Run Query
@@ -444,26 +460,33 @@
       /////////////////////////////////////////
       // Modal Manager
       /////////////////////////////////////////
+      //var resultsList = $("#results ul");
       var modalManager = function () {
-        resultsList.on("click", "[data-toggle='modal']", function(event){
+        $("#query").on("click", "[data-toggle='modal']", function(event){
           event.preventDefault();
           var fishID = $(this).closest("li").data('id');
-          var metadata = locache.get("metadata-"+fishID);
           var shortlist = shortlistManager(fishID);
+          var fishModal = $("#"+fishID+".modal");
 
-          // Clone empty Modal template and display
-          var fishModal = $("#emptyModal").clone().attr("id",fishID);
-          fishModal.modal("show");
+          // if Modal for Fish doesn't already exist.  
+          if (fishModal.length === 0){
+            // Clone empty Modal template and display temporarily
+            fishModal = $("#emptyModal").clone().attr("id",fishID);
+            fishModal.modal("show");
 
-          // Load data into empty Modal.
-          var modalTemplate = _.template($( "#modalTemplate" ).html());
-          var modalData = { 
-            metadata  : metadata,
-            shortlist : shortlist.template(),
-            comments : "http://ifish.disqus.com/combination_widget.js?num_items=5&hide_mods=0&color=blue&default_tab=people&excerpt_length=200"
-          };
-          if (fishModal.attr("id") === metadata.id){
+            // Load data into empty Modal
+            var modalTemplate = _.template($( "#modalTemplate" ).html());
+            var modalData = {
+              metadata  : locache.get("metadata-"+fishID);,
+              shortlist : shortlist.template()
+            }; 
             fishModal.empty().append( modalTemplate( modalData ));
+            
+          } else {
+            // If Modal already exists in DOM then just show Modal
+            // Minimise the comments first 
+            fishModal.find($("#comment_"+fishID)).hide(); 
+            fishModal.modal("show");
           }
         });
       }();
@@ -477,7 +500,6 @@
         return {
           isShortlisted: function () {
             // Check if Shortlist status has been set. If not then set it to False, otherwise return the cached value.
-
             shortlistStatus = locache.get("shortlist-"+fishID);
             if (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)){
               locache.set("shortlist-"+fishID, false); // Cache Shortlist status
@@ -507,7 +529,6 @@
       function shortlistListener() {
         var shortlistMaster = $("#shortlist-master");
         var fishID;
-        var fishTitle;
 
         $("body").off();
         $("body").on("click", "[data-toggle='shortlist']", function(event){
@@ -515,7 +536,6 @@
 
           // Determine Fish ID
           fishID = $(this).closest("[data-id]").data("id");
-          fishTitle = $(this).closest("[data-title]").data("title");
 
           // Toggle Shortlist status
           var shortlistStatus = locache.get("shortlist-"+fishID);
@@ -533,7 +553,13 @@
 
           // Update Master list
           if (shortlistStatus){
-            shortlistMaster.append("<li data-id='"+ fishID +"'>"+fishTitle+"</li>");
+            var shortlistTemplate = _.template($( "#shortlistTemplate" ).html());
+            var shortlistData = { 
+              fishID        : fishID,
+              title         : $(this).data("title"),
+              thumbnail_url : $(this).data("thumbnail")
+            };
+            shortlistMaster.append( shortlistTemplate( shortlistData ));
           } else {
             shortlistMaster.find("[data-id='"+ fishID +"']").remove();
           }
@@ -566,7 +592,6 @@
       /////////////////////////////////////////
       // Comments Manager (Disqus)
       /////////////////////////////////////////
-      
       function commentsManager(pond) {
         $("body").on("click", "[data-toggle='comments']", function(event){
           event.preventDefault();
@@ -577,7 +602,7 @@
           // Check to see if comments are already loaded for current fish
           if (comments.find("#disqus_thread").length === 0){
             $("#disqus_thread").appendTo(comments); // Move comments into current modal
-
+            // Reload Discus for current Fish
             DISQUS.reset({
               reload: true,
               config: function () {
