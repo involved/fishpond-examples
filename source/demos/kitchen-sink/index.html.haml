@@ -227,8 +227,6 @@
       %a.btn{"data-dismiss" => "modal", :href => "#"} Close
 
 
-
-
   :javascript
     var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
 
@@ -362,7 +360,6 @@
 
         // Check for animation/filtering method
         if (quicksandEnabled) sortResults();
-        console.log('[Results] reordering. Animating? - ' + quicksandAnimating);
       });
 
 
@@ -549,6 +546,7 @@
       function sortResults() {
         quicksandAnimating = true;
         if(resultsList.find("li").length == 0) {
+          // On first load populate Quicksand with unsorted results
           resultsList.append(quicksandList.find("li"));
           quicksandAnimating = false;
         } else {
@@ -556,7 +554,7 @@
             // Do nothing
           }, function() {
             quicksandAnimating = false;
-            // Update templates for Fish in Queue
+            // Update templates for Fish in Queue once animation has stopped
             $.each(quicksandUpdateQueue, function(index, fishID) {
               fish = fishManager(fishID);
               fish.updateTemplate();
