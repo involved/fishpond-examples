@@ -273,7 +273,7 @@
           var tagsData = { 
             name  : name, 
             token : token
-          }
+          };
           $("fieldset.tags").append( tagsTemplate( tagsData ));
         });
 
@@ -281,7 +281,7 @@
         $.each(pond.filters, function(index, token){
           var filtersData = { 
             token : token
-          }
+          };
           $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
         });
 
@@ -296,7 +296,7 @@
             var hiddenField = $("input[name='" + $(this).data('target') + "']");
             var value = ui['value'];
 
-            if(value.toString() != hiddenField.val().toString()){
+            if(value.toString() !== hiddenField.val().toString()){
               hiddenField.val(value);
               output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
 
@@ -338,7 +338,7 @@
         // Generate Results
         /////////////////////////////////////////
         for(var i = 0; i < results.length; i++){
-          var result = results[i]
+          var result = results[i];
           var fishID = result.fish.id;
           var fish = fishManager(fishID);
 
@@ -383,7 +383,7 @@
                 url           : (metadata.url === "" || _.isNull(metadata.url)) ? "#" : metadata.url,
                 id            : metadata.id,
                 title         : metadata.title
-              }
+              };
               
               locache.set("metadata-"+fishID, parsedMetadata);
               defered.resolve(result);
@@ -403,7 +403,7 @@
               metadata        : metadata,
               status          : metadata ? "loaded" : "loading",
               shortlist       : shortlist.template()        // Pass in 'shortlistButton' Object
-            }
+            };
 
             // Update Results list
             if (quicksandEnabled){
@@ -418,7 +418,7 @@
             var fishDetailsData = { 
               metadata        : currentFish.getMetadata(),
               shortlist       : shortlist.template()
-            }
+            };
             fishResult.removeClass("loading").addClass("loaded");
 
             // Once Metadata is loaded then inject it into result.
@@ -434,7 +434,7 @@
               fishDetailsData = { 
                 metadata      : currentFish.getMetadata(),
                 shortlist     : shortlist.template()
-              }
+              };
               return fishDetailsTemplate( fishDetailsData );
             }
           } 
@@ -461,7 +461,7 @@
             metadata  : metadata,
             shortlist : shortlist.template(),
             comments : "http://ifish.disqus.com/combination_widget.js?num_items=5&hide_mods=0&color=blue&default_tab=people&excerpt_length=200"
-          }
+          };
           if (fishModal.attr("id") === metadata.id){
             fishModal.empty().append( modalTemplate( modalData ));
           }
@@ -491,11 +491,11 @@
               status          : shortlistStatus,
               wording         : shortlistWording(shortlistStatus),
               shortlistClass  : shortlistStatus ? "shortlisted btn-warning" : ""
-            }
+            };
             return shortlistButton;
           }
-        }
-      }
+        };
+      };
 
       function shortlistWording(shortlistStatus) {
         return shortlistStatus ? "Remove" : "Shortlist";
@@ -545,7 +545,7 @@
       /////////////////////////////////////////
       function sortResults() {
         quicksandAnimating = true;
-        if(resultsList.find("li").length == 0) {
+        if(resultsList.find("li").length === 0) {
           // On first load populate Quicksand with unsorted results
           resultsList.append(quicksandList.find("li"));
           quicksandAnimating = false;
@@ -587,6 +587,6 @@
             });
           }
           comments.toggle('slow');
-        })        
+        });
       }
     };
