@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html lang="en" class="no-js ie6 old-ie"> <![endif]-->
+<!--[if IE 7]>    <html lang="en" class="no-js ie7 old-ie"> <![endif]-->
+<!--[if IE 8]>    <html lang="en" class="no-js ie8 old-ie"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class='no-js' lang='en'>
+  <!--<![endif]-->
+  <head>
+    <meta charset='utf-8' />
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible' />
+    <title>Fishpond</title>
+    <meta content='noindex, nofollow' name='robots' />
+    <meta content='' name='keywords' />
+    <meta content='width=device-width, maximum-scale=1.0' name='viewport' />
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/cupertino/jquery-ui.css" media="screen" rel="stylesheet" type="text/css" />
+    <style type='text/css'>
+      /*<![CDATA[*/
+        body{
+          padding-top: 100px;
+        }
+        .hidden{
+          display: none;
+        }
+      /*]]>*/
+    </style>
+    <style type='text/css'>
+      /*<![CDATA[*/
+        .loading .shortlist{
+          display: none;
+        }
+        
+        .loaded .shortlist{
+          display: block;
+        }
+        
+        .shortlist.active{
+          border: red 1px solid;
+        }
+        
+        
+        #results ul li .thumbnail{
+          min-height: 100px;
+          text-align: center;
+          position: relative;
+          background: #fff;
+        }
+          #results ul li.loading .thumbnail{
+            background: url(/images/common/loading.gif) no-repeat center center;
+            color: #999;
+          }
+        
+          #results ul li .thumbnail a[data-toggle='modal']{
+            display: block;
+            width: 130px;
+            height: 120px;
+            overflow: hidden;
+          }
+          #results ul li .thumbnail .title{
+            height: 20px;
+            display: block;
+          }
+           
+           #results ul li .thumbnail .details{
+              width: 100%;
+              height: 120px;
+              text-align: center;
+              margin-bottom: 30px;
+              padding-top: 10px;
+            }
+              #results ul li .thumbnail .details .btn{
+                margin-top: 7px;
+              }
+        
+           #results ul li .thumbnail .shortlist{
+            position: absolute;
+            top: -5px;
+            left: -5px;
+          }
+        
+        /* Modal */
+        .modal{
+          width:940px;
+          margin-left:-470px;
+          top: 40%;
+        }
+          .modal-body{
+            max-height: 700px;
+          }
+            .modal-body.loading{
+              background: #fff url(/images/common/loading.gif) no-repeat center center;
+              min-height: 200px;
+            }
+        
+            .modal-body .comment_box{
+              display: none;
+            }
+        
+        /* Shortlist Master */
+        #shortlist-master{
+          list-style: none;
+          float: left;
+          margin: 0;
+          padding: 0;
+        }
+          #shortlist-master li{
+            float: left;
+            padding: 3px;
+            width: 120px;
+            height: 120px;
+            overflow: hidden;
+          }
+      /*]]>*/
+    </style>
+  </head>
+  <body>
+    <div class='navbar navbar-fixed-top'>
+      <div class='navbar-inner'>
+        <div class='container'>
+          <a class='brand' href='/'>Fishpond Examples</a>
+          <ul class='nav'>
+            <li class='dropdown'>
+              <a class='dropdown-toggle' data-toggle='dropdown' href='#'>
+                Demos
+                <b class='caret'></b>
+              </a>
+              <ul class='dropdown-menu'>
+                <li><a href="/fishpond-examples/demos/basic-dynamic">basic-dynamic</a></li>
+                <li><a href="/fishpond-examples/demos/basic-html5">basic-html5</a></li>
+                <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
+                <li><a href="/fishpond-examples/demos/jquery-knob">jquery-knob</a></li>
+                <li><a href="/fishpond-examples/demos/kitchen-sink">kitchen-sink</a></li>
+                <li><a href="/fishpond-examples/demos/science-majors">science-majors</a></li>
+                <li><a href="/fishpond-examples/demos/spider-graph">spider-graph</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class='container' id='loading'>
+      <div class='span4 offset4'>
+        <div class='progress progress-striped active'>
+          <div class='bar' style='width: 100%'></div>
+        </div>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='span12'>
+        <div class='hidden'>
+          <div id='disqus_thread'></div>
+        </div>
+        <script type='text/javascript'>
+          //<![CDATA[
+            var disqus_shortname = 'ifishdemos'; 
+            var disqus_developer = 1;
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+            
+            function disqus_config() {
+              this.callbacks.onReady = [function() {
+                var frameHeight = $(document).height();
+                $('iframe.comment_frame', top.document).attr("height", frameHeight)
+              }];
+              this.callbacks.onNewComment = [function() {
+                var frameHeight = $(document).height();
+                $('iframe.comment_frame', top.document).attr("height", frameHeight)
+              }];
+            }
+          //]]>
+        </script>
+      </div>
+    </div>
+    <div class='container hide' id='auth'>
+      <div class='span6 offset3'>
+        <center>
+          <form class='well form-inline'>
+            <input class='input-large' id='api_key' placeholder='API key' type='text' />
+            <input class='input-small' id='pond_token' placeholder='Pond Token' type='text' />
+            <button class='btn btn-success' type='submit'>
+              Connect
+            </button>
+          </form>
+        </center>
+      </div>
+    </div>
+    <div class='container hide' id='demo'>
+      <div id='query'>
+        <div class='page-header'>
+          <h1>Kitchen Sink - Demo</h1>
+          <br />
+          <div class='row'>
+            <div class='span9'>
+              <p>
+                <strong>Powered by:</strong>
+                <ul>
+                  <li>
+                    <a target="_blank" href="http://underscorejs.org/">Underscore JS Templates</a>
+                    (Javascript Templates)
+                  </li>
+                  <li>
+                    <a target="_blank" href="http://locachejs.org/">Locache</a>
+                    (Javascript client-side caching)
+                  </li>
+                  <li>
+                    <a target="_blank" href="http://razorjack.net/quicksand/">jQuery Quicksand Plugin</a>
+                    (Filtering and Animation)
+                  </li>
+                  <li>
+                    <a target="_blank" href="http://disqus.com">Disqus</a>
+                    (Commenting engine)
+                  </li>
+                  <li>
+                    <a target="_blank" href="http://jqueryui.com/demos/slider/">jQuery UI Slider</a>
+                    (Form UI controls)
+                  </li>
+                  <li>
+                    <a target="_blank" href="http://api.jquery.com/deferred.promise/">jQuery Deferred.Promise()</a>
+                    (Allows asynchronous javascript functions)
+                  </li>
+                </ul>
+              </p>
+            </div>
+            <div class='span2 offset1'>
+              <span class='label label-success'>Metadata enabled</span>
+              <br />
+              <span class='label label-success'>Comments enabled</span>
+              <br />
+              <span class='label label-important'>Filters disabled</span>
+            </div>
+          </div>
+        </div>
+        <div class='row'>
+          <div class='span5'>
+            <div class='row'>
+              <div class='span5'>
+                <form class='form-horizontal well' id='fishpond'>
+                  <h2>Tags</h2>
+                  <fieldset class='tags'>
+                  </fieldset>
+                  <h2>Filters</h2>
+                  <fieldset class='filters'>
+                    <div class='control-group'>
+                      <div class='control-label'>
+                        Only show:
+                      </div>
+                    </div>
+                  </fieldset>
+                  <span class='label'>
+                    Filters currently not hooked up.
+                  </span>
+                </form>
+              </div>
+              <div class='span5'>
+                <h3>Shortlisted</h3>
+                <ul id='shortlist-master'></ul>
+              </div>
+            </div>
+          </div>
+          <div class='span6 offset1'>
+            <h2>Results</h2>
+            <div id='results'>
+              <ul class='thumbnails'></ul>
+            </div>
+          </div>
+        </div>
+        <div class='modal hide' id='emptyModal'>
+          <div class='modal-body loading'>
+            <!-- / Empty -->
+          </div>
+        </div>
+      </div>
+      <!-- //////////////////////////////////////// -->
+      <!-- / REQUIRED EXTERNAL JAVASCRIPT -->
+      <!-- //////////////////////////////////////// -->
+    </div>
+    <div class='container'>
+      <hr />
+      <footer>
+        &copy; iFish 2012
+      </footer>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js" type="text/javascript"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
+    <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
+    <script src="https://raw.github.com/yeco/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
+    <script src="https://raw.github.com/d0ugal/locache/master/build/locache.js" type="text/javascript"></script>
+<script src="http://underscorejs.org/underscore.js" type="text/javascript"></script>
+<script src="https://raw.github.com/razorjack/quicksand/master/jquery.quicksand.js" type="text/javascript"></script>
+<!-- //////////////////////////////////////// -->
+<!-- / JAVASCRIPT TEMPLATES -->
+<!-- / Powered by Underscore.js 'Templates' -->
+<!-- //////////////////////////////////////// -->
+<!-- / Fish Template -->
+<script id='fishTemplate' type='text/html'>
+  <li class='{{ status }} span2' data-id='{{ fish.id }}'>
+    <div class='thumbnail'>
+      <strong class='title'>{{ fish.title }}</strong>
+      <div class='details'>
+        {[ if (!_.isEmpty(metadata)) { ]}
+        {{ fishDetailsData }}
+        {[ } ]}
+      </div>
+    </div>
+  </li>
+</script>
+<!-- / Tags Template -->
+<script id='tagsTemplate' type='text/html'>
+  <div class='control-group'>
+    <label class='control-label'>
+      {{ name }}
+      <output>(10)</output>
+    </label>
+    <div class='controls'>
+      <input data-slug='{{ name }}' id='query_tag_{{ token }}' name='query[tags][{{ token }}]' type='hidden' value='10' />
+      <div class='slider span2' data-target='query[tags][{{ token }}]'></div>
+    </div>
+  </div>
+</script>
+<!-- / Filters Template -->
+<script id='filtersTemplate' type='text/html'>
+  <div class='controls'>
+    <label class='checkbox'>
+      <input data-slug='{{ token.slug }}' id='query_filter_{{ token.id }}' name='query[filters][{{ token.id }}]' type='checkbox' value='0' />
+      {{ token.name }}
+    </label>
+  </div>
+</script>
+<!-- / Fish Details Template -->
+<script id='fishDetailsTemplate' type='text/html'>
+  <a data-toggle='modal' href='#'>
+    <img alt='{{ metadata.title }}' class='profile' src='{{ metadata.thumbnail_url }}' />
+    {[ if (!_.isEmpty(shortlist)) { ]}
+    <a class='btn btn-mini {{ shortlist.shortlistClass }}' data-id='{{ metadata.id }}' data-thumbnail='{{ metadata.thumbnail_url }}' data-title='{{ metadata.title }}' data-toggle='shortlist' href='#'>
+      <i class='icon-star'></i>
+      <span>
+        {{ shortlist.wording }}
+      </span>
+    </a>
+    {[ } ]}
+  </a>
+</script>
+<!-- / Modal Template -->
+<script id='modalTemplate' type='text/html'>
+  <div class='modal-header'>
+    <button class='close' data-dismiss='modal'>×</button>
+    <h3>{{ metadata.title }}</h3>
+  </div>
+  <div class='modal-body'>
+    <div class='row'>
+      <div class='span3'>
+        <img alt='{{ metadata.title }}' src='{{ metadata.image_url }}' />
+      </div>
+      <div class='span8'>
+        <p>{{ metadata.description }}</p>
+        <a target="_blank" href="/fishpond-examples/{{ metadata.url }}">Find out more</a>
+        <br />
+        <br />
+        {[ if (!_.isEmpty(shortlist)) { ]}
+        <a class='btn btn-mini {{ shortlist.shortlistClass }}' data-id='{{ metadata.id }}' data-thumbnail='{{ metadata.thumbnail_url }}' data-title='{{ metadata.title }}' data-toggle='shortlist' href='#'>
+          <i class='icon-star'></i>
+          <span>
+            {{ shortlist.wording }}
+          </span>
+        </a>
+        {[ } ]}
+        <a class='btn btn-mini' data-id='{{ metadata.id }}' data-toggle='comments' href='./kitchen-sink/comments/?1234#disqus_thread'>
+          <i class='icon-comment'></i>
+          <span>
+            View Comments
+          </span>
+        </a>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='span11'>
+        <div class='comment_box' id='comment_{{ metadata.id }}'></div>
+      </div>
+    </div>
+  </div>
+  <div class='modal-footer'>
+    <a class='btn' data-dismiss='modal' href='#'>Close</a>
+  </div>
+</script>
+<!-- / Shortlist (Master) Template -->
+<script id='shortlistTemplate' type='text/html'>
+  <li data-id='{{ fishID }}'>
+    <a data-toggle='modal' href='#'>
+      <img alt='{{ title }}' class='profile' src='{{ thumbnail_url }}' />
+    </a>
+  </li>
+</script>
+<script type='text/javascript'>
+  //<![CDATA[
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+    
+      // Setup global variables
+      var resultsList = $("#results ul");
+      var quicksandEnabled = true;
+      var quicksandAnimating = false;
+      var quicksandUpdateQueue = [];
+      var quicksandList;
+        
+      // Change underscore.js tenplate settings to use moustache syntax
+      _.templateSettings = {
+        evaluate : /\{\[([\s\S]+?)\]\}/g,
+        interpolate : /\{\{(.+?)\}\}/g
+      };
+    
+      /////////////////////////////////////////
+      // Fishpond loading
+      /////////////////////////////////////////
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+    
+        // Clear LocalStorage of fish data. This is optional but is in here for Development purposes
+        locache.flush();
+      });
+    
+    
+      /////////////////////////////////////////
+      // Fishpond Ready
+      /////////////////////////////////////////
+      fishpond.ready(function(pond){
+        // Loading transitions (Demo site purposes)
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');       
+    
+        // Setup Templates
+        var tagsTemplate = _.template($( "#tagsTemplate" ).html());
+        var filtersTemplate = _.template($( "#filtersTemplate" ).html());
+    
+        // Generate Tags
+        $.each(pond.tag_ids, function(name, token){ 
+          var tagsData = { 
+            name  : name, 
+            token : token
+          };
+          $("fieldset.tags").append( tagsTemplate( tagsData ));
+        });
+    
+        // Generate Filters
+        $.each(pond.filters, function(index, token){
+          var filtersData = { 
+            token : token
+          };
+          $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
+        });
+    
+        // jQuery UI Slider
+        $(".slider").slider({
+          value: 10,
+          min: 0,
+          max: 20,
+          step: 1,
+          slide: function(e, ui){
+            var output = $(this).parents('.control-group').find('output');
+            var hiddenField = $("input[name='" + $(this).data('target') + "']");
+            var value = ui['value'];
+    
+            if(value.toString() !== hiddenField.val().toString()){
+              hiddenField.val(value);
+              output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+    
+              var tags = {};
+              var filters = {};
+              $("form#fishpond input").each(function(){
+                tags[$(this).data('slug')] = $(this).val();
+              });
+              fishpond.query(tags, filters);
+            }
+          }
+        });
+    
+        // Init Shorlists
+        shortlistListener();
+    
+        // Init Comments
+        commentsManager(pond);
+    
+        // Run Query
+        fishpond.query({}, {});
+      });
+    
+    
+      /////////////////////////////////////////
+      // Results Updated
+      /////////////////////////////////////////
+      fishpond.resultsUpdated(function(results){
+        quicksandUpdateQueue = []; // Clear update queue
+    
+        // Clear old results
+        if (quicksandEnabled){
+          quicksandList = $("<ul></ul>");  
+        } else {
+          resultsList.empty(); 
+        }
+    
+        /////////////////////////////////////////
+        // Generate Results
+        /////////////////////////////////////////
+        for(var i = 0; i < results.length; i++){
+          var result = results[i];
+          var fishID = result.fish.id;
+          var fish = fishManager(fishID);
+    
+          if (fish.getMetadata() === null){
+            // If Metadata is NOT cached
+            $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
+              fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
+              
+              if (quicksandEnabled && quicksandAnimating){
+                quicksandUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
+              } else {
+                fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
+              }
+            });
+          } 
+          
+          fish.generateTemplate(result); // Generate Fish - This will either create a 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded then the partial Fish will be dynamically updated later after Metadata has loaded.
+        }
+    
+        // Check for animation/filtering method
+        if (quicksandEnabled) sortResults();
+      });
+    
+    
+      /////////////////////////////////////////
+      // Fish Manager
+      /////////////////////////////////////////
+      var fishManager = function (fishID) {
+        var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
+        var shortlist = shortlistManager(fishID);
+        
+        return {
+          setMetadata: function (result) {
+            var defered = new $.Deferred();  // Uses jQuery deferred to load Fish Metadata and then pass it back on completion.
+            fishpond.get_fish(fishID, function(metadata){
+    
+              // Parse Metadata and provide fallbacks to avoid breakages
+              var parsedMetadata = {
+                description   : _.isNull(metadata.description) ? "No description set" : metadata.description,
+                image_url     : _.isNull(metadata.image_url) ? "http://placehold.it/300x300" : metadata.image_url,
+                thumbnail_url : _.isNull(metadata.thumbnail_url) ? "http://placehold.it/120x120" : metadata.thumbnail_url,
+                url           : (metadata.url === "" || _.isNull(metadata.url)) ? "#" : metadata.url,
+                id            : metadata.id,
+                title         : metadata.title
+              };
+              
+              locache.set("metadata-"+fishID, parsedMetadata);
+              defered.resolve(result);
+            });    
+            return defered.promise();
+          },
+          getMetadata: function () {
+            return locache.get("metadata-"+fishID);
+          },
+          generateTemplate: function (result) {
+            var currentFish = this;
+            var fishTemplate = _.template($( "#fishTemplate" ).html());
+            var metadata = currentFish.getMetadata();
+            var resultData = {
+              fish            : result.fish, 
+              fishDetailsData : currentFish.fishDetails(),  // Pass 'details' template into this template
+              metadata        : metadata,
+              status          : metadata ? "loaded" : "loading",
+              shortlist       : shortlist.template()        // Pass in 'shortlistButton' Object
+            };
+    
+            // Update Results list
+            if (quicksandEnabled){
+              quicksandList.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
+            } else {
+              resultsList.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
+            }
+          },
+          updateTemplate: function () {
+            var currentFish = this;
+            var fishResult = resultsList.find("li[data-id='" + fishID + "']");
+            var fishDetailsData = { 
+              metadata        : currentFish.getMetadata(),
+              shortlist       : shortlist.template()
+            };
+            fishResult.removeClass("loading").addClass("loaded");
+    
+            // Once Metadata is loaded then inject it into result.
+            return fishResult.find(".details").html( fishDetailsTemplate( fishDetailsData ));
+          },
+          fishDetails: function () {
+            var currentFish = this;
+            var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
+            var fishDetailsData;
+    
+            // If Metadata has loaded then populate 'Details Template'
+            if (currentFish.getMetadata()) {
+              fishDetailsData = { 
+                metadata      : currentFish.getMetadata(),
+                shortlist     : shortlist.template()
+              };
+              return fishDetailsTemplate( fishDetailsData );
+            }
+          } 
+        };
+      };
+    
+      /////////////////////////////////////////
+      // Modal Manager
+      /////////////////////////////////////////
+      //var resultsList = $("#results ul");
+      var modalManager = function () {
+        $("#query").on("click", "[data-toggle='modal']", function(event){
+          event.preventDefault();
+          var fishID = $(this).closest("li").data('id');
+          var shortlist = shortlistManager(fishID);
+          var fishModal = $("#"+fishID+".modal");
+    
+          // if Modal for Fish doesn't already exist.  
+          if (fishModal.length === 0){
+            // Clone empty Modal template and display temporarily
+            fishModal = $("#emptyModal").clone().attr("id",fishID);
+            fishModal.modal("show");
+    
+            // Load data into empty Modal
+            var modalTemplate = _.template($( "#modalTemplate" ).html());
+            var modalData = {
+              metadata  : locache.get("metadata-"+fishID),
+              shortlist : shortlist.template()
+            }; 
+            fishModal.empty().append( modalTemplate( modalData ));
+            
+          } else {
+            // If Modal already exists in DOM then just show Modal
+            // Minimise the comments first 
+            fishModal.find($("#comment_"+fishID)).hide(); 
+            fishModal.modal("show");
+          }
+        });
+      }();
+    
+      /////////////////////////////////////////
+      // Shortlist Manager
+      /////////////////////////////////////////
+      var shortlistManager = function(fishID) {
+        var shortlistStatus;
+    
+        return {
+          isShortlisted: function () {
+            // Check if Shortlist status has been set. If not then set it to False, otherwise return the cached value.
+            shortlistStatus = locache.get("shortlist-"+fishID);
+            if (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)){
+              locache.set("shortlist-"+fishID, false); // Cache Shortlist status
+              return shortlistStatus = false;
+            }
+            return shortlistStatus;
+          },
+          template: function () {
+            this.isShortlisted();
+            var shortlistButton = {
+              status          : shortlistStatus,
+              wording         : shortlistWording(shortlistStatus),
+              shortlistClass  : shortlistStatus ? "shortlisted btn-warning" : ""
+            };
+            return shortlistButton;
+          }
+        };
+      };
+    
+      function shortlistWording(shortlistStatus) {
+        return shortlistStatus ? "Remove" : "Shortlist";
+      }
+    
+      /////////////////////////////////////////
+      // Shortlist Listener
+      /////////////////////////////////////////
+      function shortlistListener() {
+        var shortlistMaster = $("#shortlist-master");
+        var fishID;
+    
+        $("body").on("click", "[data-toggle='shortlist']", function(event){
+          event.preventDefault();
+    
+          // Determine Fish ID
+          fishID = $(this).closest("[data-id]").data("id");
+    
+          // Toggle Shortlist status
+          var shortlistStatus = locache.get("shortlist-"+fishID);
+          shortlistStatus = (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)) ? true : !shortlistStatus;  // If Shortlist status is empty, null or undefined then set it to True, otherwise toggle current status.
+    
+          // Cache new Shortlist status
+          locache.set("shortlist-"+fishID, shortlistStatus);
+    
+          // Update all instances of Shortlist button
+          $("[data-id='"+ fishID +"'][data-toggle='shortlist'] ").each(function(index) {
+            $(this).toggleClass("shortlisted", shortlistStatus);
+            $(this).toggleClass("btn-warning", shortlistStatus);
+            $(this).find("span").html(shortlistWording(shortlistStatus));
+          });
+    
+          // Update Master list
+          if (shortlistStatus){
+            var shortlistTemplate = _.template($( "#shortlistTemplate" ).html());
+            var shortlistData = { 
+              fishID        : fishID,
+              title         : $(this).data("title"),
+              thumbnail_url : $(this).data("thumbnail")
+            };
+            shortlistMaster.append( shortlistTemplate( shortlistData ));
+          } else {
+            shortlistMaster.find("[data-id='"+ fishID +"']").remove();
+          }
+        });
+      }
+    
+      /////////////////////////////////////////
+      // Sort Results (Quicksand)
+      /////////////////////////////////////////
+      function sortResults() {
+        quicksandAnimating = true;
+        if(resultsList.find("li").length === 0) {
+          // On first load populate Quicksand with unsorted results
+          resultsList.append(quicksandList.find("li"));
+          quicksandAnimating = false;
+        } else {
+          resultsList.quicksand(quicksandList.find("li"), {
+            // Do nothing
+          }, function() {
+            quicksandAnimating = false;
+            // Update templates for Fish in Queue once animation has stopped
+            $.each(quicksandUpdateQueue, function(index, fishID) {
+              fish = fishManager(fishID);
+              fish.updateTemplate();
+            });
+          });
+        }
+      }
+    
+      /////////////////////////////////////////
+      // Comments Manager (Disqus)
+      /////////////////////////////////////////
+      function commentsManager(pond) {
+        $("body").on("click", "[data-toggle='comments']", function(event){
+          event.preventDefault();
+    
+          var id = $(this).data("id");
+          var comments = $("#comment_"+id);
+        
+          // Check to see if comments are already loaded for current fish
+          if (comments.find("#disqus_thread").length === 0){
+            $("#disqus_thread").appendTo(comments); // Move comments into current modal
+            // Reload Discus for current Fish
+            DISQUS.reset({
+              reload: true,
+              config: function () {
+                this.page.identifier = pond.id+"-"+id;
+                this.page.url = "http://involved.github.com/fishpond-examples/demos/kitchensink/#!"+id;
+              }
+            });
+          }
+          comments.toggle('slow');
+        });
+      }
+    };
+  //]]>
+</script>
+    <script type='text/javascript'>
+      //<![CDATA[
+        $(function(){
+          // Autofill auth form
+          $("#auth form").each(function(){
+            var form = $(this);
+            var apiKeyInput = $("#api_key", form);
+            var pondTokenInput = $("#pond_token", form);
+            apiKeyInput.val(localStorage.getItem("fishpond_api_key"));
+            pondTokenInput.val(localStorage.getItem("fishpond_pond_token"));
+           });
+        
+          $("#auth").fadeIn(400);
+          $("#loading").fadeOut(0);
+        
+          // Default Authentication setup
+          $("#auth form").submit(function(e){
+              e.preventDefault();
+              var form = $(this);
+              var apiKeyInput = $("#api_key", form);
+              var pondTokenInput = $("#pond_token", form);
+              var apiKey = apiKeyInput.val();
+              var pondToken = pondTokenInput.val();
+              var errors = [];
+        
+              if(apiKey.length != 41){
+                errors.push("API key should be 41 characters long");
+              }
+              if(pondToken.length != 6){
+                errors.push("Pond token should be 6 characters long");
+              }
+        
+              if(errors.length > 0){
+                alert("There were errors in your authentication: " + errors.join(", "));
+              } else {
+                $("#auth").fadeOut(0);
+                $("#loading").fadeIn(400);
+                localStorage.setItem("fishpond_api_key", apiKey);
+                localStorage.setItem("fishpond_pond_token", pondToken);
+        
+                var options = { debug: false };
+                var fishpond = new Fishpond(apiKey, options);
+                setupFishpond(fishpond);
+                fishpond.init(pondToken);
+              }
+          });
+        });
+      //]]>
+    </script>
+  </body>
+</html>
