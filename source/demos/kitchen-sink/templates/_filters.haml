@@ -1,0 +1,6 @@
+// Filters Template
+%script{:id => "filtersTemplate", :type => "text/html"}
+	.controls
+		%label.checkbox
+			%input{ :id => "query_filter_{{ token.id }}", :name => "query[filters][{{ token.id }}]", :type => "checkbox", :value => "0", :data => { :slug => "{{ token.slug }}" } }
+			{{ token.name }}

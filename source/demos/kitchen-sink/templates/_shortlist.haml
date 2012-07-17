@@ -1,0 +1,5 @@
+// Shortlist (Master) Template
+%script{:id => "shortlistTemplate", :type => "text/html"}
+	%li{ :data => { :id => "{{ fishID }}" } }
+		%a{ :href => "#", :data => { :toggle => "modal" } }
+			%img{ :src => "{{ thumbnail_url }}", :alt => "{{ title }}", :class => "profile" }
