@@ -22,7 +22,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     $("#loading .bar").css({width: (percent * 100) + "%"});
 
     // Clear LocalStorage of fish data. This is optional but is in here for Development purposes
-    locache.flush();
+    $.jStorage.flush();
   });
 
 
@@ -156,13 +156,13 @@ var setupFishpond = function(fishpond){ // you must define this function in your
             title         : metadata.title
           };
           
-          locache.set("metadata-"+fishID, parsedMetadata);
+          $.jStorage.set("metadata-"+fishID, parsedMetadata);
           defered.resolve(result);
         });    
         return defered.promise();
       },
       getMetadata: function () {
-        return locache.get("metadata-"+fishID);
+        return $.jStorage.get("metadata-"+fishID);
       },
       generateTemplate: function (result) {
         var currentFish = this;
@@ -232,7 +232,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         // Load data into empty Modal
         var modalTemplate = _.template($( "#modalTemplate" ).html());
         var modalData = {
-          metadata  : locache.get("metadata-"+fishID),
+          metadata  : $.jStorage.get("metadata-"+fishID),
           shortlist : shortlist.template()
         }; 
         fishModal.empty().append( modalTemplate( modalData ));
@@ -255,9 +255,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     return {
       isShortlisted: function () {
         // Check if Shortlist status has been set. If not then set it to False, otherwise return the cached value.
-        shortlistStatus = locache.get("shortlist-"+fishID);
+        shortlistStatus = $.jStorage.get("shortlist-"+fishID);
         if (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)){
-          locache.set("shortlist-"+fishID, false); // Cache Shortlist status
+          $.jStorage.set("shortlist-"+fishID, false); // Cache Shortlist status
           return shortlistStatus = false;
         }
         return shortlistStatus;
@@ -292,11 +292,11 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       fishID = $(this).closest("[data-id]").data("id");
 
       // Toggle Shortlist status
-      var shortlistStatus = locache.get("shortlist-"+fishID);
+      var shortlistStatus = $.jStorage.get("shortlist-"+fishID);
       shortlistStatus = (shortlistStatus === "" || _.isNull(shortlistStatus) || _.isUndefined(shortlistStatus)) ? true : !shortlistStatus;  // If Shortlist status is empty, null or undefined then set it to True, otherwise toggle current status.
 
       // Cache new Shortlist status
-      locache.set("shortlist-"+fishID, shortlistStatus);
+      $.jStorage.set("shortlist-"+fishID, shortlistStatus);
 
       // Update all instances of Shortlist button
       $("[data-id='"+ fishID +"'][data-toggle='shortlist'] ").each(function(index) {
