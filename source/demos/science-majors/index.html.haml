@@ -5,37 +5,6 @@ layout: demo_layout_hardcoded
 #query
   .page-header
     %h1 Demo
-    %br
-    -#
-      .row
-        .span9
-          %p
-            %strong Powered by:
-            %ul
-              %li 
-                = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
-                (Javascript Templates)
-              %li
-                = link_to "Locache", "http://locachejs.org/", :target => "_blank"
-                (Javascript client-side caching)
-              %li
-                = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
-                (Filtering and Animation)
-              %li
-                = link_to "Disqus", "http://disqus.com", :target => "_blank"
-                (Commenting engine)
-              %li
-                = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
-                (Form UI controls)
-              %li
-                = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
-                (Allows asynchronous javascript functions)
-        .span2.offset1
-          %span.label.label-success Metadata enabled
-          %br 
-          %span.label.label-success Comments enabled
-          %br 
-          %span.label.label-important Filters disabled
 
   .row
     .span5
@@ -52,6 +21,16 @@ layout: demo_layout_hardcoded
                 .control-label
                   Only show:
 
+            %h2 Options
+            %fieldset.options
+              .control-group
+                .control-label 
+                  
+                .controls
+                  %label.checkbox
+                    %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
+                      Disable Animation?
+                      
         .span5
           %h3 Shortlisted
           %ul#shortlist-master

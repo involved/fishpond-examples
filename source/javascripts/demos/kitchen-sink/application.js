@@ -56,7 +56,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
     });
 
-    // Range Sliders (jQuery UI Sliders)
+    // Query Sliders (jQuery UI Sliders)
     $(".slider").slider({
       value: 10,
       min: 0,
@@ -75,9 +75,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       }
     });
 
-    // Filters
-    $("input:checkbox").change(function(){
+    // Query Filters
+    $("input[name*='filters']:checkbox").change(function(){
       sendQuery();
+    });
+
+    // Query Options
+    $("input[name*='options']:checkbox").change(function(){
+      quicksandEnabled = this.checked ? false : true;
     });
 
     // Init Shorlists
@@ -368,7 +373,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     });
   }
 
-
+  /////////////////////////////////////////
+  // Other Functions
+  /////////////////////////////////////////
   function sendQuery(){
     var tags = {};
     var filters = {};

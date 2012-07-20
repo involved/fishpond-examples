@@ -11,7 +11,7 @@
               = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
               (Javascript Templates)
             %li
-              = link_to "Locache", "http://locachejs.org/", :target => "_blank"
+              = link_to "JStorage", "http://www.jstorage.info/", :target => "_blank"
               (Javascript client-side caching)
             %li
               = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
@@ -46,6 +46,16 @@
               .control-group
                 .control-label
                   Only show:
+
+            %h2 Options
+            %fieldset.options
+              .control-group
+                .control-label 
+                  
+                .controls
+                  %label.checkbox
+                    %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
+                      Disable Animation?
 
         .span5
           %h3 Shortlisted
@@ -158,7 +168,7 @@
 // REQUIRED EXTERNAL JAVASCRIPT
 /////////////////////////////////////////
 - content_for :javascript do
-  = javascript_include_tag "vendor/locache.js"
+  = javascript_include_tag "vendor/jstorage.js"
   = javascript_include_tag "vendor/underscore.js"
   = javascript_include_tag "vendor/jquery.quicksand.js"
   
