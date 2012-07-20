@@ -2,8 +2,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
   // Setup global variables
   var resultsList = $("#results ul");
-  var quicksandEnabled = true;
-  var quicksandAnimating = false;
+  var queryAnimationEnabled = true;
+  var queryCurrentlyAnimating = false;
   var quicksandUpdateQueue = [];
   var quicksandList;
     
@@ -82,7 +82,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
     // Query Options
     $("input[name*='options']:checkbox").change(function(){
-      quicksandEnabled = this.checked ? false : true;
+      queryAnimationEnabled = this.checked ? false : true;
     });
 
     // Init Shorlists
@@ -103,7 +103,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     quicksandUpdateQueue = []; // Clear update queue
 
     // Clear old results
-    if (quicksandEnabled){
+    if (queryAnimationEnabled){
       quicksandList = $("<ul></ul>");  
     } else {
       resultsList.empty(); 
@@ -122,7 +122,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
           fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
           
-          if (quicksandEnabled && quicksandAnimating){
+          if (queryAnimationEnabled && queryCurrentlyAnimating){
             quicksandUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
           } else {
             fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
@@ -134,7 +134,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     }
 
     // Check for animation/filtering method
-    if (quicksandEnabled) sortResults();
+    if (queryAnimationEnabled) sortResults();
   });
 
 
@@ -181,7 +181,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         };
 
         // Update Results list
-        if (quicksandEnabled){
+        if (queryAnimationEnabled){
           quicksandList.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
         } else {
           resultsList.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
@@ -328,16 +328,16 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Sort Results (Quicksand)
   /////////////////////////////////////////
   function sortResults() {
-    quicksandAnimating = true;
+    queryCurrentlyAnimating = true;
     if(resultsList.find("li").length === 0) {
       // On first load populate Quicksand with unsorted results
       resultsList.append(quicksandList.find("li"));
-      quicksandAnimating = false;
+      queryCurrentlyAnimating = false;
     } else {
       resultsList.quicksand(quicksandList.find("li"), {
         // Do nothing
       }, function() {
-        quicksandAnimating = false;
+        queryCurrentlyAnimating = false;
         // Update templates for Fish in Queue once animation has stopped
         $.each(quicksandUpdateQueue, function(index, fishID) {
           fish = fishManager(fishID);
