@@ -57,12 +57,31 @@
                     %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
                       Disable Animation?
 
+      .row
         .span5
-          %h3 Shortlisted
-          %ul#shortlist-master
-          -#
-            .btn.btn-danger
-              Clear Shortlist
+          .well    
+            %h3.pull-left Shortlisted        
+            .btn-group.pull-right
+              %button.btn.dropdown-toggle{"data-toggle" => "dropdown"} 
+                Options
+                %span.caret
+              %ul.dropdown-menu
+                %li
+                  %a{:href => "#", :id => "shortlist-print"}
+                    %i.icon-print
+                    Print
+                %li
+                  %a{:href => "#", :id => "shortlist-email"}
+                    %i.icon-envelope
+                    Email
+                %li.divider
+                %li
+                  %a{:href => "#", :id => "shortlist-reset"}
+                    %i.icon-trash
+                    Reset
+            .row-fluid
+              .span12
+                %ul#shortlist-master
 
     .span6.offset1
       %h2 Results
@@ -152,14 +171,14 @@
     #shortlist-master{
       list-style: none;
       float: left;
-      margin: 0;
+      margin: 15px 0 0 0;
       padding: 0;
     }
       #shortlist-master li{
         float: left;
         padding: 3px;
-        width: 120px;
-        height: 120px;
+        width: 107px;
+        margin-bottom: 10px;
         overflow: hidden;
       }
 

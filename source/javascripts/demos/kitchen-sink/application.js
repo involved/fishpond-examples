@@ -289,6 +289,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var shortlistMaster = $("#shortlist-master");
     var fishID;
 
+    // Shortlist Options
+    shortlistPrint();
+
+    // Shortlist add/remove
     $("body").on("click", "[data-toggle='shortlist']", function(event){
       event.preventDefault();
 
@@ -321,6 +325,25 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       } else {
         shortlistMaster.find("[data-id='"+ fishID +"']").remove();
       }
+    });
+  }
+
+
+  /////////////////////////////////////////
+  // Shortlist Print
+  /////////////////////////////////////////
+  function shortlistPrint() {
+    $("body").on("click", "#shortlist-print", function(event) {
+      event.preventDefault();
+
+      // http://stackoverflow.com/questions/2603465/using-jquery-to-open-a-popup-window-and-print
+
+      //w=window.open();
+      //if(!w)alert('Please enable pop-ups');
+      //w.document.write($('.report_left_inner').html('test'));
+      //w.print();
+      //w.close();
+      console.log("PRINT");
     });
   }
 
