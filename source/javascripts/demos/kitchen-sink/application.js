@@ -56,7 +56,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
     });
 
-    // jQuery UI Slider
+    // Range Sliders (jQuery UI Sliders)
     $(".slider").slider({
       value: 10,
       min: 0,
@@ -70,15 +70,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         if(value.toString() !== hiddenField.val().toString()){
           hiddenField.val(value);
           output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
-
-          var tags = {};
-          var filters = {};
-          $("form#fishpond input").each(function(){
-            tags[$(this).data('slug')] = $(this).val();
-          });
-          fishpond.query(tags, filters);
+          sendQuery();
         }
       }
+    });
+
+    // Filters
+    $("input:checkbox").change(function(){
+      sendQuery();
     });
 
     // Init Shorlists
@@ -368,5 +367,23 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       comments.toggle('slow');
     });
   }
+
+
+  function sendQuery(){
+    var tags = {};
+    var filters = {};
+    $("form input[name*='tags']").each(function(){
+      tags[$(this).data('slug')] = $(this).val();
+    });
+    $("form input[name*='filters']").each(function(){
+      var value = 0;
+      if(this.checked){
+        value = 1;
+      }
+      filters[$(this).data('slug')] = value;
+    });
+    fishpond.query(tags, filters);
+  }
+
 };
 
