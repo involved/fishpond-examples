@@ -291,6 +291,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
     // Shortlist Options
     shortlistPrint();
+    shortlistEmail();
+    //shortlistReset();
 
     // Shortlist add/remove
     $("body").on("click", "[data-toggle='shortlist']", function(event){
@@ -325,27 +327,58 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       } else {
         shortlistMaster.find("[data-id='"+ fishID +"']").remove();
       }
+
+      if (shortlistMaster.children.length >= 1) {
+        $("#shortlist-options").removeClass("disabled");
+      } else {
+        console.log("No Shortlist children");
+        $("#shortlist-options").addClass("disabled");
+      }
     });
   }
 
 
   /////////////////////////////////////////
-  // Shortlist Print
+  // Shortlist Options: Print
   /////////////////////////////////////////
   function shortlistPrint() {
     $("body").on("click", "#shortlist-print", function(event) {
       event.preventDefault();
 
-      // http://stackoverflow.com/questions/2603465/using-jquery-to-open-a-popup-window-and-print
-
-      //w=window.open();
-      //if(!w)alert('Please enable pop-ups');
-      //w.document.write($('.report_left_inner').html('test'));
-      //w.print();
-      //w.close();
-      console.log("PRINT");
+      var confirmPrint = confirm("Would you like to print Shortlist?");
+      if (confirmPrint==true){
+        w = window.open( '', "Shortlist", "menubar=0,location=0,height=700,width=700" );
+        if(!w)alert('Please enable pop-ups');
+        $('#shortlist-master').clone().appendTo( w.document.body );
+        w.print();
+        w.close();
+      }
     });
   }
+
+  /////////////////////////////////////////
+  // Shortlist Options: Email
+  /////////////////////////////////////////
+  function shortlistEmail() {
+    $("body").on("click", "#shortlist-print", function(event) {
+      event.preventDefault();
+      if (confirm("Would you like to print Shortlist?")==true){
+        w = window.open( '', "Shortlist", "menubar=0,location=0,height=700,width=700" );
+        if(!w)alert('Please enable pop-ups');
+        $('#shortlist-master').clone().appendTo( w.document.body );
+        w.print();
+        w.close();
+      }
+    });
+  }
+
+  /////////////////////////////////////////
+  // Shortlist Options: Reset
+  /////////////////////////////////////////
+  function shortlistReset() {
+
+  }
+
 
   /////////////////////////////////////////
   // Sort Results (Quicksand)

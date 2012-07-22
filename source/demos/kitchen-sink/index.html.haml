@@ -31,6 +31,10 @@
         %span.label.label-success Comments enabled
         %br 
         %span.label.label-success Filters enabled
+        %br 
+        %span.label.label-warning Search Box [In Dev]
+        %br 
+        %span.label.label-warning Popularity Sliders [In Dev]
 
   .row
     .span5
@@ -47,22 +51,26 @@
                 .control-label
                   Only show:
 
-            %h2 Options
-            %fieldset.options
-              .control-group
-                .control-label 
-                  
-                .controls
-                  %label.checkbox
-                    %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
-                      Disable Animation?
-
+      .row
+        .span5
+          .well    
+            %h3.pull-left Options
+            .row-fluid
+              .span12
+                %fieldset.options
+                  .control-group
+                    .control-label 
+                      
+                    .controls
+                      %label.checkbox
+                        %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
+                          Disable Animation?
       .row
         .span5
           .well    
             %h3.pull-left Shortlisted        
             .btn-group.pull-right
-              %button.btn.dropdown-toggle{"data-toggle" => "dropdown"} 
+              %button.btn.dropdown-toggle.disabled{"data-toggle" => "dropdown", :id => "shortlist-options"} 
                 Options
                 %span.caret
               %ul.dropdown-menu
