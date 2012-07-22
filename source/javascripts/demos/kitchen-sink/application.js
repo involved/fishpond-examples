@@ -4,10 +4,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   var resultsList = $("#results ul");
   var queryAnimationEnabled = true;
   var queryCurrentlyAnimating = false;
-  var quicksandUpdateQueue = [];
+  var fishUpdateQueue = [];
   var quicksandList;
     
-  // Change underscore.js tenplate settings to use moustache syntax
+  // Changes underscore.js tenplate settings to use moustache syntax
   _.templateSettings = {
     evaluate : /\{\[([\s\S]+?)\]\}/g,
     interpolate : /\{\{(.+?)\}\}/g
@@ -100,7 +100,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Results Updated
   /////////////////////////////////////////
   fishpond.resultsUpdated(function(results){
-    quicksandUpdateQueue = []; // Clear update queue
+    fishUpdateQueue = []; // Clear update queue
 
     // Clear old results
     if (queryAnimationEnabled){
@@ -123,7 +123,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
           
           if (queryAnimationEnabled && queryCurrentlyAnimating){
-            quicksandUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
+            fishUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
           } else {
             fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
           }
@@ -362,7 +362,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       }, function() {
         queryCurrentlyAnimating = false;
         // Update templates for Fish in Queue once animation has stopped
-        $.each(quicksandUpdateQueue, function(index, fishID) {
+        $.each(fishUpdateQueue, function(index, fishID) {
           fish = fishManager(fishID);
           fish.updateTemplate();
         });
