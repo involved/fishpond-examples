@@ -1,0 +1,9 @@
+// Tags Template
+%script{:id => "tagsTemplate", :type => "text/html"}
+	.control-group
+		%label.control-label
+			{{ name }}
+			%output (10)
+		.controls
+			%input{ :id => "query_tag_{{ token }}", :name => "query[tags][{{ token }}]", :type => "hidden", :value => "10", :data => { :slug => "{{ name }}" } }
+			.slider.span2{ :data => { :target => "query[tags][{{ token }}]" } }

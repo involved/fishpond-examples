@@ -1,5 +1,4 @@
 !!! 5
--# paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/
 <!--[if lt IE 7]> <html lang="en" class="no-js ie6 old-ie"> <![endif]-->
 <!--[if IE 7]>    <html lang="en" class="no-js ie7 old-ie"> <![endif]-->
 <!--[if IE 8]>    <html lang="en" class="no-js ie8 old-ie"> <![endif]-->
@@ -14,7 +13,8 @@
     %meta{ :name => "keywords", :content => "" }/
     %meta{ :name => "viewport", :content => "width=device-width, maximum-scale=1.0" }/
 
-
+    = javascript_include_tag "plugins.js"
+    
     = stylesheet_link_tag "http://twitter.github.com/bootstrap/assets/css/bootstrap.css"
     = stylesheet_link_tag "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/cupertino/jquery-ui.css"
 
@@ -62,7 +62,9 @@
     = javascript_include_tag "http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js"
     = javascript_include_tag "http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js"
     = javascript_include_tag "http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js"
-    = javascript_include_tag "https://raw.github.com/yeco/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js"
+
+    = javascript_include_tag "vendor/jquery.ui.touch-punch.min.js"
+
 
     = yield_content :javascript
 
@@ -82,33 +84,33 @@
 
         // Default Authentication setup
         $("#auth form").submit(function(e){
-            e.preventDefault();
-            var form = $(this);
-            var apiKeyInput = $("#api_key", form);
-            var pondTokenInput = $("#pond_token", form);
-            var apiKey = apiKeyInput.val();
-            var pondToken = pondTokenInput.val();
-            var errors = [];
+          e.preventDefault();
+          var form = $(this);
+          var apiKeyInput = $("#api_key", form);
+          var pondTokenInput = $("#pond_token", form);
+          var apiKey = apiKeyInput.val();
+          var pondToken = pondTokenInput.val();
+          var errors = [];
 
-            if(apiKey.length != 41){
-              errors.push("API key should be 41 characters long");
-            }
-            if(pondToken.length != 6){
-              errors.push("Pond token should be 6 characters long");
-            }
+          if(apiKey.length != 41){
+            errors.push("API key should be 41 characters long");
+          }
+          if(pondToken.length != 6){
+            errors.push("Pond token should be 6 characters long");
+          }
 
-            if(errors.length > 0){
-              alert("There were errors in your authentication: " + errors.join(", "));
-            } else {
-              $("#auth").fadeOut(0);
-              $("#loading").fadeIn(400);
-              localStorage.setItem("fishpond_api_key", apiKey);
-              localStorage.setItem("fishpond_pond_token", pondToken);
+          if(errors.length > 0){
+            alert("There were errors in your authentication: " + errors.join(", "));
+          } else {
+            $("#auth").fadeOut(0);
+            $("#loading").fadeIn(400);
+            localStorage.setItem("fishpond_api_key", apiKey);
+            localStorage.setItem("fishpond_pond_token", pondToken);
 
-              var options = { debug: false };
-              var fishpond = new Fishpond(apiKey, options);
-              setupFishpond(fishpond);
-              fishpond.init(pondToken);
+            var options = { debug: false };
+            var fishpond = new Fishpond(apiKey, options);
+            setupFishpond(fishpond);
+            fishpond.init(pondToken);
             }
         });
       });
