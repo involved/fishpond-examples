@@ -80,7 +80,7 @@ configure :build do
     end
 
     def asset_url(path, prefix = nil)
-      File.join "/fishdpond-examples", super(path, prefix)
+      File.join "/fishpond-examples", super(path, prefix)
     end
   end
 end
