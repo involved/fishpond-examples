@@ -383,7 +383,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     $("body").on("click", "#shortlist-email", function(event) {
       event.preventDefault();
 
-      $("#shortlist-export-email .modal-body").empty();
+      
+      shortlist.list();
+      console.log(shortlist.list());
+      /*$("#shortlist-export-email .modal-body").empty();
 
       // Setup Templates
       var shortlistEmailTemplate = _.template($( "#shortlistEmail" ).html());
@@ -403,6 +406,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       var emailSubject = "Your shortlist";
       //var emailAddress=prompt("Please enter the recipients email address","");
       //window.location  = "mailto:"+emailAddress+"?Subject="+emailSubject+"&body="+link  
+      */
     });
   }
 
@@ -412,6 +416,47 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   function shortlistReset() {
 
   }
+
+
+
+  var shortlist = shortlist || {};
+
+  shortlist = {
+    init: function () {
+    
+    },
+    print: function () {
+
+    },
+    email: function () {
+
+    },
+    reset: function () {
+
+    },
+    list: function () {
+      var list = {};
+      $("#shortlist-master li").each(function(index) {
+        list[index] = $(this).data("id");
+      });
+      
+      $.jStorage.set("shortlist", list);
+      return list;
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   /////////////////////////////////////////
