@@ -2,12 +2,12 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
   // Setup global variables
   var resultsList = $("#results ul");
-  var quicksandEnabled = true;
-  var quicksandAnimating = false;
-  var quicksandUpdateQueue = [];
+  var queryAnimationEnabled = true;
+  var queryCurrentlyAnimating = false;
+  var fishUpdateQueue = [];
   var quicksandList;
     
-  // Change underscore.js tenplate settings to use moustache syntax
+  // Changes underscore.js tenplate settings to use moustache syntax
   _.templateSettings = {
     evaluate : /\{\[([\s\S]+?)\]\}/g,
     interpolate : /\{\{(.+?)\}\}/g
@@ -56,7 +56,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
     });
 
-    // jQuery UI Slider
+    // Query Sliders (jQuery UI Sliders)
     $(".slider").slider({
       value: 10,
       min: 0,
@@ -70,15 +70,19 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         if(value.toString() !== hiddenField.val().toString()){
           hiddenField.val(value);
           output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
-
-          var tags = {};
-          var filters = {};
-          $("form#fishpond input").each(function(){
-            tags[$(this).data('slug')] = $(this).val();
-          });
-          fishpond.query(tags, filters);
+          sendQuery();
         }
       }
+    });
+
+    // Query Filters
+    $("input[name*='filters']:checkbox").change(function(){
+      sendQuery();
+    });
+
+    // Query Options
+    $("input[name*='options']:checkbox").change(function(){
+      queryAnimationEnabled = this.checked ? false : true;
     });
 
     // Init Shorlists
@@ -96,10 +100,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Results Updated
   /////////////////////////////////////////
   fishpond.resultsUpdated(function(results){
-    quicksandUpdateQueue = []; // Clear update queue
+    fishUpdateQueue = []; // Clear update queue
 
     // Clear old results
-    if (quicksandEnabled){
+    if (queryAnimationEnabled){
       quicksandList = $("<ul></ul>");  
     } else {
       resultsList.empty(); 
@@ -118,8 +122,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
           fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
           
-          if (quicksandEnabled && quicksandAnimating){
-            quicksandUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
+          if (queryAnimationEnabled && queryCurrentlyAnimating){
+            fishUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
           } else {
             fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
           }
@@ -130,7 +134,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     }
 
     // Check for animation/filtering method
-    if (quicksandEnabled) sortResults();
+    if (queryAnimationEnabled) sortResults();
   });
 
 
@@ -177,7 +181,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         };
 
         // Update Results list
-        if (quicksandEnabled){
+        if (queryAnimationEnabled){
           quicksandList.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
         } else {
           resultsList.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
@@ -285,6 +289,12 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var shortlistMaster = $("#shortlist-master");
     var fishID;
 
+    // Shortlist Options
+    shortlistPrint();
+    shortlistEmail();
+    //shortlistReset();
+
+    // Shortlist add/remove
     $("body").on("click", "[data-toggle='shortlist']", function(event){
       event.preventDefault();
 
@@ -317,25 +327,75 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       } else {
         shortlistMaster.find("[data-id='"+ fishID +"']").remove();
       }
+
+      if (shortlistMaster.children.length >= 1) {
+        $("#shortlist-options").removeClass("disabled");
+      } else {
+        console.log("No Shortlist children");
+        $("#shortlist-options").addClass("disabled");
+      }
     });
   }
+
+
+  /////////////////////////////////////////
+  // Shortlist Options: Print
+  /////////////////////////////////////////
+  function shortlistPrint() {
+    $("body").on("click", "#shortlist-print", function(event) {
+      event.preventDefault();
+
+      var confirmPrint = confirm("Would you like to print Shortlist?");
+      if (confirmPrint==true){
+        w = window.open( '', "Shortlist", "menubar=0,location=0,height=700,width=700" );
+        if(!w)alert('Please enable pop-ups');
+        $('#shortlist-master').clone().appendTo( w.document.body );
+        w.print();
+        w.close();
+      }
+    });
+  }
+
+  /////////////////////////////////////////
+  // Shortlist Options: Email
+  /////////////////////////////////////////
+  function shortlistEmail() {
+    $("body").on("click", "#shortlist-print", function(event) {
+      event.preventDefault();
+      if (confirm("Would you like to print Shortlist?")==true){
+        w = window.open( '', "Shortlist", "menubar=0,location=0,height=700,width=700" );
+        if(!w)alert('Please enable pop-ups');
+        $('#shortlist-master').clone().appendTo( w.document.body );
+        w.print();
+        w.close();
+      }
+    });
+  }
+
+  /////////////////////////////////////////
+  // Shortlist Options: Reset
+  /////////////////////////////////////////
+  function shortlistReset() {
+
+  }
+
 
   /////////////////////////////////////////
   // Sort Results (Quicksand)
   /////////////////////////////////////////
   function sortResults() {
-    quicksandAnimating = true;
+    queryCurrentlyAnimating = true;
     if(resultsList.find("li").length === 0) {
       // On first load populate Quicksand with unsorted results
       resultsList.append(quicksandList.find("li"));
-      quicksandAnimating = false;
+      queryCurrentlyAnimating = false;
     } else {
       resultsList.quicksand(quicksandList.find("li"), {
         // Do nothing
       }, function() {
-        quicksandAnimating = false;
+        queryCurrentlyAnimating = false;
         // Update templates for Fish in Queue once animation has stopped
-        $.each(quicksandUpdateQueue, function(index, fishID) {
+        $.each(fishUpdateQueue, function(index, fishID) {
           fish = fishManager(fishID);
           fish.updateTemplate();
         });
@@ -368,5 +428,25 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       comments.toggle('slow');
     });
   }
+
+  /////////////////////////////////////////
+  // Other Functions
+  /////////////////////////////////////////
+  function sendQuery(){
+    var tags = {};
+    var filters = {};
+    $("form input[name*='tags']").each(function(){
+      tags[$(this).data('slug')] = $(this).val();
+    });
+    $("form input[name*='filters']").each(function(){
+      var value = 0;
+      if(this.checked){
+        value = 1;
+      }
+      filters[$(this).data('slug')] = value;
+    });
+    fishpond.query(tags, filters);
+  }
+
 };
 
