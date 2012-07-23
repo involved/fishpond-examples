@@ -12,6 +12,7 @@
     <meta content='noindex, nofollow' name='robots' />
     <meta content='' name='keywords' />
     <meta content='width=device-width, maximum-scale=1.0' name='viewport' />
+    <script src="/fishdpond-examples/javascripts/plugins.js" type="text/javascript"></script>
     <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css" />
     <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/cupertino/jquery-ui.css" media="screen" rel="stylesheet" type="text/css" />
     <style type='text/css'>
@@ -115,7 +116,7 @@
           <div class='span2 offset1'>
             <span class='label label-important'>Metadata disabled</span>
             <br />
-            <span class='label label-warning'>Filters to be hooked up</span>
+            <span class='label label-success'>Filters enabled</span>
           </div>
         </div>
       </div>
@@ -133,9 +134,6 @@
                 </div>
               </div>
             </fieldset>
-            <span class='label'>
-              Filters currently not hooked up.
-            </span>
           </form>
         </div>
         <div class='span6 offset1'>
@@ -155,23 +153,14 @@
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js" type="text/javascript"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
-    <script src="https://raw.github.com/yeco/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
+    <script src="/fishdpond-examples/javascripts/vendor/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
     <script type='text/javascript'>
       //<![CDATA[
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
         
-          fishpond.resultsUpdated(function(results){
-            console.log(results);
-        
-            $(".results li").remove(); // Clear old results
-        
-            for(var i = 0; i < results.length; i++){
-              var li = $("<li></li>");
-              var thumbnail = $("<div></div>");
-              thumbnail.html(results[i].fish.title);
-              li.append(thumbnail);
-              $(".results").append(li);
-            }
+          fishpond.loading(function(percent){
+            $("#loading .progress").removeClass("progress-striped");
+            $("#loading .bar").css({width: (percent * 100) + "%"});
           });
         
           fishpond.ready(function(pond){
@@ -229,21 +218,51 @@
                   var tags = {};
                   var filters = {};
                   $("form#fishpond input").each(function(){
-                    console.error($(this).data('slug'));
+                    //console.error($(this).data('slug'));
                     tags[$(this).data('slug')] = $(this).val();
                   });
-                  fishpond.query(tags, filters);
+                  sendQuery();
                 }
               }
+            });
+        
+            // Filters
+            $("input:checkbox").change(function(){
+              sendQuery();
             });
         
             fishpond.query({}, {});
           });
         
-          fishpond.loading(function(percent){
-            $("#loading .progress").removeClass("progress-striped");
-            $("#loading .bar").css({width: (percent * 100) + "%"});
+          fishpond.resultsUpdated(function(results){
+            //console.log(results);
+        
+            $(".results li").remove(); // Clear old results
+        
+            for(var i = 0; i < results.length; i++){
+              var li = $("<li></li>");
+              var thumbnail = $("<div></div>");
+              thumbnail.html(results[i].fish.title);
+              li.append(thumbnail);
+              $(".results").append(li);
+            }
           });
+        
+          function sendQuery(){
+            var tags = {};
+            var filters = {};
+            $("form input[name*='tags']").each(function(){
+              tags[$(this).data('slug')] = $(this).val();
+            });
+            $("form input[name*='filters']").each(function(){
+              var value = 0;
+              if(this.checked){
+                value = 1;
+              }
+              filters[$(this).data('slug')] = value;
+            });
+            fishpond.query(tags, filters);
+          }
         
         };
       //]]>
@@ -265,33 +284,33 @@
         
           // Default Authentication setup
           $("#auth form").submit(function(e){
-              e.preventDefault();
-              var form = $(this);
-              var apiKeyInput = $("#api_key", form);
-              var pondTokenInput = $("#pond_token", form);
-              var apiKey = apiKeyInput.val();
-              var pondToken = pondTokenInput.val();
-              var errors = [];
+            e.preventDefault();
+            var form = $(this);
+            var apiKeyInput = $("#api_key", form);
+            var pondTokenInput = $("#pond_token", form);
+            var apiKey = apiKeyInput.val();
+            var pondToken = pondTokenInput.val();
+            var errors = [];
         
-              if(apiKey.length != 41){
-                errors.push("API key should be 41 characters long");
-              }
-              if(pondToken.length != 6){
-                errors.push("Pond token should be 6 characters long");
-              }
+            if(apiKey.length != 41){
+              errors.push("API key should be 41 characters long");
+            }
+            if(pondToken.length != 6){
+              errors.push("Pond token should be 6 characters long");
+            }
         
-              if(errors.length > 0){
-                alert("There were errors in your authentication: " + errors.join(", "));
-              } else {
-                $("#auth").fadeOut(0);
-                $("#loading").fadeIn(400);
-                localStorage.setItem("fishpond_api_key", apiKey);
-                localStorage.setItem("fishpond_pond_token", pondToken);
+            if(errors.length > 0){
+              alert("There were errors in your authentication: " + errors.join(", "));
+            } else {
+              $("#auth").fadeOut(0);
+              $("#loading").fadeIn(400);
+              localStorage.setItem("fishpond_api_key", apiKey);
+              localStorage.setItem("fishpond_pond_token", pondToken);
         
-                var options = { debug: false };
-                var fishpond = new Fishpond(apiKey, options);
-                setupFishpond(fishpond);
-                fishpond.init(pondToken);
+              var options = { debug: false };
+              var fishpond = new Fishpond(apiKey, options);
+              setupFishpond(fishpond);
+              fishpond.init(pondToken);
               }
           });
         });
