@@ -1,0 +1,8 @@
+// Shortlist Email
+%script{:id => "shortlistEmail", :type => "text/html"}
+	.row-fluid{ :data => { :id => "{{ metadata.id }}" } }
+		.span12
+			%h3 {{ metadata.title }}
+			%p {{ metadata.description }}
+			= link_to "{{ metadata.url }}", "{{ metadata.url }}"
+			%hr

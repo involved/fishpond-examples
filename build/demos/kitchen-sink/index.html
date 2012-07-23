@@ -101,14 +101,14 @@
         #shortlist-master{
           list-style: none;
           float: left;
-          margin: 0;
+          margin: 15px 0 0 0;
           padding: 0;
         }
           #shortlist-master li{
             float: left;
             padding: 3px;
-            width: 120px;
-            height: 120px;
+            width: 107px;
+            margin-bottom: 10px;
             overflow: hidden;
           }
       /*]]>*/
@@ -204,7 +204,7 @@
                     (Javascript Templates)
                   </li>
                   <li>
-                    <a target="_blank" href="http://locachejs.org/">Locache</a>
+                    <a target="_blank" href="http://www.jstorage.info/">JStorage</a>
                     (Javascript client-side caching)
                   </li>
                   <li>
@@ -231,7 +231,7 @@
               <br />
               <span class='label label-success'>Comments enabled</span>
               <br />
-              <span class='label label-important'>Filters disabled</span>
+              <span class='label label-success'>Filters enabled</span>
             </div>
           </div>
         </div>
@@ -251,14 +251,59 @@
                       </div>
                     </div>
                   </fieldset>
-                  <span class='label'>
-                    Filters currently not hooked up.
-                  </span>
+                  <h2>Options</h2>
+                  <fieldset class='options'>
+                    <div class='control-group'>
+                      <div class='control-label'></div>
+                      <div class='controls'>
+                        <label class='checkbox'>
+                          <input data-slug='options-animation' id='query_options_animation' name='query[options][animation]' type='checkbox' value='0'>
+                            Disable Animation?
+                          </input>
+                        </label>
+                      </div>
+                    </div>
+                  </fieldset>
                 </form>
               </div>
+            </div>
+            <div class='row'>
               <div class='span5'>
-                <h3>Shortlisted</h3>
-                <ul id='shortlist-master'></ul>
+                <div class='well'>
+                  <h3 class='pull-left'>Shortlisted</h3>
+                  <div class='btn-group pull-right'>
+                    <button class='btn dropdown-toggle' data-toggle='dropdown'>
+                      Options
+                      <span class='caret'></span>
+                    </button>
+                    <ul class='dropdown-menu'>
+                      <li>
+                        <a href='#' id='shortlist-print'>
+                          <i class='icon-print'></i>
+                          Print
+                        </a>
+                      </li>
+                      <li>
+                        <a href='#' id='shortlist-email'>
+                          <i class='icon-envelope'></i>
+                          Email
+                        </a>
+                      </li>
+                      <li class='divider'></li>
+                      <li>
+                        <a href='#' id='shortlist-reset'>
+                          <i class='icon-trash'></i>
+                          Reset
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class='row-fluid'>
+                    <div class='span12'>
+                      <ul id='shortlist-master'></ul>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -291,7 +336,7 @@
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
     <script src="/fishdpond-examples/javascripts/vendor/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
-    <script src="/fishdpond-examples/javascripts/vendor/locache.js" type="text/javascript"></script>
+    <script src="/fishdpond-examples/javascripts/vendor/jstorage.js" type="text/javascript"></script>
     <script src="/fishdpond-examples/javascripts/vendor/underscore.js" type="text/javascript"></script>
     <script src="/fishdpond-examples/javascripts/vendor/jquery.quicksand.js" type="text/javascript"></script>
     <!-- //////////////////////////////////////// -->

@@ -91,6 +91,31 @@
               .span12
                 %ul#shortlist-master
 
+            // Shortlist Email Modal
+            #shortlist-export-email.modal.hide
+              .modal-header
+                %button.close{"data-dismiss" => "modal"} ×
+                %h3 Confirm Email
+              .modal-body
+                // Dynamically added
+              .modal-footer
+                %a.btn{"data-dismiss" => "modal", :href => "#"} Cancel
+                %a.btn.btn-primary{:href => "#", :id => "shortlist-email-confirm"} Email
+
+
+            // Shortlist Print Modal 
+            #shortlist-export-print.modal.hide
+              .modal-header
+                %button.close{"data-dismiss" => "modal"} ×
+                %h3 Confirm Print
+              .modal-body
+                // Dynamically added
+              .modal-footer
+                %a.btn{"data-dismiss" => "modal", :href => "#"} Cancel
+                %a.btn.btn-primary{:href => "#", :id => "shortlist-print-confirm"} Print
+
+
+
     .span6.offset1
       %h2 Results
       #results
@@ -98,7 +123,7 @@
 
 
 
-  #emptyModal.modal.hide
+  #emptyModal.modal.modal-wide.hide
     .modal-body.loading
       // Empty
 
@@ -158,20 +183,20 @@
       }
 
     /* Modal */
-    .modal{
+    .modal.modal-wide{
       width:940px;
       margin-left:-470px;
       top: 40%;
     }
-      .modal-body{
+      .modal.modal-wide .modal-body{
         max-height: 700px;
       }
-        .modal-body.loading{
+        .modal.modal-wide .modal-body.loading{
           background: #fff url(/images/common/loading.gif) no-repeat center center;
           min-height: 200px;
         }
 
-        .modal-body .comment_box{
+        .modal.modal-wide .modal-body .comment_box{
           display: none;
         }
 

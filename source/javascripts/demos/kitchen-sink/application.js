@@ -328,6 +328,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         shortlistMaster.find("[data-id='"+ fishID +"']").remove();
       }
 
+      // Options button
       if (shortlistMaster.children.length >= 1) {
         $("#shortlist-options").removeClass("disabled");
       } else {
@@ -345,14 +346,33 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     $("body").on("click", "#shortlist-print", function(event) {
       event.preventDefault();
 
-      var confirmPrint = confirm("Would you like to print Shortlist?");
-      if (confirmPrint==true){
+      $("#shortlist-export-print .modal-body").empty();
+
+      // Setup Templates
+      var shortlistPrintTemplate = _.template($( "#shortlistPrint" ).html());
+
+      // Generate Export
+      $("#shortlist-master li").each(function(index) {
+        var fishID = $(this).data("id");
+        var metadata = $.jStorage.get("metadata-"+fishID);
+        var shortlist = { 
+          metadata : metadata
+        };
+        $("#shortlist-export-print .modal-body").append( shortlistPrintTemplate( shortlist ));  
+      });
+      
+      $('#shortlist-export-print').modal('show');
+
+      $("body").on("click", "#shortlist-print-confirm", function(event) {
+        console.log("Print confirm");
+
         w = window.open( '', "Shortlist", "menubar=0,location=0,height=700,width=700" );
         if(!w)alert('Please enable pop-ups');
-        $('#shortlist-master').clone().appendTo( w.document.body );
+        $('#shortlist-export-print .modal-body').clone().appendTo( w.document.body );
         w.print();
         w.close();
-      }
+
+      });
     });
   }
 
@@ -360,15 +380,29 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Shortlist Options: Email
   /////////////////////////////////////////
   function shortlistEmail() {
-    $("body").on("click", "#shortlist-print", function(event) {
+    $("body").on("click", "#shortlist-email", function(event) {
       event.preventDefault();
-      if (confirm("Would you like to print Shortlist?")==true){
-        w = window.open( '', "Shortlist", "menubar=0,location=0,height=700,width=700" );
-        if(!w)alert('Please enable pop-ups');
-        $('#shortlist-master').clone().appendTo( w.document.body );
-        w.print();
-        w.close();
-      }
+
+      $("#shortlist-export-email .modal-body").empty();
+
+      // Setup Templates
+      var shortlistEmailTemplate = _.template($( "#shortlistEmail" ).html());
+
+      // Generate Export
+      $("#shortlist-master li").each(function(index) {
+        var fishID = $(this).data("id");
+        var metadata = $.jStorage.get("metadata-"+fishID);
+        var shortlist= { 
+          metadata : metadata
+        };
+        $("#shortlist-export-email .modal-body").append( shortlistEmailTemplate( shortlist ));  
+      });
+      
+      $('#shortlist-export-email').modal('show');
+      var link = $("#shortlist-export");
+      var emailSubject = "Your shortlist";
+      //var emailAddress=prompt("Please enter the recipients email address","");
+      //window.location  = "mailto:"+emailAddress+"?Subject="+emailSubject+"&body="+link  
     });
   }
 

@@ -2,8 +2,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
   // Setup global variables
   var resultsList = $("#results ul");
-  var quicksandEnabled = true;
-  var quicksandAnimating = false;
+  var queryAnimationEnabled = true;
+  var queryCurrentlyAnimating = false;
   var quicksandUpdateQueue = [];
   var quicksandList;
     
@@ -56,7 +56,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
     });
 
-    // jQuery UI Slider
+    // Query Sliders (jQuery UI Sliders)
     $(".slider").slider({
       value: 10,
       min: 0,
@@ -70,15 +70,19 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         if(value.toString() !== hiddenField.val().toString()){
           hiddenField.val(value);
           output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
-
-          var tags = {};
-          var filters = {};
-          $("form#fishpond input").each(function(){
-            tags[$(this).data('slug')] = $(this).val();
-          });
-          fishpond.query(tags, filters);
+          sendQuery();
         }
       }
+    });
+
+    // Query Filters
+    $("input[name*='filters']:checkbox").change(function(){
+      sendQuery();
+    });
+
+    // Query Options
+    $("input[name*='options']:checkbox").change(function(){
+      queryAnimationEnabled = this.checked ? false : true;
     });
 
     // Init Shorlists
@@ -99,7 +103,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     quicksandUpdateQueue = []; // Clear update queue
 
     // Clear old results
-    if (quicksandEnabled){
+    if (queryAnimationEnabled){
       quicksandList = $("<ul></ul>");  
     } else {
       resultsList.empty(); 
@@ -118,7 +122,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
           fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
           
-          if (quicksandEnabled && quicksandAnimating){
+          if (queryAnimationEnabled && queryCurrentlyAnimating){
             quicksandUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
           } else {
             fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
@@ -130,7 +134,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     }
 
     // Check for animation/filtering method
-    if (quicksandEnabled) sortResults();
+    if (queryAnimationEnabled) sortResults();
   });
 
 
@@ -177,7 +181,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         };
 
         // Update Results list
-        if (quicksandEnabled){
+        if (queryAnimationEnabled){
           quicksandList.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
         } else {
           resultsList.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
@@ -285,6 +289,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var shortlistMaster = $("#shortlist-master");
     var fishID;
 
+    // Shortlist Options
+    shortlistPrint();
+
+    // Shortlist add/remove
     $("body").on("click", "[data-toggle='shortlist']", function(event){
       event.preventDefault();
 
@@ -320,20 +328,39 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     });
   }
 
+
+  /////////////////////////////////////////
+  // Shortlist Print
+  /////////////////////////////////////////
+  function shortlistPrint() {
+    $("body").on("click", "#shortlist-print", function(event) {
+      event.preventDefault();
+
+      // http://stackoverflow.com/questions/2603465/using-jquery-to-open-a-popup-window-and-print
+
+      //w=window.open();
+      //if(!w)alert('Please enable pop-ups');
+      //w.document.write($('.report_left_inner').html('test'));
+      //w.print();
+      //w.close();
+      console.log("PRINT");
+    });
+  }
+
   /////////////////////////////////////////
   // Sort Results (Quicksand)
   /////////////////////////////////////////
   function sortResults() {
-    quicksandAnimating = true;
+    queryCurrentlyAnimating = true;
     if(resultsList.find("li").length === 0) {
       // On first load populate Quicksand with unsorted results
       resultsList.append(quicksandList.find("li"));
-      quicksandAnimating = false;
+      queryCurrentlyAnimating = false;
     } else {
       resultsList.quicksand(quicksandList.find("li"), {
         // Do nothing
       }, function() {
-        quicksandAnimating = false;
+        queryCurrentlyAnimating = false;
         // Update templates for Fish in Queue once animation has stopped
         $.each(quicksandUpdateQueue, function(index, fishID) {
           fish = fishManager(fishID);
@@ -368,5 +395,25 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       comments.toggle('slow');
     });
   }
+
+  /////////////////////////////////////////
+  // Other Functions
+  /////////////////////////////////////////
+  function sendQuery(){
+    var tags = {};
+    var filters = {};
+    $("form input[name*='tags']").each(function(){
+      tags[$(this).data('slug')] = $(this).val();
+    });
+    $("form input[name*='filters']").each(function(){
+      var value = 0;
+      if(this.checked){
+        value = 1;
+      }
+      filters[$(this).data('slug')] = value;
+    });
+    fishpond.query(tags, filters);
+  }
+
 };
 

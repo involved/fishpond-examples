@@ -116,7 +116,7 @@
           <div class='span2 offset1'>
             <span class='label label-important'>Metadata disabled</span>
             <br />
-            <span class='label label-warning'>Filters to be hooked up</span>
+            <span class='label label-success'>Filters enabled</span>
           </div>
         </div>
       </div>
@@ -134,9 +134,6 @@
                 </div>
               </div>
             </fieldset>
-            <span class='label'>
-              Filters currently not hooked up.
-            </span>
           </form>
         </div>
         <div class='span6 offset1'>
@@ -161,18 +158,9 @@
       //<![CDATA[
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
         
-          fishpond.resultsUpdated(function(results){
-            console.log(results);
-        
-            $(".results li").remove(); // Clear old results
-        
-            for(var i = 0; i < results.length; i++){
-              var li = $("<li></li>");
-              var thumbnail = $("<div></div>");
-              thumbnail.html(results[i].fish.title);
-              li.append(thumbnail);
-              $(".results").append(li);
-            }
+          fishpond.loading(function(percent){
+            $("#loading .progress").removeClass("progress-striped");
+            $("#loading .bar").css({width: (percent * 100) + "%"});
           });
         
           fishpond.ready(function(pond){
@@ -230,21 +218,51 @@
                   var tags = {};
                   var filters = {};
                   $("form#fishpond input").each(function(){
-                    console.error($(this).data('slug'));
+                    //console.error($(this).data('slug'));
                     tags[$(this).data('slug')] = $(this).val();
                   });
-                  fishpond.query(tags, filters);
+                  sendQuery();
                 }
               }
+            });
+        
+            // Filters
+            $("input:checkbox").change(function(){
+              sendQuery();
             });
         
             fishpond.query({}, {});
           });
         
-          fishpond.loading(function(percent){
-            $("#loading .progress").removeClass("progress-striped");
-            $("#loading .bar").css({width: (percent * 100) + "%"});
+          fishpond.resultsUpdated(function(results){
+            //console.log(results);
+        
+            $(".results li").remove(); // Clear old results
+        
+            for(var i = 0; i < results.length; i++){
+              var li = $("<li></li>");
+              var thumbnail = $("<div></div>");
+              thumbnail.html(results[i].fish.title);
+              li.append(thumbnail);
+              $(".results").append(li);
+            }
           });
+        
+          function sendQuery(){
+            var tags = {};
+            var filters = {};
+            $("form input[name*='tags']").each(function(){
+              tags[$(this).data('slug')] = $(this).val();
+            });
+            $("form input[name*='filters']").each(function(){
+              var value = 0;
+              if(this.checked){
+                value = 1;
+              }
+              filters[$(this).data('slug')] = value;
+            });
+            fishpond.query(tags, filters);
+          }
         
         };
       //]]>
