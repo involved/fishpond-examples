@@ -72,7 +72,7 @@ configure :build do
   #
   helpers do
     def link_to(label, link, options = {})
-      if link =~ /^http/
+      if link =~ /^http/ || link =~ /^{{/
         super(label, link, options)
       else
         super(label, File.join("/fishpond-examples", link), options)

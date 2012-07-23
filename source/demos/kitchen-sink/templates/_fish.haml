@@ -1,0 +1,9 @@
+// Fish Template
+%script{:id => "fishTemplate", :type => "text/html"}
+	%li{ :data => { :id => "{{ fish.id }}" }, :class => "{{ status }} span2" }
+		.thumbnail
+			%strong.title {{ fish.title }}      
+			.details
+				{[ if (!_.isEmpty(metadata)) { ]}
+				{{ fishDetailsData }}
+				{[ } ]}
