@@ -314,11 +314,6 @@
     <script id='fishDetailsTemplate' type='text/html'>
       <a data-toggle='modal' href='#'>
         <img alt='{{ metadata.title }}' class='profile' src='{{ metadata.thumbnail_url }}' />
-      <div class='span8'>
-        <p>{{ metadata.description }}</p>
-        <a target="_blank" href="{{ metadata.url }}">Find out more</a>
-        <br />
-        <br />
         {[ if (!_.isEmpty(shortlist)) { ]}
         <a class='btn btn-mini {{ shortlist.shortlistClass }}' data-id='{{ metadata.id }}' data-thumbnail='{{ metadata.thumbnail_url }}' data-title='{{ metadata.title }}' data-toggle='shortlist' href='#'>
           <i class='icon-star'></i>
