@@ -116,14 +116,15 @@
           },
           updater: function (item) {
             var fish = mappedFish[item];
-
-            $("form#fish input:checkbox").removeAttr('checked');
+            console.log(fish);
+            $("form#fishpond input:checkbox").removeAttr('checked');
 
             for( var token in fish.tags ){
               var value = fish.tags[token];
-              $("form#fish .slider[data-target='query[tags][" + token + "]']").slider("value", value);
+              $("form#fishpond input[name='query[tags][" + token + "]']").val(value);
+              $("form#fishpond .slider[data-target='query[tags][" + token + "]']").slider("value", value); // Update jQuery UI sliders positions
               if(value >= 1){
-                $("form#fish input[name='query[filters][" + token + "]']").attr('checked', 'checked');
+                $("form#fishpond input[name='query[filters][" + token + "]']").attr('checked', 'checked');
               }
             }
 
@@ -185,7 +186,7 @@
         var filters = {};
 
         // Search Box
-        $("form#search input").val("");
+        $("form#search input").val(""); // Reset search value
         
         // Sliders
         $("form input[name*='tags']").each(function(){

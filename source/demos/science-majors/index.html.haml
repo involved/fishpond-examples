@@ -17,6 +17,12 @@
     .span5
       .row
         .span5
+          %form#search.form-horizontal
+            .well
+              %fieldset
+                %center
+                  %input.search-query{:type => "text", :class => "span4", :placeholder => "Search by title"}
+
           %form#fishpond.form-horizontal.well
             %h2 Tags
             %fieldset.tags

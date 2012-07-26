@@ -42,7 +42,7 @@
         %br 
         %span.label.label-success Filters enabled
         %br 
-        %span.label.label-warning Search Box [In Dev]
+        %span.label.label-success Search Box enabled
         %br 
         %span.label.label-warning Popularity Sliders [In Dev]
 
@@ -50,6 +50,12 @@
     .span5
       .row
         .span5
+          %form#search.form-horizontal
+            .well
+              %fieldset
+                %center
+                  %input.search-query{:type => "text", :class => "span4", :placeholder => "Search by title"}
+
           %form#fishpond.form-horizontal.well
             %h2 Tags
             %fieldset.tags

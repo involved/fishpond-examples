@@ -56,6 +56,51 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
     });
 
+    // Query Search-box
+    var mappedFish = {};
+    var fishIds = [];
+
+    for(var i = 0; i < pond.fish.length; i++){
+      var fish = pond.fish[i];
+      mappedFish[fish.id] = fish;
+      fishIds.push(fish.id);
+    }
+
+    $("form#search .search-query").typeahead({
+      items: 5,
+      source: fishIds,
+      matcher: function(item){
+        return mappedFish[item].title.score(this.query) > 0.1;
+      },
+      sorter: function(items){
+        var query = this.query;
+        items.sort(function(item1, item2){
+          if(mappedFish[item1].title.score(query) >  mappedFish[item2].title.score(query)) { return -1 };
+          if(mappedFish[item1].title.score(query) == mappedFish[item2].title.score(query)) { return 0  };
+          if(mappedFish[item1].title.score(query) <  mappedFish[item2].title.score(query)) { return 1  };
+        });
+        return items;
+      },
+      highlighter: function(item){
+        return mappedFish[item].title;
+      },
+      updater: function (item) {
+        var fish = mappedFish[item];
+        $("form#fishpond input:checkbox").removeAttr('checked');
+
+        for( var token in fish.tags ){
+          var value = fish.tags[token];
+          $("form#fishpond input[name='query[tags][" + token + "]']").val(value);
+          $("form#fishpond .slider[data-target='query[tags][" + token + "]']").slider("value", value); // Update jQuery UI sliders positions
+          if(value >= 1){
+            $("form#fishpond input[name='query[filters][" + token + "]']").attr('checked', 'checked');
+          }
+        }
+        sendQuery();
+        return fish.title;
+      }
+    });
+
     // Query Sliders (jQuery UI Sliders)
     $(".slider").slider({
       value: 10,
@@ -419,45 +464,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
 
 
-  var shortlist = shortlist || {};
-
-  shortlist = {
-    init: function () {
-    
-    },
-    print: function () {
-
-    },
-    email: function () {
-
-    },
-    reset: function () {
-
-    },
-    list: function () {
-      var list = {};
-      $("#shortlist-master li").each(function(index) {
-        list[index] = $(this).data("id");
-      });
-      
-      $.jStorage.set("shortlist", list);
-      return list;
-    }
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   /////////////////////////////////////////
   // Sort Results (Quicksand)
@@ -514,9 +520,16 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   function sendQuery(){
     var tags = {};
     var filters = {};
+   
+    // Search Box
+    $("form#search input").val("");// Reset search value
+  
+    // Sliders
     $("form input[name*='tags']").each(function(){
       tags[$(this).data('slug')] = $(this).val();
     });
+
+    // Filters
     $("form input[name*='filters']").each(function(){
       var value = 0;
       if(this.checked){
@@ -524,6 +537,11 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       }
       filters[$(this).data('slug')] = value;
     });
+    
+    console.log(tags);
+    console.log(filters);
+    console.log("-----------");
+
     fishpond.query(tags, filters);
   }
 
