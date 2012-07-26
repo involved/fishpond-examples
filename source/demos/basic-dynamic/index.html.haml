@@ -7,14 +7,24 @@
     .span9
       %p
         %strong Powered by: 
-        = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+        %ul
+          %li= link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+          %li= link_to "Twitter Bootstrap Typeahead", "http://twitter.github.com/bootstrap/javascript.html#typeahead", :target => "_blank"
     .span2.offset1
-      %span.label.label-important Metadata disabled
-      %br 
       %span.label.label-success Filters enabled
+      %br 
+      %span.label.label-success Search enabled
+      %br 
+      %span.label.label-important Metadata disabled
 
-.row
+.row.form-and-results
   .span5
+    %form#search.form-horizontal
+      .well
+        %fieldset
+          %center
+            %input.search-query{:type => "text", :class => "span4", :placeholder => "Search by title"}
+
     %form#fishpond.form-horizontal.well
       %h2 Tags
       %fieldset.tags
@@ -76,6 +86,52 @@
           formFilters.append(filterControl);
         });
 
+        // Search
+        var mappedFish = {};
+        var fishIds = [];
+
+        for(var i = 0; i < pond.fish.length; i++){
+          var fish = pond.fish[i];
+          mappedFish[fish.id] = fish;
+          fishIds.push(fish.id);
+        }
+
+        $("form#search .search-query").typeahead({
+          items: 5,
+          source: fishIds,
+          matcher: function(item){
+            return mappedFish[item].title.score(this.query) > 0.1;
+          },
+          sorter: function(items){
+            var query = this.query;
+            items.sort(function(item1, item2){
+              if(mappedFish[item1].title.score(query) >  mappedFish[item2].title.score(query))  {  return -1 };
+              if(mappedFish[item1].title.score(query) == mappedFish[item2].title.score(query))  {  return 0  };
+              if(mappedFish[item1].title.score(query) <  mappedFish[item2].title.score(query))  {  return 1  };
+            });
+            return items;
+          },
+          highlighter: function(item){
+            return mappedFish[item].title;
+          },
+          updater: function (item) {
+            var fish = mappedFish[item];
+
+            $("form#fish input:checkbox").removeAttr('checked');
+
+            for( var token in fish.tags ){
+              var value = fish.tags[token];
+              $("form#fish .slider[data-target='query[tags][" + token + "]']").slider("value", value);
+              if(value >= 1){
+                $("form#fish input[name='query[filters][" + token + "]']").attr('checked', 'checked');
+              }
+            }
+
+            sendQuery();
+            return fish.title;
+          }
+        });
+
         // jQuery UI Slider
         $(".slider").slider({
           value: 10,
@@ -127,9 +183,16 @@
       function sendQuery(){
         var tags = {};
         var filters = {};
+
+        // Search Box
+        $("form#search input").val("");
+        
+        // Sliders
         $("form input[name*='tags']").each(function(){
           tags[$(this).data('slug')] = $(this).val();
         });
+
+        // Filters
         $("form input[name*='filters']").each(function(){
           var value = 0;
           if(this.checked){
