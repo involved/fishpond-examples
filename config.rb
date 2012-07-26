@@ -6,7 +6,7 @@ page "/demos/*", :layout => "demo_layout" do
   @lab_demos = Dir[File.expand_path('../source/lab/demos/*/', __FILE__)].map{ |d| File.basename(d) }
 end
 
-page "/lab/*", :layout => "demo_layout" do
+page "/lab/demos/*", :layout => "demo_layout" do
   @demos = Dir[File.expand_path('../source/demos/*/', __FILE__)].map{ |d| File.basename(d) }
   @lab_demos = Dir[File.expand_path('../source/lab/demos/*/', __FILE__)].map{ |d| File.basename(d) }
 end
@@ -48,6 +48,23 @@ helpers do
   def lab_demo_path(demo_name)
     "/lab/demos/#{demo_name}"
   end
+
+  def title(page_title, page_subtitle = nil)
+    content_for(:title) { page_title }
+  end 
+
+  def body_class(body_class)
+    content_for(:body_class){ body_class }
+  end
+
+  def root_path
+    "/"
+  end
+
+  def api_hardcoded(boolean)
+    content_for(:api_hardcoded){ boolean }
+  end
+
 end
 
 ###

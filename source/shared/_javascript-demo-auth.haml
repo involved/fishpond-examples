@@ -1,0 +1,46 @@
+:javascript
+  $(function(){
+    // Autofill auth form
+    $("#auth form").each(function(){
+      var form = $(this);
+      var apiKeyInput = $("#api_key", form);
+      var pondTokenInput = $("#pond_token", form);
+      apiKeyInput.val(localStorage.getItem("fishpond_api_key"));
+      pondTokenInput.val(localStorage.getItem("fishpond_pond_token"));
+     });
+
+    $("#auth").fadeIn(400);
+    $("#loading").fadeOut(0);
+
+    // Default Authentication setup
+    $("#auth form").submit(function(e){
+      e.preventDefault();
+      var form = $(this);
+      var apiKeyInput = $("#api_key", form);
+      var pondTokenInput = $("#pond_token", form);
+      var apiKey = apiKeyInput.val();
+      var pondToken = pondTokenInput.val();
+      var errors = [];
+
+      if(apiKey.length != 41){
+        errors.push("API key should be 41 characters long");
+      }
+      if(pondToken.length != 6){
+        errors.push("Pond token should be 6 characters long");
+      }
+
+      if(errors.length > 0){
+        alert("There were errors in your authentication: " + errors.join(", "));
+      } else {
+        $("#auth").fadeOut(0);
+        $("#loading").fadeIn(400);
+        localStorage.setItem("fishpond_api_key", apiKey);
+        localStorage.setItem("fishpond_pond_token", pondToken);
+
+        var options = { debug: false };
+        var fishpond = new Fishpond(apiKey, options);
+        setupFishpond(fishpond);
+        fishpond.init(pondToken);
+        }
+    });
+  });

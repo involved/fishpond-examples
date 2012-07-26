@@ -1,6 +1,16 @@
----
-layout: demo_layout_hardcoded
----
+- api_hardcoded true
+- title "Science Majors"
+
+
+- content_for :javascript do 
+  // REQUIRED EXTERNAL JAVASCRIPT
+  = partial "demos/kitchen-sink/templates/base"
+  = javascript_include_tag "vendor/underscore.js"
+  = javascript_include_tag "vendor/jstorage.js"
+  = javascript_include_tag "vendor/jquery.quicksand.js"
+  = javascript_include_tag "demos/kitchen-sink/application.js"
+
+
 
 #query
   .page-header
@@ -144,11 +154,5 @@ layout: demo_layout_hardcoded
       }
 
 
-/////////////////////////////////////////
-// REQUIRED EXTERNAL JAVASCRIPT
-/////////////////////////////////////////
 
-- content_for :javascript do  
-  = partial "demos/kitchen-sink/templates/base"
-  = javascript_include_tag "demos/kitchen-sink/application.js"
 
