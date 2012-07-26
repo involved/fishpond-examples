@@ -61,8 +61,12 @@ helpers do
     "/"
   end
 
-  def api_hardcoded(boolean)
-    content_for(:api_hardcoded){ boolean }
+  def static_api_key(boolean)
+    content_for(:static_api_key){ boolean }
+  end
+
+  def api_hardcoded?
+    return true if content_for?(:static_api_key) == true
   end
 
 end

@@ -14,7 +14,6 @@
     %meta{ :name => "viewport", :content => "width=device-width, maximum-scale=1.0" }/
 
     = javascript_include_tag "plugins.js"
-    
     = stylesheet_link_tag "http://twitter.github.com/bootstrap/assets/css/bootstrap.css"
     = stylesheet_link_tag "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/cupertino/jquery-ui.css"
 
@@ -67,8 +66,7 @@
 
     = yield_content :javascript
 
-
-    - if content_for?(:api_hardcoded)
+    - if api_hardcoded?
       = partial "shared/javascript-demo-hardcoded"
     - else
       = partial "shared/javascript-demo-auth"
