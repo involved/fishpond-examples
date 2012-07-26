@@ -5,6 +5,7 @@
   = partial "demos/kitchen-sink/templates/base"
   = javascript_include_tag "vendor/underscore.js"
   = javascript_include_tag "vendor/jstorage.js"
+  = javascript_include_tag "vendor/jquery.easing.1.3.js"
   = javascript_include_tag "vendor/jquery.quicksand.js"
   = javascript_include_tag "demos/kitchen-sink/application.js"
 
@@ -76,11 +77,15 @@
                 %fieldset.options
                   .control-group
                     .control-label 
-                      
+                      Disable Animation?
                     .controls
                       %label.checkbox
                         %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
-                          Disable Animation?
+                  
+                  .control-group
+                    .control-label 
+                      Animation Easing 
+                      = partial "shared/easing"
       .row
         .span5
           .well    

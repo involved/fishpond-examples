@@ -476,7 +476,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       queryCurrentlyAnimating = false;
     } else {
       resultsList.quicksand(quicksandList.find("li"), {
-        // Do nothing
+        easing: 'easeInOutBounce'
       }, function() {
         queryCurrentlyAnimating = false;
         // Update templates for Fish in Queue once animation has stopped
@@ -486,6 +486,13 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         });
       });
     }
+  }
+
+  function easing(){
+    $("#easing").change(function(){
+      var val = $(this).find(":selected");
+      console.log("easing - " + val);
+    });
   }
 
   /////////////////////////////////////////
@@ -537,10 +544,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       }
       filters[$(this).data('slug')] = value;
     });
-    
-    console.log(tags);
-    console.log(filters);
-    console.log("-----------");
 
     fishpond.query(tags, filters);
   }
