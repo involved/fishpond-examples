@@ -8,7 +8,7 @@
   <head>
     <meta charset='utf-8' />
     <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible' />
-    <title>Fishpond</title>
+    <title>Kitchen Sink | Demo | Fishpond</title>
     <meta content='noindex, nofollow' name='robots' />
     <meta content='' name='keywords' />
     <meta content='width=device-width, maximum-scale=1.0' name='viewport' />
@@ -80,20 +80,20 @@
           }
         
         /* Modal */
-        .modal{
+        .modal.modal-wide{
           width:940px;
           margin-left:-470px;
           top: 40%;
         }
-          .modal-body{
+          .modal.modal-wide .modal-body{
             max-height: 700px;
           }
-            .modal-body.loading{
+            .modal.modal-wide .modal-body.loading{
               background: #fff url(/images/common/loading.gif) no-repeat center center;
               min-height: 200px;
             }
         
-            .modal-body .comment_box{
+            .modal.modal-wide .modal-body .comment_box{
               display: none;
             }
         
@@ -118,7 +118,7 @@
     <div class='navbar navbar-fixed-top'>
       <div class='navbar-inner'>
         <div class='container'>
-          <a class='brand' href='/'>Fishpond Examples</a>
+          <a class='brand' href='/fishpond-examples/'>Fishpond Examples</a>
           <ul class='nav'>
             <li class='dropdown'>
               <a class='dropdown-toggle' data-toggle='dropdown' href='#'>
@@ -129,10 +129,10 @@
                 <li><a href="/fishpond-examples/demos/basic-dynamic">basic-dynamic</a></li>
                 <li><a href="/fishpond-examples/demos/basic-html5">basic-html5</a></li>
                 <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
-                <li><a href="/fishpond-examples/demos/jquery-knob">jquery-knob</a></li>
                 <li><a href="/fishpond-examples/demos/kitchen-sink">kitchen-sink</a></li>
                 <li><a href="/fishpond-examples/demos/science-majors">science-majors</a></li>
-                <li><a href="/fishpond-examples/demos/spider-graph">spider-graph</a></li>
+                <li class='divider'></li>
+                <li><a href="/fishpond-examples/lab/">Labs</a></li>
               </ul>
             </li>
           </ul>
@@ -198,33 +198,33 @@
             <div class='span9'>
               <p>
                 <strong>Powered by:</strong>
-                <ul>
-                  <li>
-                    <a target="_blank" href="http://underscorejs.org/">Underscore JS Templates</a>
-                    (Javascript Templates)
-                  </li>
-                  <li>
-                    <a target="_blank" href="http://www.jstorage.info/">JStorage</a>
-                    (Javascript client-side caching)
-                  </li>
-                  <li>
-                    <a target="_blank" href="http://razorjack.net/quicksand/">jQuery Quicksand Plugin</a>
-                    (Filtering and Animation)
-                  </li>
-                  <li>
-                    <a target="_blank" href="http://disqus.com">Disqus</a>
-                    (Commenting engine)
-                  </li>
-                  <li>
-                    <a target="_blank" href="http://jqueryui.com/demos/slider/">jQuery UI Slider</a>
-                    (Form UI controls)
-                  </li>
-                  <li>
-                    <a target="_blank" href="http://api.jquery.com/deferred.promise/">jQuery Deferred.Promise()</a>
-                    (Allows asynchronous javascript functions)
-                  </li>
-                </ul>
               </p>
+              <ul>
+                <li>
+                  <a target="_blank" href="http://underscorejs.org/">Underscore JS Templates</a>
+                  (Javascript Templates)
+                </li>
+                <li>
+                  <a target="_blank" href="http://www.jstorage.info/">JStorage</a>
+                  (Javascript client-side caching)
+                </li>
+                <li>
+                  <a target="_blank" href="http://razorjack.net/quicksand/">jQuery Quicksand Plugin</a>
+                  (Filtering and Animation)
+                </li>
+                <li>
+                  <a target="_blank" href="http://disqus.com">Disqus</a>
+                  (Commenting engine)
+                </li>
+                <li>
+                  <a target="_blank" href="http://jqueryui.com/demos/slider/">jQuery UI Slider</a>
+                  (Form UI controls)
+                </li>
+                <li>
+                  <a target="_blank" href="http://api.jquery.com/deferred.promise/">jQuery Deferred.Promise()</a>
+                  (Allows asynchronous javascript functions)
+                </li>
+              </ul>
             </div>
             <div class='span2 offset1'>
               <span class='label label-success'>Metadata enabled</span>
@@ -232,6 +232,10 @@
               <span class='label label-success'>Comments enabled</span>
               <br />
               <span class='label label-success'>Filters enabled</span>
+              <br />
+              <span class='label label-success'>Search Box enabled</span>
+              <br />
+              <span class='label label-warning'>Popularity Sliders [In Dev]</span>
             </div>
           </div>
         </div>
@@ -239,6 +243,15 @@
           <div class='span5'>
             <div class='row'>
               <div class='span5'>
+                <form class='form-horizontal' id='search'>
+                  <div class='well'>
+                    <fieldset>
+                      <center>
+                        <input class='search-query span4' placeholder='Search by title' type='text' />
+                      </center>
+                    </fieldset>
+                  </div>
+                </form>
                 <form class='form-horizontal well' id='fishpond'>
                   <h2>Tags</h2>
                   <fieldset class='tags'>
@@ -251,20 +264,72 @@
                       </div>
                     </div>
                   </fieldset>
-                  <h2>Options</h2>
-                  <fieldset class='options'>
-                    <div class='control-group'>
-                      <div class='control-label'></div>
-                      <div class='controls'>
-                        <label class='checkbox'>
-                          <input data-slug='options-animation' id='query_options_animation' name='query[options][animation]' type='checkbox' value='0'>
-                            Disable Animation?
-                          </input>
-                        </label>
+                </form>
+              </div>
+            </div>
+            <div class='row'>
+              <div class='span5'>
+                <div class='well'>
+                  <h3 class='pull-left'>Animation Options</h3>
+                  <div class='row-fluid'>
+                    <div class='span12'>
+                      <div class='form-horizontal'>
+                        <fieldset class='options'>
+                          <div class='control-group'>
+                            <div class='control-label'>
+                              Disable Animation?
+                            </div>
+                            <div class='controls'>
+                              <label class='checkbox'>
+                                <input data-slug='options-animation' id='query_options_animation' name='query[options][animation]' type='checkbox' value='0' />
+                              </label>
+                            </div>
+                          </div>
+                          <div class='control-group'>
+                            <div class='control-label'>
+                              Animation Easing
+                            </div>
+                            <div class='controls'>
+                              <select class='span10' id='easing'>
+                                <option value='easeInQuad'>easeInQuad</option>
+                                <option value='easeOutQuad'>easeOutQuad</option>
+                                <option value='easeInOutQuad'>easeInOutQuad</option>
+                                <option value='easeInCubic'>easeInCubic</option>
+                                <option value='easeOutCubic'>easeOutCubic</option>
+                                <option value='easeInOutCubic'>easeInOutCubic</option>
+                                <option value='easeInQuart'>easeInQuart</option>
+                                <option value='easeOutQuart'>easeOutQuart</option>
+                                <option value='easeInOutQuart'>easeInOutQuart</option>
+                                <option value='easeInQuint'>easeInQuint</option>
+                                <option value='easeOutQuint'>easeOutQuint</option>
+                                <option value='easeInOutQuint'>easeInOutQuint</option>
+                                <option value='easeInSine'>easeInSine</option>
+                                <option value='easeOutSine'>easeOutSine</option>
+                                <option selected='selected' value='easeInOutSine'>easeInOutSine</option>
+                                <option value='easeInExpo'>easeInExpo</option>
+                                <option value='easeOutExpo'>easeOutExpo</option>
+                                <option value='easeInOutExpo'>easeInOutExpo</option>
+                                <option value='easeInCirc'>easeInCirc</option>
+                                <option value='easeOutCirc'>easeOutCirc</option>
+                                <option value='easeInOutCirc'>easeInOutCirc</option>
+                                <option value='easeInElastic'>easeInElastic</option>
+                                <option value='easeOutElastic'>easeOutElastic</option>
+                                <option value='easeInOutElastic'>easeInOutElastic</option>
+                                <option value='easeInBack'>easeInBack</option>
+                                <option value='easeOutBack'>easeOutBack</option>
+                                <option value='easeInOutBack'>easeInOutBack</option>
+                                <option value='easeInBounce'>easeInBounce</option>
+                                <option value='easeOutBounce'>easeOutBounce</option>
+                                <option value='easeInOutBounce'>easeInOutBounce</option>
+                                <option value='jswing'>jswing</option>
+                              </select>
+                            </div>
+                          </div>
+                        </fieldset>
                       </div>
                     </div>
-                  </fieldset>
-                </form>
+                  </div>
+                </div>
               </div>
             </div>
             <div class='row'>
@@ -272,7 +337,7 @@
                 <div class='well'>
                   <h3 class='pull-left'>Shortlisted</h3>
                   <div class='btn-group pull-right'>
-                    <button class='btn dropdown-toggle' data-toggle='dropdown'>
+                    <button class='btn dropdown-toggle disabled' data-toggle='dropdown' id='shortlist-options'>
                       Options
                       <span class='caret'></span>
                     </button>
@@ -286,14 +351,14 @@
                       <li>
                         <a href='#' id='shortlist-email'>
                           <i class='icon-envelope'></i>
-                          Email
+                          Email (ToDo)
                         </a>
                       </li>
                       <li class='divider'></li>
                       <li>
                         <a href='#' id='shortlist-reset'>
                           <i class='icon-trash'></i>
-                          Reset
+                          Reset (ToDo)
                         </a>
                       </li>
                     </ul>
@@ -301,6 +366,34 @@
                   <div class='row-fluid'>
                     <div class='span12'>
                       <ul id='shortlist-master'></ul>
+                    </div>
+                  </div>
+                  <!-- / Shortlist Email Modal -->
+                  <div class='modal hide' id='shortlist-export-email'>
+                    <div class='modal-header'>
+                      <button class='close' data-dismiss='modal'>×</button>
+                      <h3>Confirm Email</h3>
+                    </div>
+                    <div class='modal-body'>
+                      <!-- / Dynamically added -->
+                    </div>
+                    <div class='modal-footer'>
+                      <a class='btn' data-dismiss='modal' href='#'>Cancel</a>
+                      <a class='btn btn-primary' href='#' id='shortlist-email-confirm'>Email</a>
+                    </div>
+                  </div>
+                  <!-- / Shortlist Print Modal -->
+                  <div class='modal hide' id='shortlist-export-print'>
+                    <div class='modal-header'>
+                      <button class='close' data-dismiss='modal'>×</button>
+                      <h3>Confirm Print</h3>
+                    </div>
+                    <div class='modal-body'>
+                      <!-- / Dynamically added -->
+                    </div>
+                    <div class='modal-footer'>
+                      <a class='btn' data-dismiss='modal' href='#'>Cancel</a>
+                      <a class='btn btn-primary' data-dismiss='modal' href='#' id='shortlist-print-confirm'>Print</a>
                     </div>
                   </div>
                 </div>
@@ -314,15 +407,12 @@
             </div>
           </div>
         </div>
-        <div class='modal hide' id='emptyModal'>
+        <div class='modal modal-wide hide' id='emptyModal'>
           <div class='modal-body loading'>
             <!-- / Empty -->
           </div>
         </div>
       </div>
-      <!-- //////////////////////////////////////// -->
-      <!-- / REQUIRED EXTERNAL JAVASCRIPT -->
-      <!-- //////////////////////////////////////// -->
     </div>
     <div class='container'>
       <hr />
@@ -330,15 +420,14 @@
         &copy; iFish 2012
       </footer>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/fishdpond-examples/javascripts/vendor/jquery-1.7.2.min.js" type="text/javascript"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js" type="text/javascript"></script>
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-typeahead.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
     <script src="/fishdpond-examples/javascripts/vendor/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
-    <script src="/fishdpond-examples/javascripts/vendor/jstorage.js" type="text/javascript"></script>
-    <script src="/fishdpond-examples/javascripts/vendor/underscore.js" type="text/javascript"></script>
-    <script src="/fishdpond-examples/javascripts/vendor/jquery.quicksand.js" type="text/javascript"></script>
+    <!-- / REQUIRED EXTERNAL JAVASCRIPT -->
     <!-- //////////////////////////////////////// -->
     <!-- / JAVASCRIPT TEMPLATES -->
     <!-- / Powered by Underscore.js 'Templates' -->
@@ -442,55 +531,81 @@
         </a>
       </li>
     </script>
+    <!-- / Shortlist Email -->
+    <script id='shortlistEmail' type='text/html'>
+      <div class='row-fluid' data-id='{{ metadata.id }}'>
+        <div class='span12'>
+          <h3>{{ metadata.title }}</h3>
+          <p>{{ metadata.description }}</p>
+          <a href="{{ metadata.url }}">{{ metadata.url }}</a>
+          <hr />
+        </div>
+      </div>
+    </script>
+    <!-- / Shortlist Print -->
+    <script id='shortlistPrint' type='text/html'>
+      <div class='row-fluid' data-id='{{ metadata.id }}'>
+        <div class='span12'>
+          <h3>{{ metadata.title }}</h3>
+          <p>{{ metadata.description }}</p>
+          <a href="{{ metadata.url }}">{{ metadata.url }}</a>
+          <hr />
+        </div>
+      </div>
+    </script>
+    <script src="/fishdpond-examples/javascripts/vendor/underscore.js" type="text/javascript"></script>
+    <script src="/fishdpond-examples/javascripts/vendor/jstorage.js" type="text/javascript"></script>
+    <script src="/fishdpond-examples/javascripts/vendor/jquery.easing.1.3.js" type="text/javascript"></script>
+    <script src="/fishdpond-examples/javascripts/vendor/jquery.quicksand.js" type="text/javascript"></script>
     <script src="/fishdpond-examples/javascripts/demos/kitchen-sink/application.js" type="text/javascript"></script>
     <script type='text/javascript'>
-      //<![CDATA[
-        $(function(){
-          // Autofill auth form
-          $("#auth form").each(function(){
-            var form = $(this);
-            var apiKeyInput = $("#api_key", form);
-            var pondTokenInput = $("#pond_token", form);
-            apiKeyInput.val(localStorage.getItem("fishpond_api_key"));
-            pondTokenInput.val(localStorage.getItem("fishpond_pond_token"));
-           });
-        
-          $("#auth").fadeIn(400);
-          $("#loading").fadeOut(0);
-        
-          // Default Authentication setup
-          $("#auth form").submit(function(e){
-            e.preventDefault();
-            var form = $(this);
-            var apiKeyInput = $("#api_key", form);
-            var pondTokenInput = $("#pond_token", form);
-            var apiKey = apiKeyInput.val();
-            var pondToken = pondTokenInput.val();
-            var errors = [];
-        
-            if(apiKey.length != 41){
-              errors.push("API key should be 41 characters long");
-            }
-            if(pondToken.length != 6){
-              errors.push("Pond token should be 6 characters long");
-            }
-        
-            if(errors.length > 0){
-              alert("There were errors in your authentication: " + errors.join(", "));
-            } else {
-              $("#auth").fadeOut(0);
-              $("#loading").fadeIn(400);
-              localStorage.setItem("fishpond_api_key", apiKey);
-              localStorage.setItem("fishpond_pond_token", pondToken);
-        
-              var options = { debug: false };
-              var fishpond = new Fishpond(apiKey, options);
-              setupFishpond(fishpond);
-              fishpond.init(pondToken);
-              }
-          });
-        });
-      //]]>
-    </script>
+  //<![CDATA[
+    $(function(){
+      // Autofill auth form
+      $("#auth form").each(function(){
+        var form = $(this);
+        var apiKeyInput = $("#api_key", form);
+        var pondTokenInput = $("#pond_token", form);
+        apiKeyInput.val(localStorage.getItem("fishpond_api_key"));
+        pondTokenInput.val(localStorage.getItem("fishpond_pond_token"));
+       });
+    
+      $("#auth").fadeIn(400);
+      $("#loading").fadeOut(0);
+    
+      // Default Authentication setup
+      $("#auth form").submit(function(e){
+        e.preventDefault();
+        var form = $(this);
+        var apiKeyInput = $("#api_key", form);
+        var pondTokenInput = $("#pond_token", form);
+        var apiKey = apiKeyInput.val();
+        var pondToken = pondTokenInput.val();
+        var errors = [];
+    
+        if(apiKey.length != 41){
+          errors.push("API key should be 41 characters long");
+        }
+        if(pondToken.length != 6){
+          errors.push("Pond token should be 6 characters long");
+        }
+    
+        if(errors.length > 0){
+          alert("There were errors in your authentication: " + errors.join(", "));
+        } else {
+          $("#auth").fadeOut(0);
+          $("#loading").fadeIn(400);
+          localStorage.setItem("fishpond_api_key", apiKey);
+          localStorage.setItem("fishpond_pond_token", pondToken);
+    
+          var options = { debug: false };
+          var fishpond = new Fishpond(apiKey, options);
+          setupFishpond(fishpond);
+          fishpond.init(pondToken);
+          }
+      });
+    });
+  //]]>
+</script>
   </body>
 </html>

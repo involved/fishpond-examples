@@ -69,6 +69,10 @@ helpers do
     return true if content_for?(:static_api_key) == true
   end
 
+  def root_path
+    "/"
+  end
+
 end
 
 ###
@@ -112,5 +116,10 @@ configure :build do
     def asset_url(path, prefix = nil)
       File.join "/fishdpond-examples", super(path, prefix)
     end
+
+    def root_path
+      "/fishpond-examples/"
+    end
+    
   end
 end

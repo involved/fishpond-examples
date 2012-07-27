@@ -8,7 +8,7 @@
   <head>
     <meta charset='utf-8' />
     <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible' />
-    <title>Basic (Static) | Demo | Fishpond</title>
+    <title>Fishpond Demos</title>
     <meta content='noindex, nofollow' name='robots' />
     <meta content='' name='keywords' />
     <meta content='width=device-width, maximum-scale=1.0' name='viewport' />
@@ -104,92 +104,66 @@
     </div>
     <div class='container hide' id='demo'>
       <div class='page-header'>
-  <h1>Basic (Static) Demo</h1>
-  <br />
-  <div class='row'>
-    <div class='span9'>
-      <div class='alert alert-error'>
-        <strong>Note:</strong>
-        The form for this demo has been hardcoded for demonstration purposes. Results filtering will only work with the 'Science Majors' pond `uhEHwd`.
+        <h1>Spider Graph Demo</h1>
+        <br />
+        <div class='row'>
+          <div class='span9'>
+            <p>
+              <strong>Powered by:</strong>
+              <a target="_blank" href="https://github.com/jmstriegel/jquery.spidergraph">Spidergraph</a>
+              jQuery Plugin by
+              <a target="_blank" href="https://github.com/jmstriegel">jmstriegel</a>
+              <br />
+              <strong>Requires:</strong>
+              Canvas capable
+              <a target="_blank" href="http://caniuse.com/#feat=canvas">browser</a>
+              <br />
+              <span class='label label-info'>iOS compatible</span>
+            </p>
+          </div>
+          <div class='span2 offset1'>
+            <span class='label label-important'>Metadata disabled</span>
+            <br />
+            <span class='label label-important'>Filters disabled</span>
+          </div>
+        </div>
       </div>
-      <p>
-        <strong>Powered by:</strong>
-        <a target="_blank" href="http://jqueryui.com/demos/slider/">jQuery UI Slider</a>
-      </p>
-    </div>
-    <div class='span2 offset1'>
-      <span class='label label-important'>Metadata disabled</span>
-      <br />
-      <span class='label label-important'>Filters disabled</span>
-    </div>
-  </div>
-</div>
-<div class='row'>
-  <div class='span5'>
-    <div class='well'>
-      <h2>Tags</h2>
-      <form class='form-horizontal'>
-        <fieldset>
-          <div class='control-group'>
-            <label class='control-label'>Quantitative (10)</label>
-            <div class='controls'>
-              <input data-slug='quantitative' id='query_tags_quantitative' name='query[tags][quantitative]' type='hidden' value='10' />
-              <div class='slider span2' data-target='query[tags][quantitative]'></div>
+      <section id='query'>
+        <div class='row'>
+          <div class='span7'>
+            <div class='well'>
+              <h2>Tags</h2>
+              <div class='span6'>
+                <div id='radar'></div>
+                <br />
+                <br />
+                <h2>Filters</h2>
+                <span class='label'>
+                  Filters not included in this demo
+                </span>
+              </div>
             </div>
           </div>
-          <div class='control-group'>
-            <label class='control-label'>Biological (10)</label>
-            <div class='controls'>
-              <input data-slug='biological' id='query_tags_biological' name='query[tags][biological]' type='hidden' value='10' />
-              <div class='slider span2' data-target='query[tags][biological]'></div>
-            </div>
+          <div class='span4 offset1'>
+            <h2>Results</h2>
+            <ul class='thumbnails results'></ul>
           </div>
-          <div class='control-group'>
-            <label class='control-label'>Pure (10)</label>
-            <div class='controls'>
-              <input data-slug='pure' id='query_tags_pure' name='query[tags][pure]' type='hidden' value='10' />
-              <div class='slider span2' data-target='query[tags][pure]'></div>
-            </div>
-          </div>
-          <div class='control-group'>
-            <label class='control-label'>Indoors (10)</label>
-            <div class='controls'>
-              <input data-slug='indoors' id='query_tags_indoors' name='query[tags][indoors]' type='hidden' value='10' />
-              <div class='slider span2' data-target='query[tags][indoors]'></div>
-            </div>
-          </div>
-          <div class='control-group'>
-            <label class='control-label'>Dunno (10)</label>
-            <div class='controls'>
-              <input data-slug='dunno' id='query_tags_dunno' name='query[tags][dunno]' type='hidden' value='10' />
-              <div class='slider span2' data-target='query[tags][dunno]'></div>
-            </div>
-          </div>
-        </fieldset>
-        <h2>Filters</h2>
-        <fieldset class='filters'>
-          <div class='control-group'>
-            <div class='control-label'>
-              Only show:
-            </div>
-            <div class='controls'>
-              <label class='checkbox'>
-                <input data-slug='maths-prerequisite' id='query_filter_sgH' name='query[filters][sgH]' type='checkbox' value='0'>Maths Prerequisite</input>
-              </label>
-            </div>
-          </div>
-          <span class='label'>
-            Filters not included in this demo
-          </span>
-        </fieldset>
-      </form>
-    </div>
-  </div>
-  <div class='span6 offset1'>
-    <h2>Results</h2>
-    <ul class='results'></ul>
-  </div>
-</div>
+        </div>
+      </section>
+      <style type='text/css'>
+        /*<![CDATA[*/
+          .well{
+            overflow: auto
+            }
+            #radar{
+              position: relative;;
+              height: 500px;
+            }
+          .results{
+            min-height: 550px;
+            }
+        /*]]>*/
+      </style>
     </div>
     <div class='container'>
       <hr />
@@ -204,9 +178,15 @@
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-typeahead.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
     <script src="/fishdpond-examples/javascripts/vendor/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
+    <script src="https://raw.github.com/jmstriegel/jquery.spidergraph/master/assets/js/jquery.spidergraph.js" type="text/javascript"></script>
     <script type='text/javascript'>
       //<![CDATA[
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+          
+          // Spidergraph Array Variables
+          var tagValues = [];
+          var tagList = [];
+          
         
           fishpond.resultsUpdated(function(results){
             //console.log(results);
@@ -220,12 +200,41 @@
               li.append(thumbnail);
               $(".results").append(li);
             }
+        
           });
         
           fishpond.ready(function(pond){
             $("#loading").fadeOut(0);
             $("#demo").fadeIn(400);
-            $("#demo h1").append(' "' + pond.name + '"');
+            $("#demo h1").append(' "' + pond.name + '"');       
+            
+            // Create Array for Spidergraph
+            $.each(pond.tag_ids, function(name, token){
+              tagList.push(name);
+              tagValues.push(10); // Inital value
+            });
+        
+            spidergraph(tagList, tagValues);
+           
+            // Dynamically Generate Form Controls
+            var form = $("form fieldset");
+            var controlGroup;
+        
+            $.each(pond.tag_ids, function(name, token){ 
+              controlGroup = $("" +
+                "<div class='control-group'>" +
+                  "<label class='control-label'>" +
+                    name + " <output>(6)</output>" +
+                  "</label>" +
+                  "<div class='controls'>" +
+                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='10'>" +
+                    "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+                  "</div>" +
+                "</div>");
+        
+              form.append(controlGroup);
+            });
+        
             fishpond.query({}, {});
           });
         
@@ -234,36 +243,39 @@
             $("#loading .bar").css({width: (percent * 100) + "%"});
           });
         
-          $(".slider").slider({
-            value: 10,
-            min: 0,
-            max: 20,
-            step: 1,
-            slide: function(e, ui){
-              var label = $(this).parents('.control-group').find('label');
-              var hiddenField = $("input[name='" + $(this).data('target') + "']");
-              var value = ui['value'];
         
-              if(value.toString() != hiddenField.val().toString()){
-                hiddenField.val(value);
-                label.html(label.html().split("(")[0] + " (" + value.toString() + ")");
+          function spidergraph(tagList, tagValues){   
+            $('#radar').spidergraph({
+                'fields': tagList,
+                'strokewidth': 2,
+                'handlewidth': 4,
+                'increments': 20,
+                'minrad': 0,
+                'gridcolor': 'rgba(20,20,20,1)'   
+            });
+            
+            $('#radar').spidergraph('resetdata');
+            
+            $('#radar').spidergraph('setactivedata', { 
+              'strokecolor': 'rgba(0, 41, 199,0.8)',
+              'fillcolor': 'rgba(10,77,255,0.6)',
+              'data': tagValues
+            });
         
-                var tags = {};
-                var filters = {};
-                $("form input").each(function(){
-                  tags[$(this).data('slug')] = $(this).val();
-                });
-                fishpond.query({
-                  quantitative: $("#query_tags_quantitative").val(),
-                  biological: $("#query_tags_biological").val(),
-                  pure: $("#query_tags_pure").val(),
-                  indoors: $("#query_tags_indoors").val(),
-                  dunno: $("#query_tags_dunno").val()
-                },
-                {/* no filters, yet */});
-              }
-            }
-          });
+            $('#radar').bind('spiderdatachange', function( ev, data ) {
+              var tags = {};
+              var filters = {};
+              var new_value;
+        
+              $.each(data, function(index, value) { 
+                console.log(tagList[index] + ': ' + value); 
+        
+                tags[tagList[index]] = value;
+              });
+        
+              fishpond.query(tags, filters);
+            });
+          }
         };
       //]]>
     </script>
