@@ -1,3 +1,14 @@
+- title "Kitchen Sink"
+
+- content_for :javascript do 
+  // REQUIRED EXTERNAL JAVASCRIPT
+  = partial "demos/kitchen-sink/templates/base"
+  = javascript_include_tag "vendor/underscore.js"
+  = javascript_include_tag "vendor/jstorage.js"
+  = javascript_include_tag "vendor/jquery.easing.1.3.js"
+  = javascript_include_tag "vendor/jquery.quicksand.js"
+  = javascript_include_tag "demos/kitchen-sink/application.js"
+
 #query
   .page-header
     %h1 Kitchen Sink - Demo
@@ -6,25 +17,25 @@
       .span9
         %p
           %strong Powered by:
-          %ul
-            %li 
-              = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
-              (Javascript Templates)
-            %li
-              = link_to "JStorage", "http://www.jstorage.info/", :target => "_blank"
-              (Javascript client-side caching)
-            %li
-              = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
-              (Filtering and Animation)
-            %li
-              = link_to "Disqus", "http://disqus.com", :target => "_blank"
-              (Commenting engine)
-            %li
-              = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
-              (Form UI controls)
-            %li
-              = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
-              (Allows asynchronous javascript functions)
+        %ul
+          %li 
+            = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
+            (Javascript Templates)
+          %li
+            = link_to "JStorage", "http://www.jstorage.info/", :target => "_blank"
+            (Javascript client-side caching)
+          %li
+            = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
+            (Filtering and Animation)
+          %li
+            = link_to "Disqus", "http://disqus.com", :target => "_blank"
+            (Commenting engine)
+          %li
+            = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+            (Form UI controls)
+          %li
+            = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
+            (Allows asynchronous javascript functions)
       .span2.offset1
         %span.label.label-success Metadata enabled
         %br 
@@ -32,7 +43,7 @@
         %br 
         %span.label.label-success Filters enabled
         %br 
-        %span.label.label-warning Search Box [In Dev]
+        %span.label.label-success Search Box enabled
         %br 
         %span.label.label-warning Popularity Sliders [In Dev]
 
@@ -40,6 +51,12 @@
     .span5
       .row
         .span5
+          %form#search.form-horizontal
+            .well
+              %fieldset
+                %center
+                  %input.search-query{:type => "text", :class => "span4", :placeholder => "Search by title"}
+
           %form#fishpond.form-horizontal.well
             %h2 Tags
             %fieldset.tags
@@ -54,17 +71,23 @@
       .row
         .span5
           .well    
-            %h3.pull-left Options
+            %h3.pull-left Animation Options
             .row-fluid
               .span12
-                %fieldset.options
-                  .control-group
-                    .control-label 
-                      
-                    .controls
-                      %label.checkbox
-                        %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
-                          Disable Animation?
+                .form-horizontal
+                  %fieldset.options
+                    .control-group
+                      .control-label 
+                        Disable Animation?
+                      .controls
+                        %label.checkbox
+                          %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
+                    
+                    .control-group
+                      .control-label 
+                        Animation Easing
+                      .controls
+                        = partial "shared/easing"
       .row
         .span5
           .well    
@@ -81,15 +104,40 @@
                 %li
                   %a{:href => "#", :id => "shortlist-email"}
                     %i.icon-envelope
-                    Email
+                    Email (ToDo)
                 %li.divider
                 %li
                   %a{:href => "#", :id => "shortlist-reset"}
                     %i.icon-trash
-                    Reset
+                    Reset (ToDo)
             .row-fluid
               .span12
                 %ul#shortlist-master
+
+            // Shortlist Email Modal
+            #shortlist-export-email.modal.hide
+              .modal-header
+                %button.close{"data-dismiss" => "modal"} ×
+                %h3 Confirm Email
+              .modal-body
+                // Dynamically added
+              .modal-footer
+                %a.btn{"data-dismiss" => "modal", :href => "#"} Cancel
+                %a.btn.btn-primary{:href => "#", :id => "shortlist-email-confirm"} Email
+
+
+            // Shortlist Print Modal 
+            #shortlist-export-print.modal.hide
+              .modal-header
+                %button.close{"data-dismiss" => "modal"} ×
+                %h3 Confirm Print
+              .modal-body
+                // Dynamically added
+              .modal-footer
+                %a.btn{"data-dismiss" => "modal", :href => "#"} Cancel
+                %a.btn.btn-primary{"data-dismiss" => "modal", :href => "#", :id => "shortlist-print-confirm"} Print
+
+
 
     .span6.offset1
       %h2 Results
@@ -98,7 +146,7 @@
 
 
 
-  #emptyModal.modal.hide
+  #emptyModal.modal.modal-wide.hide
     .modal-body.loading
       // Empty
 
@@ -158,20 +206,20 @@
       }
 
     /* Modal */
-    .modal{
+    .modal.modal-wide{
       width:940px;
       margin-left:-470px;
       top: 40%;
     }
-      .modal-body{
+      .modal.modal-wide .modal-body{
         max-height: 700px;
       }
-        .modal-body.loading{
+        .modal.modal-wide .modal-body.loading{
           background: #fff url(/images/common/loading.gif) no-repeat center center;
           min-height: 200px;
         }
 
-        .modal-body .comment_box{
+        .modal.modal-wide .modal-body .comment_box{
           display: none;
         }
 
@@ -189,15 +237,3 @@
         margin-bottom: 10px;
         overflow: hidden;
       }
-
-
-/////////////////////////////////////////
-// REQUIRED EXTERNAL JAVASCRIPT
-/////////////////////////////////////////
-- content_for :javascript do
-  = javascript_include_tag "vendor/jstorage.js"
-  = javascript_include_tag "vendor/underscore.js"
-  = javascript_include_tag "vendor/jquery.quicksand.js"
-  
-  = partial "demos/kitchen-sink/templates/base"
-  = javascript_include_tag "demos/kitchen-sink/application.js"

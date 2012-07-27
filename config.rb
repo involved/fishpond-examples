@@ -3,15 +3,20 @@
 ###
 page "/demos/*", :layout => "demo_layout" do
   @demos = Dir[File.expand_path('../source/demos/*/', __FILE__)].map{ |d| File.basename(d) }
+  @lab_demos = Dir[File.expand_path('../source/lab/demos/*/', __FILE__)].map{ |d| File.basename(d) }
 end
 
-page "/" do
+page "/lab/demos/*", :layout => "demo_layout" do
   @demos = Dir[File.expand_path('../source/demos/*/', __FILE__)].map{ |d| File.basename(d) }
+  @lab_demos = Dir[File.expand_path('../source/lab/demos/*/', __FILE__)].map{ |d| File.basename(d) }
 end
 
-page "/search/" do
+page "/*" do
   @demos = Dir[File.expand_path('../source/demos/*/', __FILE__)].map{ |d| File.basename(d) }
+  @lab_demos = Dir[File.expand_path('../source/lab/demos/*/', __FILE__)].map{ |d| File.basename(d) }
 end
+
+
 
 # Per-page layout changes:
 # 
@@ -39,6 +44,31 @@ helpers do
   def demo_path(demo_name)
     "/demos/#{demo_name}"
   end
+
+  def lab_demo_path(demo_name)
+    "/lab/demos/#{demo_name}"
+  end
+
+  def title(page_title, page_subtitle = nil)
+    content_for(:title) { page_title }
+  end 
+
+  def body_class(body_class)
+    content_for(:body_class){ body_class }
+  end
+
+  def root_path
+    "/"
+  end
+
+  def static_api_key(boolean)
+    content_for(:static_api_key){ boolean }
+  end
+
+  def api_hardcoded?
+    return true if content_for?(:static_api_key) == true
+  end
+
 end
 
 ###

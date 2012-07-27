@@ -1,0 +1,10 @@
+:javascript
+	$(function(){
+		$("#loading").hide().fadeIn(400);
+		var apiKey = "01DiXO8l2oDfXa6VFQRR2M5Gkf1hNWmScLLPZIQcs";
+		var pondToken = "uhEHwd";
+		var options = { debug: false };
+		var fishpond = new Fishpond(apiKey, options);
+		setupFishpond(fishpond);
+		fishpond.init(pondToken);
+	});

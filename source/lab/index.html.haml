@@ -1,0 +1,11 @@
+.page-header
+	%h1 
+		Demo Labs
+		%small (Expertimental &amp; proof-of-concept demos)
+
+.row
+	.span12
+		%ul
+			- @lab_demos.each do |demo|
+				%li= link_to demo, lab_demo_path(demo)
+   

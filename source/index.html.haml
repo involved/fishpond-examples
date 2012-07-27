@@ -1,3 +1,61 @@
+- title "Demos"
+- body_class "homepage"
+
+.page-header
+	%h1 Demos
+
+.row
+	.span12
+		%ul
+			- @demos.each do |demo|
+				%li= link_to demo, demo_path(demo)
+
+%br
+%br
+%br
+%br
+
+.page-header
+	%h2 Changelog
+
+%h3= link_to "26-07-2012", "https://github.com/involved/fishpond-examples/pull/7", :target => "_blank"
 %ul
-  - @demos.each do |demo|
-    %li= link_to demo, demo_path(demo)
+	%li Added Search Box functionality - [KS, SM, BD]
+	%li Updated Shortlist Print implementation - [KS]
+	%li Added 'Animation Easing Library' (Can now choose from dropdown) - [KS]
+	%li Added 'Changelog' to demos' homepage.
+	%li Created 'Labs' for experimental demos.
+	%li Minor changes to all demo's template.
+	%li Lots of Javascript refactoring. 
+
+%h3= link_to "23-07-2012", "https://github.com/involved/fishpond-examples/pull/6", :target => "_blank"
+%ul
+	%li Filters Hooked up [KS, SM, BD]
+	%li IE7+ javascript compatibility [KS, SM]
+	%li An options box: 'disable animations'. More for development purposes but thought it would be a good one to have in the kitchen-sink.
+	%li Print shortlist: Current implementation is super basic (and a bit alert buggy). I'm currently working on a refined TBS modal nicer version that formats the data much better. The 'email' shortlist will work that same as the 'print' and will be implemented once I refine the print function.
+	%li Javascript abstraction: For the [KS, SM] demos they both run off the same Javascript and templates files.
+	%li 'ZigZag' results [SM]. This was a test in preparation for the library version. Currently uses CSS3 :nth-child selectors.
+
+-#
+	%h3= link_to "16-07-2012", "https://github.com/involved/fishpond-examples/pull/5", :target => "_blank"
+	%ul
+		%li Added a stand alone demo with embedded API key/pondID. [SM]
+		%li Removed a bunch of the earlier experimental demos
+
+
+%br
+%br
+%br
+%h5 Legend
+%small 
+	[KS] =
+	= link_to "Kitchen Sink Demo", demo_path("kitchen-sink")
+%br
+%small 
+	[SM] =
+	= link_to "Science Majors Demo", demo_path("science-majors")
+%br
+%small
+	[BD] =
+	= link_to "Basic Dynamic Demo", demo_path("basic-dynamic")

@@ -10,3 +10,5 @@
           %ul.dropdown-menu
             - @demos.each do |demo|
               %li= link_to demo, demo_path(demo)
+            %li.divider
+            %li= link_to "Labs", "/lab/";
