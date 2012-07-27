@@ -2,11 +2,17 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
   // Setup global variables
   var resultsList = $("#results ul");
-  var queryAnimationEnabled = true;
-  var queryCurrentlyAnimating = false;
   var fishUpdateQueue = [];
-  var quicksandList;
-    
+
+  var queryAnimation = {
+    enabled       : true,
+    duration      : 1000,
+    easingMethod  : _.isElement($("#easing")) ? $("#easing").find(":selected").val() : "easeInOutSine",
+    // Do not edit options below
+    list          : $("<ul></ul>"),
+    inProgress    : false
+  }
+
   // Changes underscore.js tenplate settings to use moustache syntax
   _.templateSettings = {
     evaluate : /\{\[([\s\S]+?)\]\}/g,
@@ -55,6 +61,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       };
       $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
     });
+
+    ///////////////////
+    // Query UI
+    ///////////////////
 
     // Query Search-box
     var mappedFish = {};
@@ -125,10 +135,25 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       sendQuery();
     });
 
+    //////////////////
     // Query Options
+    //////////////////
+
+    // Disable animation
     $("input[name*='options']:checkbox").change(function(){
-      queryAnimationEnabled = this.checked ? false : true;
+      queryAnimation.enabled = this.checked ? false : true;
     });
+
+    // Change easing method
+    $("#easing").change(function(){
+      queryAnimation.easingMethod = $(this).find(":selected").val().toString();
+    });
+
+
+
+    ////////////////////
+    // Listeners
+    ////////////////////
 
     // Init Shorlists
     shortlistListener();
@@ -148,8 +173,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     fishUpdateQueue = []; // Clear update queue
 
     // Clear old results
-    if (queryAnimationEnabled){
-      quicksandList = $("<ul></ul>");  
+    if (queryAnimation.enabled){
+      queryAnimation.list.empty();// = $("<ul></ul>");  
     } else {
       resultsList.empty(); 
     }
@@ -167,7 +192,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
           fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
           
-          if (queryAnimationEnabled && queryCurrentlyAnimating){
+          if (queryAnimation.enabled && queryAnimation.inProgress){
             fishUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
           } else {
             fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
@@ -179,7 +204,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     }
 
     // Check for animation/filtering method
-    if (queryAnimationEnabled) sortResults();
+    if (queryAnimation.enabled) sortResults();
   });
 
 
@@ -226,8 +251,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         };
 
         // Update Results list
-        if (queryAnimationEnabled){
-          quicksandList.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
+        if (queryAnimation.enabled){
+          queryAnimation.list.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
         } else {
           resultsList.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
         }
@@ -469,16 +494,17 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Sort Results (Quicksand)
   /////////////////////////////////////////
   function sortResults() {
-    queryCurrentlyAnimating = true;
+    queryAnimation.inProgress = true;
     if(resultsList.find("li").length === 0) {
       // On first load populate Quicksand with unsorted results
-      resultsList.append(quicksandList.find("li"));
-      queryCurrentlyAnimating = false;
+      resultsList.append(queryAnimation.list.find("li"));
+      queryAnimation.inProgress = false;
     } else {
-      resultsList.quicksand(quicksandList.find("li"), {
-        easing: 'easeInOutBounce'
+      resultsList.quicksand(queryAnimation.list.find("li"), {
+        easing: queryAnimation.easingMethod,
+        duration: queryAnimation.duration
       }, function() {
-        queryCurrentlyAnimating = false;
+        queryAnimation.inProgress = false;
         // Update templates for Fish in Queue once animation has stopped
         $.each(fishUpdateQueue, function(index, fishID) {
           fish = fishManager(fishID);
@@ -488,12 +514,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     }
   }
 
-  function easing(){
-    $("#easing").change(function(){
-      var val = $(this).find(":selected");
-      console.log("easing - " + val);
-    });
-  }
 
   /////////////////////////////////////////
   // Comments Manager (Disqus)
