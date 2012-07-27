@@ -433,16 +433,17 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       
       $('#shortlist-export-print').modal('show');
 
-      $("body").on("click", "#shortlist-print-confirm", function(event) {
-        console.log("Print confirm");
+    });
 
-        w = window.open( '', "Shortlist", "menubar=0,location=0,height=700,width=700" );
-        if(!w)alert('Please enable pop-ups');
-        $('#shortlist-export-print .modal-body').clone().appendTo( w.document.body );
-        w.print();
-        w.close();
+    $("body").on("click", "#shortlist-print-confirm", function(event) {
+      console.log("Print confirm");
 
-      });
+      var w = window.open( '', "Shortlist", "menubar=0,location=0,height=700,width=700" );
+      if(!w)alert('Please enable pop-ups');
+      $('#shortlist-export-print .modal-body').clone().appendTo( w.document.body );
+      w.print();
+      w.close();
+
     });
   }
 

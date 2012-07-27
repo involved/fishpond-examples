@@ -102,12 +102,12 @@
                 %li
                   %a{:href => "#", :id => "shortlist-email"}
                     %i.icon-envelope
-                    Email
+                    Email (ToDo)
                 %li.divider
                 %li
                   %a{:href => "#", :id => "shortlist-reset"}
                     %i.icon-trash
-                    Reset
+                    Reset (ToDo)
             .row-fluid
               .span12
                 %ul#shortlist-master
@@ -133,7 +133,7 @@
                 // Dynamically added
               .modal-footer
                 %a.btn{"data-dismiss" => "modal", :href => "#"} Cancel
-                %a.btn.btn-primary{:href => "#", :id => "shortlist-print-confirm"} Print
+                %a.btn.btn-primary{"data-dismiss" => "modal", :href => "#", :id => "shortlist-print-confirm"} Print
 
 
 
