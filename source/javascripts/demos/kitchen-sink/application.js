@@ -11,7 +11,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     // Do not edit options below
     list          : $("<ul></ul>"),
     inProgress    : false
-  }
+  };
 
   // Changes underscore.js tenplate settings to use moustache syntax
   _.templateSettings = {
