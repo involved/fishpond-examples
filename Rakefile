@@ -29,7 +29,7 @@ task :publish do
   commands << 'git pull origin gh-pages'
   commands << 'rm .git/index'
   commands << 'git clean -fdx'
-  commands << 'git checkout master /build'
+  commands << 'git checkout master build'
   commands << 'mv build/* ./'
   commands << 'rmdir build'
   commands << 'git add .'
