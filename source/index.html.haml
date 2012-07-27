@@ -21,10 +21,12 @@
 %h3= link_to "26-07-2012", "https://github.com/involved/fishpond-examples/pull/7", :target => "_blank"
 %ul
 	%li Added Search Box functionality - [KS, SM, BD]
-	%li Added 'Changelog' to homepage.
+	%li Updated Shortlist Print implementation - [KS]
+	%li Added 'Animation Easing Library' (Can now choose from dropdown) - [KS]
+	%li Added 'Changelog' to demos' homepage.
 	%li Created 'Labs' for experimental demos.
 	%li Minor changes to all demo's template.
-	%li Began upgrades on 'Shortlist Options'. i.e. print + email
+	%li Lots of Javascript refactoring. 
 
 %h3= link_to "23-07-2012", "https://github.com/involved/fishpond-examples/pull/6", :target => "_blank"
 %ul
@@ -40,3 +42,20 @@
 	%ul
 		%li Added a stand alone demo with embedded API key/pondID. [SM]
 		%li Removed a bunch of the earlier experimental demos
+
+
+%br
+%br
+%br
+%h5 Legend
+%small 
+	[KS] =
+	= link_to "Kitchen Sink Demo", demo_path("kitchen-sink")
+%br
+%small 
+	[SM] =
+	= link_to "Science Majors Demo", demo_path("science-majors")
+%br
+%small
+	[BD] =
+	= link_to "Basic Dynamic Demo", demo_path("basic-dynamic")

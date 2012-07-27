@@ -74,18 +74,20 @@
             %h3.pull-left Animation Options
             .row-fluid
               .span12
-                %fieldset.options
-                  .control-group
-                    .control-label 
-                      Disable Animation?
-                    .controls
-                      %label.checkbox
-                        %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
-                  
-                  .control-group
-                    .control-label 
-                      Animation Easing 
-                      = partial "shared/easing"
+                .form-horizontal
+                  %fieldset.options
+                    .control-group
+                      .control-label 
+                        Disable Animation?
+                      .controls
+                        %label.checkbox
+                          %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
+                    
+                    .control-group
+                      .control-label 
+                        Animation Easing
+                      .controls
+                        = partial "shared/easing"
       .row
         .span5
           .well    
