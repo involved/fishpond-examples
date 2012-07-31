@@ -144,10 +144,13 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       queryAnimation.enabled = this.checked ? false : true;
     });
 
-    // Change easing method
-    $("#easing").change(function(){
+    // Animation Easing Method
+    $("#animation-easing").change(function(){
       queryAnimation.easingMethod = $(this).find(":selected").val().toString();
     });
+
+    // Animation Duration
+
 
 
 
@@ -565,7 +568,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       }
       filters[$(this).data('slug')] = value;
     });
-
     fishpond.query(tags, filters);
   }
 
