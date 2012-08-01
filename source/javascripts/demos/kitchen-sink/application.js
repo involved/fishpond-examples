@@ -250,7 +250,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           metadata        : metadata,
           status          : metadata ? "loaded" : "loading",
           shortlist       : shortlist.template(),       // Pass in 'shortlistButton' Object
-          position        : "pos"+position
+          position        : "pos-"+(position++)
         };
 
         // Update Results list
