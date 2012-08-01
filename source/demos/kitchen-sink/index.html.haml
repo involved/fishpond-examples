@@ -159,93 +159,82 @@
 
 - content_for :css do
   %style(type="text/css") 
-    :scss 
-      = partial "demos/kitchen-sink/partials/test"
-    
+    :scss
+      #query{
+        #results{
+          .thumbnails{
+            .fish{
+              &.loading{
+                .thumbnail{
+                  background: url(/images/common/loading.gif) no-repeat center center;
+                  color: #999;
+                }
+              }
+              &.loaded{ }
 
-  :css
+              .thumbnail{
+                min-height: 150px;
+                text-align: center;
+                position: relative;
+                background: #fff;
 
-    .loading .shortlist{
-      display: none;
-    }
-    
-    .loaded .shortlist{
-      display: block;
-    }
+                .title{
+                  height: 35x;
+                  display: block;
+                }
 
-    .shortlist.active{
-      border: red 1px solid;
-    }
+                .details{
+                  width: 100%;
+                  height: 120px;
+                  text-align: center;
+                  margin-bottom: 30px;
+                  padding-top: 10px;
 
+                  a[data-toggle='modal']{
+                    display: block;
+                    width: 130px;
+                    height: 120px;
+                    overflow: hidden;
+                  }
 
-    #results ul li .thumbnail{
-      min-height: 100px;
-      text-align: center;
-      position: relative;
-      background: #fff;
-    }
-      #results ul li.loading .thumbnail{
-        background: url(/images/common/loading.gif) no-repeat center center;
-        color: #999;
-      }
-
-      #results ul li .thumbnail a[data-toggle='modal']{
-        display: block;
-        width: 130px;
-        height: 120px;
-        overflow: hidden;
-      }
-      #results ul li .thumbnail .title{
-        height: 20px;
-        display: block;
-      }
-       
-       #results ul li .thumbnail .details{
-          width: 100%;
-          height: 120px;
-          text-align: center;
-          margin-bottom: 30px;
-          padding-top: 10px;
-        }
-          #results ul li .thumbnail .details .btn{
-            margin-top: 7px;
+                  .btn{
+                    margin-top: 7px;
+                  }
+                }
+              }
+            }
           }
-
-       #results ul li .thumbnail .shortlist{
-        position: absolute;
-        top: -5px;
-        left: -5px;
+        }
       }
 
-    /* Modal */
-    .modal.modal-wide{
-      width:940px;
-      margin-left:-470px;
-      top: 40%;
-    }
-      .modal.modal-wide .modal-body{
-        max-height: 700px;
+      .modal{
+        &.modal-wide{
+          width: 940px;
+          margin-left: -470px;
+          top: 40%;
+          .modal-body{
+            max-height: 700px;
+            &.loading{
+              background: #fff url(/images/common/loading.gif) no-repeat center center;
+              min-height: 200px;
+            }
+            .comment_box{
+              display: none;
+            }
+          }
+        }
       }
-        .modal.modal-wide .modal-body.loading{
-          background: #fff url(/images/common/loading.gif) no-repeat center center;
-          min-height: 200px;
-        }
-
-        .modal.modal-wide .modal-body .comment_box{
-          display: none;
-        }
-
-    /* Shortlist Master */
-    #shortlist-master{
-      list-style: none;
-      float: left;
-      margin: 15px 0 0 0;
-      padding: 0;
-    }
-      #shortlist-master li{
+    
+      #shortlist-master{
+        list-style: none;
         float: left;
-        padding: 3px;
-        width: 107px;
-        margin-bottom: 10px;
-        overflow: hidden;
+        margin: 15px 0 0 0;
+        padding: 0;
+        li{
+          float: left;
+          padding: 3px;
+          width: 107px;
+          margin-bottom: 10px;
+          overflow: hidden;
+        }
       }
