@@ -177,7 +177,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
     // Clear old results
     if (queryAnimation.enabled){
-      queryAnimation.list.empty();// = $("<ul></ul>");  
+      queryAnimation.list.empty(); 
     } else {
       resultsList.empty(); 
     }
@@ -505,8 +505,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       queryAnimation.inProgress = false;
     } else {
       resultsList.quicksand(queryAnimation.list.find("li"), {
-        easing: queryAnimation.easingMethod,
-        duration: queryAnimation.duration
+        easing      : queryAnimation.easingMethod,
+        Duration    : queryAnimation.duration,
+        useScaling  : true
       }, function() {
         queryAnimation.inProgress = false;
         // Update templates for Fish in Queue once animation has stopped

@@ -4,18 +4,9 @@ $fish-width: 140px;
   #results{
     .thumbnails{
       .fish{
-        //width: $fish-width;
         margin-left: 20px;
         float: left;
         margin-bottom: 18px;
-
-        /*&:nth-child(6n+1) { margin-top: 0px; clear: left; }
-        &:nth-child(6n+2) { margin-top: 30px; }
-        &:nth-child(6n+3) { margin-top: 60px; }
-        &:nth-child(6n+4) { margin-top: 60px; }
-        &:nth-child(6n+5) { margin-top: 30px; }
-        &:nth-child(6n+6) { margin-top: 0px; }*/
-
 
         $i: 40;
         @while $i > 0 {
@@ -23,22 +14,6 @@ $fish-width: 140px;
           $i: $i - 1;
         }
 
-
-        /*&:nth-child(n+10) { 
-          width: $fish-width * 0.5;
-          .thumbnail{
-            min-height: 0px !important;
-          }
-          .title,
-          .btn {
-            display: none !important;
-          }
-          .details{
-            height: auto !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-        }*/
       }
     }
   }
