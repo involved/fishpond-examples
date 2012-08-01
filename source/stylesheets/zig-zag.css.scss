@@ -8,6 +8,11 @@ $fish-width: 140px;
         float: left;
         margin-bottom: 18px;
 
+        &[data-pos-end='0']{
+          background: yellow;
+          border: green 2px solid;
+        }
+
         $i: 40;
         @while $i > 0 {
           &.pos-#{$i} { width: $fish-width - ($i*2); }

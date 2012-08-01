@@ -250,7 +250,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           metadata        : metadata,
           status          : metadata ? "loaded" : "loading",
           shortlist       : shortlist.template(),       // Pass in 'shortlistButton' Object
-          position        : "pos-"+(position++)
+          position        : position
         };
 
         // Update Results list
@@ -504,6 +504,19 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       resultsList.append(queryAnimation.list.find("li"));
       queryAnimation.inProgress = false;
     } else {
+      
+      $.each(resultsList.find("li"), function(index){
+        var id = $(this).data('id');
+        var currentPos = queryAnimation.list.find("[data-id='"+id+"']").data('pos-start');
+        $(this).data('pos-start', currentPos); 
+        $(this).data('pos-end', index); 
+        
+        //resultsList.find("[data-id='"+id+"']").data('pos-start',);
+
+        console.log($(this).data());
+      });
+
+
       resultsList.quicksand(queryAnimation.list.find("li"), {
         easing      : queryAnimation.easingMethod,
         Duration    : queryAnimation.duration,
