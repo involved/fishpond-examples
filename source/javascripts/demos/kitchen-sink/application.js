@@ -7,7 +7,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   var queryAnimation = {
     enabled       : true,
     duration      : 1000,
-    easingMethod  : _.isElement($("#easing")) ? $("#easing").find(":selected").val() : "easeInOutSine",
+    easingMethod  : _.isElement($("#easing")) ? $("#easing").find(":selected").val() : "easeInOutQuad",
     // Do not edit options below
     list          : $("<ul></ul>"),
     inProgress    : false
@@ -202,8 +202,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           }
         });
       } 
-      
-      fish.generateTemplate(result); // Generate Fish - This will either create a 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded then the partial Fish will be dynamically updated later after Metadata has loaded.
+      fish.generateTemplate(result, i); // Generate Fish - This will either create a 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded then the partial Fish will be dynamically updated later after Metadata has loaded.
     }
 
     // Check for animation/filtering method
@@ -241,7 +240,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       getMetadata: function () {
         return $.jStorage.get("metadata-"+fishID);
       },
-      generateTemplate: function (result) {
+      generateTemplate: function (result, position) {
         var currentFish = this;
         var fishTemplate = _.template($( "#fishTemplate" ).html());
         var metadata = currentFish.getMetadata();
@@ -250,7 +249,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           fishDetailsData : currentFish.fishDetails(),  // Pass 'details' template into this template
           metadata        : metadata,
           status          : metadata ? "loaded" : "loading",
-          shortlist       : shortlist.template()        // Pass in 'shortlistButton' Object
+          shortlist       : shortlist.template(),       // Pass in 'shortlistButton' Object
+          position        : "pos"+position
         };
 
         // Update Results list

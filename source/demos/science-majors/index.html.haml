@@ -65,98 +65,114 @@
 
 
 - content_for :css do
-  :css
-    .loading .shortlist{
-      display: none;
-    }
-    
-    .loaded .shortlist{
-      display: block;
-    }
+  %style(type="text/css") 
+    :scss
+      $fish-width: 140px;
 
-    .shortlist.active{
-      border: red 1px solid;
-    }
+      #query{
+        #results{
+          .thumbnails{
+            .fish{
+              width: $fish-width;
+              margin-left: 20px;
+              float: left;
+              margin-bottom: 18px;
 
-    #results ul li:nth-child(6n+1) { margin-top: 0px; clear: left; }
-    #results ul li:nth-child(6n+2) { margin-top: 30px; }
-    #results ul li:nth-child(6n+3) { margin-top: 60px; }
-    #results ul li:nth-child(6n+4) { margin-top: 60px; }
-    #results ul li:nth-child(6n+5) { margin-top: 30px; }
-    #results ul li:nth-child(6n+6) { margin-top: 0px; }
+              &:nth-child(6n+1) { margin-top: 0px; clear: left; }
+              &:nth-child(6n+2) { margin-top: 30px; }
+              &:nth-child(6n+3) { margin-top: 60px; }
+              &:nth-child(6n+4) { margin-top: 60px; }
+              &:nth-child(6n+5) { margin-top: 30px; }
+              &:nth-child(6n+6) { margin-top: 0px; }
 
-    #results ul li .thumbnail{
-      min-height: 100px;
-      text-align: center;
-      position: relative;
-      background: #fff;
-    }
-      #results ul li.loading .thumbnail{
-        background: url(/images/common/loading.gif) no-repeat center center;
-        color: #999;
-      }
+              &:nth-child(n+10) { 
+                width: $fish-width * 0.5;
+                .thumbnail{
+                  min-height: 0px !important;
+                }
+                .title,
+                .btn {
+                  display: none !important;
+                }
+                .details{
+                  height: auto !important;
+                  margin: 0 !important;
+                  padding: 0 !important;
+                }
+              }
 
-      #results ul li .thumbnail a[data-toggle='modal']{
-        display: block;
-        width: 130px;
-        height: 100px;
-        overflow: hidden;
-      }
-      #results ul li .thumbnail .title{
-        height: 40px;
-        display: block;
-      }
-       
-       #results ul li .thumbnail .details{
-          width: 100%;
-          height: 120px;
-          text-align: center;
-          margin-bottom: 10px;
-          padding-top: 10px;
-        }
-          #results ul li .thumbnail .details .btn{
-            margin-top: 7px;
+              &.loading{
+                .thumbnail{
+                  background: url(/images/common/loading.gif) no-repeat center center;
+                  color: #999;
+                }
+              }
+              &.loaded{ }
+
+              .thumbnail{
+                min-height: 150px;
+                text-align: center;
+                position: relative;
+                background: #fff;
+
+                .title{
+                  height: 35px;
+                  display: block;
+                }
+
+                .details{
+                  width: 100%;
+                  height: 120px;
+                  text-align: center;
+                  margin-bottom: 30px;
+                  padding-top: 10px;
+
+                  a[data-toggle='modal']{
+                    display: block;
+                    border: red 1px solid;
+                    width: 100%;
+                    height: auto;
+                    overflow: hidden;
+                  }
+
+                  .btn{
+                    margin-top: 7px;
+                  }
+                }
+              }
+            }
           }
-
-       #results ul li .thumbnail .shortlist{
-        position: absolute;
-        top: -5px;
-        left: -5px;
+        }
       }
 
-    /* Modal */
-    .modal{
-      width:940px;
-      margin-left:-470px;
-      top: 40%;
-    }
-      .modal-body{
-        max-height: 700px;
+      .modal{
+        &.modal-wide{
+          width: 940px;
+          margin-left: -470px;
+          top: 40%;
+          .modal-body{
+            max-height: 700px;
+            &.loading{
+              background: #fff url(/images/common/loading.gif) no-repeat center center;
+              min-height: 200px;
+            }
+            .comment_box{
+              display: none;
+            }
+          }
+        }
       }
-        .modal-body.loading{
-          background: #fff url(/images/common/loading.gif) no-repeat center center;
-          min-height: 200px;
-        }
-
-        .modal-body .comment_box{
-          display: none;
-        }
-
-    /* Shortlist Master */
-    #shortlist-master{
-      list-style: none;
-      float: left;
-      margin: 0;
-      padding: 0;
-    }
-      #shortlist-master li{
+    
+      #shortlist-master{
+        list-style: none;
         float: left;
-        padding: 3px;
-        width: 120px;
-        height: 120px;
-        overflow: hidden;
+        margin: 15px 0 0 0;
+        padding: 0;
+        li{
+          float: left;
+          padding: 3px;
+          width: 107px;
+          margin-bottom: 10px;
+          overflow: hidden;
+        }
       }
-
-
-
-
