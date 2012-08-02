@@ -504,35 +504,33 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       resultsList.append(queryAnimation.list.find("li"));
       queryAnimation.inProgress = false;
     } else {
+
       $(resultsList.find("li")).each(function (index) {
         var id = $(this).data('id');
         var oldPos = index;
         var animateFish = queryAnimation.list.find("li[data-id='"+id+"']");
         var newPos = animateFish.index();
+        var newSize = 1-((5*newPos)/100);
 
-        var fishPos = {
-          id        : id,
-          oldPos    : index,
-          newPos    : newPos
-        }
-        //console.log(fishPos);
+        $(this).removeClass("static").addClass("animating");
+        animateFish.addClass("static");
 
-        $(this).addClass("pos2");
-        animateFish.addClass("pos1");
+        //$(this).scale(newSize);
 
-        $(this).attr('data-pos-start', index); 
+        //$(this).animate({width: (140*newSize)}, 500);
+
+        //$(this).transition({ scale: newSize });
+
+        //console.log($(this).index() + " - " + (1-((5*newPos)/100)));
+        $(this).attr('data-pos-start', oldPos); 
         $(this).attr('data-pos-end', newPos); 
 
       });
 
       resultsList.quicksand(queryAnimation.list.find("li"), {
         easing      : queryAnimation.easingMethod,
-        Duration    : queryAnimation.duration,
-        useScaling  : true,
-        enhancement: function() {
-          
-          
-        }
+        Duration    : queryAnimation.duration//,
+        //useScaling  : true
       }, function() {
         queryAnimation.inProgress = false;
         // Update templates for Fish in Queue once animation has stopped

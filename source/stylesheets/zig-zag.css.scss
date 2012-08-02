@@ -7,34 +7,57 @@ $fish-width: 140px;
         margin-left: 20px;
         float: left;
         margin-bottom: 18px;
+        width: 140px;
 
-        &.pos1{
-          border-top: orange 3px solid;
-        }
-        &.pos2{
-          border-top: green 3px solid;
-        }
+        &:before { content: "New: " attr(data-pos-end); }
+        &:after { content: "Current: " attr(data-pos-start); }
 
-        &:before {
-          content: "New: " attr(data-pos-end);
-        }
-
-        &:after {
-          content: "Current: " attr(data-pos-start);
-        }
-
-        &[data-pos-end='0']{
-          border-bottom: green 2px solid;
-        }
-
-        $i: 40;
-        @while $i > 0 {
-          &.pos-#{$i} { width: $fish-width - ($i*2); }
-          $i: $i - 1;
-        }
-
+    
         &.animating{
-          border-top: blue 2px solid;
+          border-top: green 3px solid;
+          $i: 40;
+          @while $i >= 0 {
+            $scale: (1-((3*$i)/100));
+            &[data-pos-start='#{$i}']{
+             // width: $fish-width * $scale;
+            }
+
+            &[data-pos-end='#{$i}']{ 
+              transition: width 0.5s;
+              -moz-transition: width 0.5s; /* Firefox 4 */
+              -webkit-transition: width 0.5s; /* Safari and Chrome */
+              -o-transition: width 0.5s; /* Opera */
+              width: $fish-width * $scale;
+            }
+
+            $i: $i - 1;
+          }
+
+        }
+
+
+
+        //&.static{
+          border-top: orange 3px solid;
+          $i: 40;
+          @while $i > 0 {
+            $scale: (1-((3*$i)/100));
+            &[data-pos-start='#{$i}']{
+              width: $fish-width * $scale;
+            }
+            $i: $i - 1;
+          }
+        //}
+
+
+
+
+        .title,
+        .btn{
+          display: none !important;
+        }
+        .details{
+          margin-bottom: 0px !important;
         }
       }
     }
