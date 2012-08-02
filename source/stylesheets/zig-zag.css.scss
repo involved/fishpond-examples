@@ -8,9 +8,16 @@ $fish-width: 140px;
         float: left;
         margin-bottom: 18px;
 
+        &.pos1{
+          border-top: orange 3px solid;
+        }
+        &.pos2{
+          border-top: green 3px solid;
+        }
+
+
         &[data-pos-end='0']{
-          background: yellow;
-          border: green 2px solid;
+          border-bottom: green 2px solid;
         }
 
         $i: 40;
@@ -19,6 +26,9 @@ $fish-width: 140px;
           $i: $i - 1;
         }
 
+        &.animating{
+          border-top: blue 2px solid;
+        }
       }
     }
   }

@@ -1,6 +1,6 @@
 / TEMPLATE - Fish
 %script{:id => "fishTemplate", :type => "text/html"}
-	%li{ :data => { :id => "{{ fish.id }}", "pos-start" => "{{ position }}", "pos-end" => "" }, :class => "{{ status }} fish" }
+	%li{ :data => { :id => "{{ fish.id }}", "pos-start" => "{{ position }}", "pos-end" => "na" }, :class => "{{ status }} fish" }
 		.thumbnail
 			%strong.title {{ fish.title }}      
 			.details
