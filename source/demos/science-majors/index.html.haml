@@ -8,12 +8,11 @@
   = javascript_include_tag "vendor/jquery.easing.1.3.js"
   = javascript_include_tag "vendor/jquery-animate-css-rotate-scale.js"
   = javascript_include_tag "vendor/jquery-css-transform.js"
-  =# javascript_include_tag "http://ricostacruz.com/jquery.transit/jquery.transit.js"
   = javascript_include_tag "vendor/jquery.quicksand.js"
   = javascript_include_tag "demos/kitchen-sink/application.js"
   = partial "demos/kitchen-sink/templates/base"
 
-#query
+#query.dev
   .page-header
     %h1 Demo
 
@@ -78,11 +77,6 @@
           #results{
             .thumbnails{
               .fish{
-                //width: 140px;
-                margin-left: 20px;
-                float: left;
-                margin-bottom: 18px;
-
                 &.loading{
                   .thumbnail{
                     background: url(/images/common/loading.gif) no-repeat center center;

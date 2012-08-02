@@ -515,22 +515,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         $(this).removeClass("static").addClass("animating");
         animateFish.addClass("static");
 
-        //$(this).scale(newSize);
-
-        //$(this).animate({width: (140*newSize)}, 500);
-
-        //$(this).transition({ scale: newSize });
-
-        //console.log($(this).index() + " - " + (1-((5*newPos)/100)));
         $(this).attr('data-pos-start', oldPos); 
         $(this).attr('data-pos-end', newPos); 
-
       });
 
       resultsList.quicksand(queryAnimation.list.find("li"), {
         easing      : queryAnimation.easingMethod,
-        Duration    : queryAnimation.duration//,
-        //useScaling  : true
+        Duration    : queryAnimation.duration,
+        useScaling  : true
       }, function() {
         queryAnimation.inProgress = false;
         // Update templates for Fish in Queue once animation has stopped
