@@ -515,11 +515,13 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           oldPos    : index,
           newPos    : newPos
         }
+        //console.log(fishPos);
 
         $(this).addClass("pos2");
         animateFish.addClass("pos1");
 
-        console.log(fishPos);
+        $(this).attr('data-pos-start', index); 
+        $(this).attr('data-pos-end', newPos); 
 
       });
 
