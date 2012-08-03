@@ -75,6 +75,17 @@ helpers do
 
 end
 
+module Haml::Filters
+  module Scss
+    include Base
+    lazy_require 'sass/plugin'
+
+    def render(text)
+      ::Sass::Engine.new(text, ::Sass::Plugin.engine_options.merge(:syntax => :scss)).render
+    end
+  end
+end
+
 ###
 # Config
 ###

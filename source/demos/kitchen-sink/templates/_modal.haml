@@ -1,4 +1,4 @@
-// Modal Template
+/ TEMPLATE - Modal
 %script{:id => "modalTemplate", :type => "text/html"}
 	.modal-header
 		%button.close{"data-dismiss" => "modal"} ×
@@ -12,6 +12,8 @@
 				= link_to "Find out more", "{{ metadata.url }}", :target => "_blank"
 				%br
 				%br
+				%a{ :href => "#", :class => "btn btn-mini {{ upvote.upvoteClass }}", :data => { :id => "{{ metadata.id }}", :toggle => "upvote" } }
+					%i.icon-thumbs-up
 				{[ if (!_.isEmpty(shortlist)) { ]}
 				%a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :title => "{{ metadata.title }}", :thumbnail => "{{ metadata.thumbnail_url }}", :toggle => "shortlist" } }
 					%i.icon-star

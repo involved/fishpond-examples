@@ -1,52 +1,55 @@
 - title "Kitchen Sink"
 
 - content_for :javascript do 
-  // REQUIRED EXTERNAL JAVASCRIPT
-  = partial "demos/kitchen-sink/templates/base"
+  -# // REQUIRED JAVASCRIPT LIBRARIES
   = javascript_include_tag "vendor/underscore.js"
   = javascript_include_tag "vendor/jstorage.js"
   = javascript_include_tag "vendor/jquery.easing.1.3.js"
+  = javascript_include_tag "vendor/jquery-animate-css-rotate-scale.js"
+  = javascript_include_tag "vendor/jquery-css-transform.js"
   = javascript_include_tag "vendor/jquery.quicksand.js"
   = javascript_include_tag "demos/kitchen-sink/application.js"
+  = partial "demos/kitchen-sink/templates/base"
 
-#query
-  .page-header
-    %h1 Kitchen Sink - Demo
-    %br
-    .row
-      .span9
-        %p
-          %strong Powered by:
-        %ul
-          %li 
-            = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
-            (Javascript Templates)
-          %li
-            = link_to "JStorage", "http://www.jstorage.info/", :target => "_blank"
-            (Javascript client-side caching)
-          %li
-            = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
-            (Filtering and Animation)
-          %li
-            = link_to "Disqus", "http://disqus.com", :target => "_blank"
-            (Commenting engine)
-          %li
-            = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
-            (Form UI controls)
-          %li
-            = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
-            (Allows asynchronous javascript functions)
-      .span2.offset1
-        %span.label.label-success Metadata enabled
-        %br 
-        %span.label.label-success Comments enabled
-        %br 
-        %span.label.label-success Filters enabled
-        %br 
-        %span.label.label-success Search Box enabled
+.page-header
+  %h1 Kitchen Sink - Demo
+  %br
+  .row
+    .span9
+      %p
+        %strong Powered by:
+      %ul
+        %li 
+          = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
+          (Javascript Templates)
+        %li
+          = link_to "JStorage", "http://www.jstorage.info/", :target => "_blank"
+          (Javascript client-side caching)
+        %li
+          = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
+          (Filtering and Animation)
+        %li
+          = link_to "Disqus", "http://disqus.com", :target => "_blank"
+          (Commenting engine)
+        %li
+          = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+          (Form UI controls)
+        %li
+          = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
+          (Allows asynchronous javascript functions)
+    .span2.offset1
+      %span.label.label-success Metadata enabled
+      %br 
+      %span.label.label-success Comments enabled
+      %br 
+      %span.label.label-success Filters enabled
+      %br 
+      %span.label.label-success Search Box enabled
+      -#
         %br 
         %span.label.label-warning Popularity Sliders [In Dev]
 
+#query
   .row
     .span5
       .row
@@ -71,23 +74,42 @@
       .row
         .span5
           .well    
-            %h3.pull-left Animation Options
-            .row-fluid
-              .span12
-                .form-horizontal
-                  %fieldset.options
-                    .control-group
-                      .control-label 
-                        Disable Animation?
-                      .controls
-                        %label.checkbox
-                          %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
-                    
-                    .control-group
-                      .control-label 
-                        Animation Easing
-                      .controls
-                        = partial "shared/easing"
+            %h3.pull-left Options
+
+            .form-horizontal
+              %fieldset.options                        
+                .control-group
+                  .control-label 
+                    Animation Easing
+                  .controls
+                    = partial "demos/kitchen-sink/partials/easing"
+                -#
+                  .control-group
+                    %label.control-label Animation Duration
+                    .controls
+                      %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "10"}/
+                      .slider.span2{"data-target" => "query[tags][biological]"}
+
+                .control-group
+                  .control-label 
+                    Disable Animation?
+                  .controls
+                    %label.checkbox
+                      %input#query_options_animation{:name => "query[options][animation]", :type => "checkbox", :value => "0"}
+
+                .control-group
+                  .control-label 
+                    Zig Zag Results
+                  .controls
+                    %label.checkbox
+                      %input#query_options_zigzag{:name => "query[options][zigzag]", :type => "checkbox", :value => "0"}
+
+                .control-group
+                  .control-label 
+                    Debug Mode
+                  .controls
+                    %label.checkbox
+                      %input#query_options_debug{:name => "query[options][debug]", :type => "checkbox", :value => "0"}                               
       .row
         .span5
           .well    
@@ -141,7 +163,7 @@
 
     .span6.offset1
       %h2 Results
-      #results
+      #results.grid
         %ul.thumbnails
 
 
@@ -151,89 +173,93 @@
       // Empty
 
 
+
 - content_for :css do
-  :css
-    .loading .shortlist{
-      display: none;
-    }
-    
-    .loaded .shortlist{
-      display: block;
-    }
+  = stylesheet_link_tag "zig-zag.css"
+  %style(type="text/css") 
+    :scss
+      #query{
+        #results{
 
-    .shortlist.active{
-      border: red 1px solid;
-    }
+          &.grid{
+            .thumbnails{
+              .fish{
+                width: 140px;
+                margin-left: 20px;
+                float: left;
+                margin-bottom: 18px;
+                &.loading{
+                  .thumbnail{
+                    background: url(/images/common/loading.gif) no-repeat center center;
+                    color: #999;
+                  }
+                }
+                &.loaded{ }
 
+                .thumbnail{
+                  min-height: 150px;
+                  text-align: center;
+                  position: relative;
+                  background: #fff;
 
-    #results ul li .thumbnail{
-      min-height: 100px;
-      text-align: center;
-      position: relative;
-      background: #fff;
-    }
-      #results ul li.loading .thumbnail{
-        background: url(/images/common/loading.gif) no-repeat center center;
-        color: #999;
-      }
+                  .title{
+                    height: 35px;
+                    display: block;
+                  }
 
-      #results ul li .thumbnail a[data-toggle='modal']{
-        display: block;
-        width: 130px;
-        height: 120px;
-        overflow: hidden;
-      }
-      #results ul li .thumbnail .title{
-        height: 20px;
-        display: block;
-      }
-       
-       #results ul li .thumbnail .details{
-          width: 100%;
-          height: 120px;
-          text-align: center;
-          margin-bottom: 30px;
-          padding-top: 10px;
-        }
-          #results ul li .thumbnail .details .btn{
-            margin-top: 7px;
+                  .details{
+                    width: 100%;
+                    height: 120px;
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding-top: 10px;
+
+                    a[data-toggle='modal']{
+                      display: block;
+                      width: 130px;
+                      height: 120px;
+                      overflow: hidden;
+                    }
+
+                    .btn{
+                      margin-top: 7px;
+                    }
+                  }
+                }
+              }
+            }
           }
-
-       #results ul li .thumbnail .shortlist{
-        position: absolute;
-        top: -5px;
-        left: -5px;
+        }
       }
 
-    /* Modal */
-    .modal.modal-wide{
-      width:940px;
-      margin-left:-470px;
-      top: 40%;
-    }
-      .modal.modal-wide .modal-body{
-        max-height: 700px;
+      .modal{
+        &.modal-wide{
+          width: 940px;
+          margin-left: -470px;
+          top: 40%;
+          .modal-body{
+            max-height: 700px;
+            &.loading{
+              background: #fff url(/images/common/loading.gif) no-repeat center center;
+              min-height: 200px;
+            }
+            .comment_box{
+              display: none;
+            }
+          }
+        }
       }
-        .modal.modal-wide .modal-body.loading{
-          background: #fff url(/images/common/loading.gif) no-repeat center center;
-          min-height: 200px;
-        }
-
-        .modal.modal-wide .modal-body .comment_box{
-          display: none;
-        }
-
-    /* Shortlist Master */
-    #shortlist-master{
-      list-style: none;
-      float: left;
-      margin: 15px 0 0 0;
-      padding: 0;
-    }
-      #shortlist-master li{
+    
+      #shortlist-master{
+        list-style: none;
         float: left;
-        padding: 3px;
-        width: 107px;
-        margin-bottom: 10px;
-        overflow: hidden;
+        margin: 15px 0 0 0;
+        padding: 0;
+        li{
+          float: left;
+          padding: 3px;
+          width: 107px;
+          margin-bottom: 10px;
+          overflow: hidden;
+        }
       }

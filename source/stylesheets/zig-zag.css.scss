@@ -1,0 +1,149 @@
+$fish-width: 140px;
+$fish-spacing: 20px;
+$results-width: 460px - $fish-spacing;
+$i: 40;
+
+@mixin fish-width($row-count){
+  width: (($results-width -  ($fish-spacing * ($row-count - 1)))/$row-count);
+}
+
+@mixin width-transtion($duration){
+  transition: width $duration;
+  -moz-transition: width $duration; /* Firefox 4 */
+  -webkit-transition: width $duration; /* Safari and Chrome */
+  -o-transition: width $duration; /* Opera */
+}
+
+#query{
+  #results.zigzag{
+    .thumbnails{
+      margin-left: 0;
+      .fish{
+        @include width-transtion(0.5s);
+        position: relative;
+        width: $fish-width; // backup width
+        margin-right: $fish-spacing;
+        margin-left: 0;
+
+        .thumbnail{
+          border: none;
+          padding: 0;
+          border: 0;
+          .title,
+          .btn{
+            display: none !important;
+          }
+          .details{
+            padding: 0 !important;
+            margin-bottom: 0 !important;
+          }
+        }
+
+
+        &.loading{
+          .thumbnail{
+            height: 50px;
+            background: url(/images/common/loading.gif) no-repeat center center;
+            color: #999;
+          }
+        }
+        &.loaded{ }
+
+
+        // Fish Scaling and Reszing 
+        // Row 1  => 3 fish
+        // Row 2  => 4 fish
+        // Row 3  => 5 fish
+        // Row 4+ => 6 fish
+
+        // Row 1
+        $x: 0;
+        @for $i from 0 through 2 {
+          &[data-pos-start='#{$i}']{
+            @include fish-width(3);
+            float: left;
+            margin-top: $x * 20px;
+          }
+          $x: $x + 1;
+        }
+
+        // Row 2
+        $x: 0;
+        @for $i from 3 through 6 {
+          &[data-pos-start='#{$i}']{
+            @include fish-width(4);
+            float: right;
+            margin-top: $x * 10px;
+          }
+          $x: $x + 1
+        }
+
+        // Row 3
+        $x: 0;
+        @for $i from 7 through 11{
+          &[data-pos-start='#{$i}']{
+            @include fish-width(5);
+            float: left;
+            margin-top: $x * 10px;
+          }
+          $x: $x + 1
+        }
+
+        // Row 4
+        $x: 0;
+        @for $i from 12 through 17 {
+          &[data-pos-start='#{$i}']{
+            @include fish-width(6);
+            float: right;
+            margin-top: $x * 2px;
+          }
+          $x: $x + 1
+        }
+
+        // Row 5+
+        $x: 0;
+        @for $i from 17 through 40 {
+          &[data-pos-start='#{$i}']{
+            @include fish-width(6);
+            float: left;
+            @if $x == 1 { 
+              clear: left; 
+            }         
+          }
+          $x: $x + 1
+        }
+
+
+        &.animating{
+          // Row 1   
+          @for $i from 0 through 2 {
+            &[data-pos-end='#{$i}']{ 
+              @include fish-width(3); 
+            }
+          }
+
+          // Row 2
+          @for $i from 3 through 6 {
+            &[data-pos-end='#{$i}']{  
+              @include fish-width(4); 
+            }
+          }
+
+          // Row 3
+          @for $i from 7 through 11 {
+            &[data-pos-end='#{$i}']{ 
+              @include fish-width(5); 
+            }
+          }
+
+          // Row 4
+          @for $i from 12 through 40 {
+            &[data-pos-end='#{$i}']{
+              @include fish-width(6);
+            }
+          }
+        }
+      }
+    }
+  }  
+}

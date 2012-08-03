@@ -1,4 +1,4 @@
-// Shortlist Print
+/ TEMPLATE - Shortlist Print
 %script{:id => "shortlistPrint", :type => "text/html"}
 	.row-fluid{ :data => { :id => "{{ metadata.id }}" } }
 		.span12
@@ -6,4 +6,3 @@
 			%p {{ metadata.description }}
 			= link_to "{{ metadata.url }}", "{{ metadata.url }}"
 			%hr
-
