@@ -1,5 +1,5 @@
 - static_api_key true
-- title "Science Majors"
+- title "Zig-Zag"
 
 - content_for :javascript do 
   -# // REQUIRED JAVASCRIPT LIBRARIES
@@ -10,11 +10,25 @@
   = javascript_include_tag "vendor/jquery-css-transform.js"
   = javascript_include_tag "vendor/jquery.quicksand.js"
   = javascript_include_tag "demos/kitchen-sink/application.js"
-  = partial "demos/kitchen-sink/templates/base"
+ 
+  /////////////////////////////////////////
+  // JAVASCRIPT TEMPLATES 
+  // Powered by Underscore.js 'Templates'
+  /////////////////////////////////////////
+  = partial "demos/zig-zag/templates/fish"
+
+  = partial "demos/kitchen-sink/templates/tags"
+  = partial "demos/kitchen-sink/templates/filters"
+  = partial "demos/kitchen-sink/templates/fish-details"
+  = partial "demos/kitchen-sink/templates/modal"
+  = partial "demos/kitchen-sink/templates/shortlist"
+  = partial "demos/kitchen-sink/templates/shortlist-email"
+  = partial "demos/kitchen-sink/templates/shortlist-print"
+
 
 #query.dev
   .page-header
-    %h1 Demo
+    %h1 Zig-Zag Demo
 
   .row
     .span5
@@ -67,6 +81,8 @@
 
 
 - content_for :css do
+  = stylesheet_link_tag "zig-zag.css"
+
   %style(type="text/css") 
     :scss
       html{
@@ -75,10 +91,6 @@
           #results{
             .thumbnails{
               .fish{
-                width: 140px;
-                margin-left: 20px;
-                float: left;
-                margin-bottom: 18px;
                 &.loading{
                   .thumbnail{
                     background: url(/images/common/loading.gif) no-repeat center center;
@@ -100,15 +112,16 @@
 
                   .details{
                     width: 100%;
-                    height: 120px;
+                    //height: 120px;
                     text-align: center;
                     margin-bottom: 30px;
                     padding-top: 10px;
 
                     a[data-toggle='modal']{
                       display: block;
-                      width: 130px;
-                      height: 120px;
+                     // border: red 1px solid;
+                      width: 100%;
+                      height: auto;
                       overflow: hidden;
                     }
 
@@ -121,6 +134,7 @@
             }
           }
         }
+
         .modal{
           &.modal-wide{
             width: 940px;
