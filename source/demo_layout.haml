@@ -16,14 +16,7 @@
     = javascript_include_tag "plugins.js"
     = stylesheet_link_tag "http://twitter.github.com/bootstrap/assets/css/bootstrap.css"
     = stylesheet_link_tag "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/cupertino/jquery-ui.css"
-
-    :css
-      body{
-        padding-top: 100px;
-      }
-      .hidden{
-        display: none;
-      }
+    = stylesheet_link_tag "screen.css"
 
     = yield_content :css
 
@@ -55,7 +48,9 @@
       %hr
       %footer
         &copy; iFish 2012
-
+    /////////////////////////////////////////
+    // REQUIRED JAVASCRIPT LIBRARIES
+    /////////////////////////////////////////
     = javascript_include_tag "vendor/jquery-1.7.2.min.js"
     = javascript_include_tag "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"
     = javascript_include_tag "http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js"
