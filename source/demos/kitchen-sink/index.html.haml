@@ -73,24 +73,10 @@
       .row
         .span5
           .well    
-            %h3.pull-left Animation Options
+            %h3.pull-left Options
 
             .form-horizontal
-              %fieldset.options
-                .control-group
-                  .control-label 
-                    Disable Animation?
-                  .controls
-                    %label.checkbox
-                      %input#query_options_animation{"data-slug" => "options-animation", :name => "query[options][animation]", :type => "checkbox", :value => "0"}
-
-                .control-group
-                  .control-label 
-                    Zig Zag Results
-                  .controls
-                    %label.checkbox
-                      %input#query_options_zigzag{"data-slug" => "options-zigzag", :name => "query[options][zigzag]", :type => "checkbox", :value => "0"}
-                
+              %fieldset.options                        
                 .control-group
                   .control-label 
                     Animation Easing
@@ -102,6 +88,27 @@
                   .controls
                     %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "10"}/
                     .slider.span2{"data-target" => "query[tags][biological]"}
+
+                .control-group
+                  .control-label 
+                    Disable Animation?
+                  .controls
+                    %label.checkbox
+                      %input#query_options_animation{:name => "query[options][animation]", :type => "checkbox", :value => "0"}
+
+                .control-group
+                  .control-label 
+                    Zig Zag Results
+                  .controls
+                    %label.checkbox
+                      %input#query_options_zigzag{:name => "query[options][zigzag]", :type => "checkbox", :value => "0"}
+
+                .control-group
+                  .control-label 
+                    Debug Mode
+                  .controls
+                    %label.checkbox
+                      %input#query_options_debug{:name => "query[options][debug]", :type => "checkbox", :value => "0"}                               
       .row
         .span5
           .well    

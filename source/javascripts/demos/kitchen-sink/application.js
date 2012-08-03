@@ -152,6 +152,11 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $("#results").toggleClass("zigzag");
     });
 
+    // Debug
+    $("#query_options_debug:checkbox").change(function(){
+      $("body").toggleClass("debug");
+    });
+
     // Animation Easing Method
     $("#animation-easing").change(function(){
       queryAnimation.easingMethod = $(this).find(":selected").val().toString();

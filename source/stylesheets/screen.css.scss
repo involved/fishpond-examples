@@ -3,3 +3,26 @@
 //
 
 @import "globals/base";
+
+body{
+	padding-top: 100px;
+	&.debug{
+	  #results{
+	    .thumbnails{
+	      .fish{
+	        border-top: orange 3px solid;
+	        &:before { content: "Pos: " attr(data-pos-start); }
+	        &.animating{
+	          border-top: green 3px solid; 
+	          &:before { content: "Dest: " attr(data-pos-end); }
+	        }
+	      }
+	    }
+	  }
+	}
+}
+
+
+.hidden{
+  display: none;
+}

@@ -8,3 +8,5 @@
 			%span
 				{{ shortlist.wording }}
 		{[ } ]}
+		%a{ :href => "#", :class => "btn btn-mini {{ shortlist.upvoteClass }}", :data => { :id => "{{ metadata.id }}", :toggle => "upvote" } }
+			%i.icon-thumbs-up
