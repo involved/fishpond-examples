@@ -3,6 +3,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Setup global variables
   var resultsList = $("#results ul");
   var fishUpdateQueue = [];
+  var debugMode = false;
 
   var queryAnimation = {
     enabled       : true,
@@ -19,13 +20,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     interpolate : /\{\{(.+?)\}\}/g
   };
 
-  
   /////////////////////////////////////////
   // Fishpond loading
   /////////////////////////////////////////
   fishpond.loading(function(percent){
     $("#loading .progress").removeClass("progress-striped");
     $("#loading .bar").css({width: (percent * 100) + "%"});
+
+    if (debugMode == true) $("body").addClass("debug");
 
     // Clear LocalStorage of fish data. This is optional but is in here for Development purposes
     $.jStorage.flush();
@@ -140,8 +142,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     //////////////////
 
     // Disable animation
-    $("input[name*='options']:checkbox").change(function(){
+    $("#query_options_animation:checkbox").change(function(){
       queryAnimation.enabled = this.checked ? false : true;
+    });
+
+    // Zig-Zag results
+    $("#query_options_zigzag:checkbox").change(function(){
+      $("#results").toggleClass("grid");
+      $("#results").toggleClass("zigzag");
     });
 
     // Animation Easing Method

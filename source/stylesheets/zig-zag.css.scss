@@ -1,6 +1,7 @@
 $fish-width: 140px;
 $fish-spacing: 20px;
 $results-width: 460px - $fish-spacing;
+$i: 40;
 
 @mixin fish-width($row-count){
   width: (($results-width -  ($fish-spacing * ($row-count - 1)))/$row-count);
@@ -14,16 +15,30 @@ $results-width: 460px - $fish-spacing;
 }
 
 #query{
-  #results{
+  #results.zigzag{
     .thumbnails{
       margin-left: 0;
       .fish{
+        @include width-transtion(0.5s);
         position: relative;
         width: $fish-width; // backup width
         margin-right: $fish-spacing;
         margin-left: 0;
-        $i: 40;
-        @include width-transtion(0.5s);
+
+        .thumbnail{
+          border: none;
+          padding: 0;
+          border: 0;
+          .title,
+          .btn{
+            display: none !important;
+          }
+          .details{
+            padding: 0 !important;
+            margin-bottom: 0 !important;
+          }
+        }
+
 
         &.loading{
           .thumbnail{
@@ -123,33 +138,18 @@ $results-width: 460px - $fish-spacing;
         }
       }
     }
-  }
+  }  
+}
 
-  &.dev{
-    #results{
-      .thumbnails{
-        .fish{
-          //border-top: orange 3px solid;
-          //&.animating{ border-top: green 3px solid; }
-          //&:before { content: "New: " attr(data-pos-end); }
-          //&:after { content: "Current: " attr(data-pos-start); }
-
-          .thumbnail{
-            min-height: 10px !important;
-            border: none;
-            padding: 0;
-            border: 0;
-            .title,
-            .btn{
-              display: none !important;
-            }
-            .details{
-              padding: 0 !important;
-              margin-bottom: 0 !important;
-            }
-          }
-        }
+body.debug{
+  #results{
+    .thumbnails{
+      .fish{
+        border-top: orange 3px solid;
+        &.animating{ border-top: green 3px solid; }
+        &:before { content: "New: " attr(data-pos-end); }
+        &:after { content: "Current: " attr(data-pos-start); }
       }
-    }   
+    }
   }
 }
