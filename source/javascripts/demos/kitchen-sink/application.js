@@ -171,6 +171,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     // Listeners
     ////////////////////
 
+    // Init Upvotes
+    upvoteListener();
+
     // Init Shorlists
     shortlistListener();
 
@@ -229,6 +232,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   var fishManager = function (fishID) {
     var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
     var shortlist = shortlistManager(fishID);
+    var upvote = upvoteManager(fishID);
     
     return {
       setMetadata: function (result) {
@@ -263,6 +267,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           metadata        : metadata,
           status          : metadata ? "loaded" : "loading",
           shortlist       : shortlist.template(),       // Pass in 'shortlistButton' Object
+          upvote          : upvote.template(),        
           position        : position
         };
 
@@ -278,7 +283,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         var fishResult = resultsList.find("li[data-id='" + fishID + "']");
         var fishDetailsData = { 
           metadata        : currentFish.getMetadata(),
-          shortlist       : shortlist.template()
+          shortlist       : shortlist.template(),
+          upvote          : upvote.template()
         };
         fishResult.removeClass("loading").addClass("loaded");
 
@@ -294,7 +300,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         if (currentFish.getMetadata()) {
           fishDetailsData = { 
             metadata      : currentFish.getMetadata(),
-            shortlist     : shortlist.template()
+            shortlist     : shortlist.template(),
+            upvote        : upvote.template()
           };
           return fishDetailsTemplate( fishDetailsData );
         }
@@ -335,6 +342,61 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       }
     });
   }();
+
+
+  /////////////////////////////////////////
+  // Upvote Manager
+  /////////////////////////////////////////
+  var upvoteManager = function(fishID) {
+    var upvoteStatus;
+
+    return {
+      isUpvoted: function () {
+        // Check if Shortlist status has been set. If not then set it to False, otherwise return the cached value.
+        upvoteStatus = $.jStorage.get("upvote-"+fishID);
+        if (upvoteStatus === "" || _.isNull(upvoteStatus) || _.isUndefined(upvoteStatus)){
+          $.jStorage.set("upvote-"+fishID, false); // Cache Shortlist status
+          return upvoteStatus = false;
+        }
+        return upvoteStatus;
+      },
+      template: function () {
+        this.isUpvoted();
+        var upvoteButton = {
+          upvoteClass  : upvoteStatus ? "upvoted btn-success disabled" : ""
+        };
+        return upvoteButton;
+      }
+    };
+  };
+
+  /////////////////////////////////////////
+  // Upvote Listener
+  /////////////////////////////////////////
+  function upvoteListener() {
+    var fishID;
+
+    // Upvote add/remove
+    $("body").on("click", "[data-toggle='upvote']", function(event){
+      event.preventDefault();
+
+      // Determine Fish ID
+      fishID = $(this).closest("[data-id]").data("id");
+
+      // Toggle Shortlist status
+      var upvoteStatus = $.jStorage.get("upvote-"+fishID);
+      upvoteStatus = (upvoteStatus === "" || _.isNull(upvoteStatus) || _.isUndefined(upvoteStatus)) ? true : !upvoteStatus;  // If Upvote status is empty, null or undefined then set it to True, otherwise toggle current status.
+
+      // Cache new Upvote status
+      $.jStorage.set("upvote-"+fishID, upvoteStatus);
+
+      // Update all instances of Upvote button
+      $("[data-id='"+ fishID +"'][data-toggle='upvote'] ").each(function(index) {
+        $(this).addClass("upvoted btn-success disabled");
+      });
+    });
+  }
+
 
   /////////////////////////////////////////
   // Shortlist Manager
@@ -501,11 +563,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Shortlist Options: Reset
   /////////////////////////////////////////
   function shortlistReset() {
-
+    // TODO
   }
-
-
-
 
   /////////////////////////////////////////
   // Sort Results (Quicksand)

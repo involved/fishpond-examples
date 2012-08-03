@@ -49,6 +49,13 @@ $i: 40;
         }
         &.loaded{ }
 
+
+        // Fish Scaling and Reszing 
+        // Row 1  => 3 fish
+        // Row 2  => 4 fish
+        // Row 3  => 5 fish
+        // Row 4+ => 6 fish
+
         // Row 1
         $x: 0;
         @for $i from 0 through 2 {
