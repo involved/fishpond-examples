@@ -3,11 +3,13 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Setup global variables
   var resultsList = $("#results ul");
   var fishUpdateQueue = [];
+  var debugMode = false;
+  var pond;
 
   var queryAnimation = {
     enabled       : true,
     duration      : 1000,
-    easingMethod  : _.isElement($("#easing")) ? $("#easing").find(":selected").val() : "easeInOutSine",
+    easingMethod  : _.isElement($("#easing")) ? $("#easing").find(":selected").val() : "easeInOutQuad",
     // Do not edit options below
     list          : $("<ul></ul>"),
     inProgress    : false
@@ -19,13 +21,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     interpolate : /\{\{(.+?)\}\}/g
   };
 
-  
   /////////////////////////////////////////
   // Fishpond loading
   /////////////////////////////////////////
   fishpond.loading(function(percent){
     $("#loading .progress").removeClass("progress-striped");
     $("#loading .bar").css({width: (percent * 100) + "%"});
+
+    if (debugMode == true) $("body").addClass("debug");
 
     // Clear LocalStorage of fish data. This is optional but is in here for Development purposes
     $.jStorage.flush();
@@ -35,7 +38,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   // Fishpond Ready
   /////////////////////////////////////////
-  fishpond.ready(function(pond){
+  fishpond.ready(function(pondObject){
+    pond = pondObject;
     // Loading transitions (Demo site purposes)
     $("#loading").fadeOut(0);
     $("#demo").fadeIn(400);
@@ -110,7 +114,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         return fish.title;
       }
     });
-
+    
     // Query Sliders (jQuery UI Sliders)
     $(".slider").slider({
       value: 10,
@@ -140,20 +144,37 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     //////////////////
 
     // Disable animation
-    $("input[name*='options']:checkbox").change(function(){
+    $("#query_options_animation:checkbox").change(function(){
       queryAnimation.enabled = this.checked ? false : true;
     });
 
-    // Change easing method
-    $("#easing").change(function(){
+    // Zig-Zag results
+    $("#query_options_zigzag:checkbox").change(function(){
+      $("#results").toggleClass("grid");
+      $("#results").toggleClass("zigzag");
+    });
+
+    // Debug
+    $("#query_options_debug:checkbox").change(function(){
+      $("body").toggleClass("debug");
+    });
+
+    // Animation Easing Method
+    $("#animation-easing").change(function(){
       queryAnimation.easingMethod = $(this).find(":selected").val().toString();
     });
+
+    // Animation Duration
+
 
 
 
     ////////////////////
     // Listeners
     ////////////////////
+
+    // Init Upvotes
+    upvoteListener();
 
     // Init Shorlists
     shortlistListener();
@@ -174,7 +195,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
     // Clear old results
     if (queryAnimation.enabled){
-      queryAnimation.list.empty();// = $("<ul></ul>");  
+      queryAnimation.list.empty(); 
     } else {
       resultsList.empty(); 
     }
@@ -199,8 +220,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           }
         });
       } 
-      
-      fish.generateTemplate(result); // Generate Fish - This will either create a 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded then the partial Fish will be dynamically updated later after Metadata has loaded.
+      fish.generateTemplate(result, i); // Generate Fish - This will either create a 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded then the partial Fish will be dynamically updated later after Metadata has loaded.
     }
 
     // Check for animation/filtering method
@@ -214,6 +234,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   var fishManager = function (fishID) {
     var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
     var shortlist = shortlistManager(fishID);
+    var upvote = upvoteManager(fishID);
     
     return {
       setMetadata: function (result) {
@@ -238,7 +259,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       getMetadata: function () {
         return $.jStorage.get("metadata-"+fishID);
       },
-      generateTemplate: function (result) {
+      generateTemplate: function (result, position) {
         var currentFish = this;
         var fishTemplate = _.template($( "#fishTemplate" ).html());
         var metadata = currentFish.getMetadata();
@@ -247,7 +268,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           fishDetailsData : currentFish.fishDetails(),  // Pass 'details' template into this template
           metadata        : metadata,
           status          : metadata ? "loaded" : "loading",
-          shortlist       : shortlist.template()        // Pass in 'shortlistButton' Object
+          shortlist       : shortlist.template(),       // Pass in 'shortlistButton' Object
+          upvote          : upvote.template(),        
+          position        : position
         };
 
         // Update Results list
@@ -262,7 +285,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         var fishResult = resultsList.find("li[data-id='" + fishID + "']");
         var fishDetailsData = { 
           metadata        : currentFish.getMetadata(),
-          shortlist       : shortlist.template()
+          shortlist       : shortlist.template(),
+          upvote          : upvote.template()
         };
         fishResult.removeClass("loading").addClass("loaded");
 
@@ -278,7 +302,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         if (currentFish.getMetadata()) {
           fishDetailsData = { 
             metadata      : currentFish.getMetadata(),
-            shortlist     : shortlist.template()
+            shortlist     : shortlist.template(),
+            upvote        : upvote.template()
           };
           return fishDetailsTemplate( fishDetailsData );
         }
@@ -295,6 +320,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       event.preventDefault();
       var fishID = $(this).closest("li").data('id');
       var shortlist = shortlistManager(fishID);
+      var upvote = upvoteManager(fishID);
       var fishModal = $("#"+fishID+".modal");
 
       // if Modal for Fish doesn't already exist.  
@@ -307,7 +333,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         var modalTemplate = _.template($( "#modalTemplate" ).html());
         var modalData = {
           metadata  : $.jStorage.get("metadata-"+fishID),
-          shortlist : shortlist.template()
+          shortlist : shortlist.template(),
+          upvote    : upvote.template(),
         }; 
         fishModal.empty().append( modalTemplate( modalData ));
         
@@ -319,6 +346,64 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       }
     });
   }();
+
+
+  /////////////////////////////////////////
+  // Upvote Manager
+  /////////////////////////////////////////
+  var upvoteManager = function(fishID) {
+    var upvoteStatus;
+
+    return {
+      isUpvoted: function () {
+        // Check if Shortlist status has been set. If not then set it to False, otherwise return the cached value.
+        upvoteStatus = $.jStorage.get("upvote-"+fishID);
+        if (upvoteStatus === "" || _.isNull(upvoteStatus) || _.isUndefined(upvoteStatus)){
+          $.jStorage.set("upvote-"+fishID, false); // Cache Shortlist status
+          return upvoteStatus = false;
+        }
+        return upvoteStatus;
+      },
+      template: function () {
+        this.isUpvoted();
+        var upvoteButton = {
+          upvoteClass  : upvoteStatus ? "upvoted btn-success disabled" : ""
+        };
+        return upvoteButton;
+      }
+    };
+  };
+
+  /////////////////////////////////////////
+  // Upvote Listener
+  /////////////////////////////////////////
+  function upvoteListener() {
+    var fishID;
+
+    // Upvote add/remove
+    $("body").on("click", "[data-toggle='upvote']", function(event){
+      event.preventDefault();
+
+      // Determine Fish ID
+      fishID = $(this).closest("[data-id]").data("id");
+
+      // Toggle Shortlist status
+      var upvoteStatus = $.jStorage.get("upvote-"+fishID);
+      upvoteStatus = (upvoteStatus === "" || _.isNull(upvoteStatus) || _.isUndefined(upvoteStatus)) ? true : !upvoteStatus;  // If Upvote status is empty, null or undefined then set it to True, otherwise toggle current status.
+
+      // Cache new Upvote status
+      $.jStorage.set("upvote-"+fishID, upvoteStatus);
+
+      // Update all instances of Upvote button
+      $("[data-id='"+ fishID +"'][data-toggle='upvote'] ").each(function(index) {
+        $(this).addClass("upvoted btn-success disabled");
+      });
+
+      // Upvote Fish on iFish Server
+      pond.find_fish(fishID).up_vote();
+    });
+  }
+
 
   /////////////////////////////////////////
   // Shortlist Manager
@@ -485,11 +570,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Shortlist Options: Reset
   /////////////////////////////////////////
   function shortlistReset() {
-
+    // TODO
   }
-
-
-
 
   /////////////////////////////////////////
   // Sort Results (Quicksand)
@@ -501,9 +583,25 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       resultsList.append(queryAnimation.list.find("li"));
       queryAnimation.inProgress = false;
     } else {
+
+      $(resultsList.find("li")).each(function (index) {
+        var id = $(this).data('id');
+        var oldPos = index;
+        var animateFish = queryAnimation.list.find("li[data-id='"+id+"']");
+        var newPos = animateFish.index();
+        var newSize = 1-((5*newPos)/100);
+
+        $(this).removeClass("static").addClass("animating");
+        animateFish.addClass("static");
+
+        $(this).attr('data-pos-start', oldPos); 
+        $(this).attr('data-pos-end', newPos); 
+      });
+
       resultsList.quicksand(queryAnimation.list.find("li"), {
-        easing: queryAnimation.easingMethod,
-        duration: queryAnimation.duration
+        easing      : queryAnimation.easingMethod,
+        Duration    : queryAnimation.duration,
+        useScaling  : true
       }, function() {
         queryAnimation.inProgress = false;
         // Update templates for Fish in Queue once animation has stopped
@@ -565,7 +663,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       }
       filters[$(this).data('slug')] = value;
     });
-
     fishpond.query(tags, filters);
   }
 
