@@ -45,8 +45,9 @@
       %span.label.label-success Filters enabled
       %br 
       %span.label.label-success Search Box enabled
-      %br 
-      %span.label.label-warning Popularity Sliders [In Dev]
+      -#
+        %br 
+        %span.label.label-warning Popularity Sliders [In Dev]
 
 #query
   .row
@@ -82,12 +83,12 @@
                     Animation Easing
                   .controls
                     = partial "demos/kitchen-sink/partials/easing"
-
-                .control-group
-                  %label.control-label Animation Duration
-                  .controls
-                    %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "10"}/
-                    .slider.span2{"data-target" => "query[tags][biological]"}
+                -#
+                  .control-group
+                    %label.control-label Animation Duration
+                    .controls
+                      %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "10"}/
+                      .slider.span2{"data-target" => "query[tags][biological]"}
 
                 .control-group
                   .control-label 

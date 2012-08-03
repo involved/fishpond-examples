@@ -4,6 +4,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   var resultsList = $("#results ul");
   var fishUpdateQueue = [];
   var debugMode = false;
+  var pond;
 
   var queryAnimation = {
     enabled       : true,
@@ -37,7 +38,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   // Fishpond Ready
   /////////////////////////////////////////
-  fishpond.ready(function(pond){
+  fishpond.ready(function(pondObject){
+    pond = pondObject;
     // Loading transitions (Demo site purposes)
     $("#loading").fadeOut(0);
     $("#demo").fadeIn(400);
@@ -112,7 +114,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         return fish.title;
       }
     });
-
+    
     // Query Sliders (jQuery UI Sliders)
     $(".slider").slider({
       value: 10,
@@ -318,6 +320,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       event.preventDefault();
       var fishID = $(this).closest("li").data('id');
       var shortlist = shortlistManager(fishID);
+      var upvote = upvoteManager(fishID);
       var fishModal = $("#"+fishID+".modal");
 
       // if Modal for Fish doesn't already exist.  
@@ -330,7 +333,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         var modalTemplate = _.template($( "#modalTemplate" ).html());
         var modalData = {
           metadata  : $.jStorage.get("metadata-"+fishID),
-          shortlist : shortlist.template()
+          shortlist : shortlist.template(),
+          upvote    : upvote.template(),
         }; 
         fishModal.empty().append( modalTemplate( modalData ));
         
@@ -394,6 +398,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $("[data-id='"+ fishID +"'][data-toggle='upvote'] ").each(function(index) {
         $(this).addClass("upvoted btn-success disabled");
       });
+
+      // Upvote Fish on iFish Server
+      pond.find_fish(fishID).up_vote();
     });
   }
 
