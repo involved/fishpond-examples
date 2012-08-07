@@ -587,13 +587,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $(resultsList.find("li")).each(function (index) {
         var id = $(this).data('id');
         var oldPos = index;
-        var animateFish = queryAnimation.list.find("li[data-id='"+id+"']");
-        var newPos = animateFish.index();
-        var newSize = 1-((5*newPos)/100);
+        var newPos = queryAnimation.list.find("li[data-id='"+id+"']").index();
 
-        $(this).removeClass("static").addClass("animating");
-        animateFish.addClass("static");
-
+        $(this).addClass("animating");
         $(this).attr('data-pos-start', oldPos); 
         $(this).attr('data-pos-end', newPos); 
       });
