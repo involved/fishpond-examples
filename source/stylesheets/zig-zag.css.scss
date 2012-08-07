@@ -11,14 +11,11 @@ $row-5-count: 6;
 
 @mixin fish-width($row-count){
   // 4:3 Ratio
-  $col-width: floor((($results-width - $fish-spacing) - ($fish-spacing * ($row-count - 1)))/$row-count);
+  $col-width: floor((($results-width) - ($fish-spacing * ($row-count - 1)))/$row-count);
   width: $col-width;
   .thumbnail{
     @include height-transtion(0.5s);
     height: floor($col-width);
-  
-    border-top: blue 3px solid;
-    border-bottom: blue 3px solid;
   }
 }
 
@@ -37,24 +34,38 @@ $row-5-count: 6;
 }
 
 
+@mixin row-ltr{
+  border-top: yellow 3px solid;
+  //left: $fish-spacing;
+}
+
+@mixin row-rtl{
+  border-top: green 3px solid;
+  //right: $fish-spacing;
+}
+
+
 @mixin col-right{
-  margin-right: 0;
-  border-top: yellow 3px solid !important;
+  //margin-right: 0;
 }
 
 #query{
   #results.zigzag{
     width: $results-width;
     background: salmon;
+    
     .thumbnails{
       margin-left: 0;
+      background: lightgreen;
+
       .fish{
         @include width-transtion(0.5s);
         
         position: relative;
         width: $fish-width; // backup width
-        margin-right: $fish-spacing;
-        margin-left: 0;
+        margin: 0;
+
+
 
         .thumbnail{
           
@@ -94,14 +105,19 @@ $row-5-count: 6;
         // Row 1
         $x: 0;
         @for $i from 0 through 2 {
+
+
           &[data-pos-start='#{$i}']{
             @include fish-width($row-1-count);
+            @include row-ltr;
             float: left;
             margin-top: $x * 20px;
             padding-bottom: ($row-1-count - $x) * 20px;
-            
-            @if $x == 2 {
-              @include col-right;
+            left: $x * $fish-spacing;
+
+            @if $x == 0 {
+              border-top: red 3px solid !important;
+              clear: right;
             }
           }
 
@@ -113,12 +129,15 @@ $row-5-count: 6;
         @for $i from 3 through 6 {
           &[data-pos-start='#{$i}']{
             @include fish-width($row-2-count);
+            @include row-rtl;
             float: right;
             margin-top: $x * 10px;
             padding-bottom: ($row-2-count - $x) * 10px;
+            right: $x * $fish-spacing;
 
             @if $x == 0 {
-              //@include col-right;
+              border-top: orange 3px solid !important;
+              clear: left;
             }
           }
           $x: $x + 1
@@ -129,12 +148,15 @@ $row-5-count: 6;
         @for $i from 7 through 11{
           &[data-pos-start='#{$i}']{
             @include fish-width($row-3-count);
+            @include row-ltr;
             float: left;
             margin-top: $x * 10px;
             padding-bottom: ($row-3-count - $x) * 10px;
-            border-top: lightgreen 3px solid !important;
-            @if $x == 4 {
-              @include col-right;
+            left: $x * $fish-spacing;
+
+            @if $x == 0 {
+              border-top: red 3px solid !important;
+              clear: right;
             }
           }
           $x: $x + 1
@@ -145,12 +167,15 @@ $row-5-count: 6;
         @for $i from 12 through 17 {
           &[data-pos-start='#{$i}']{
             @include fish-width($row-4-count);
+            @include row-rtl;
             float: right;
             margin-top: $x * 2px;
             padding-bottom: ($row-4-count - $x) * 2px;
-            border-top: purple 3px solid !important;
+            right: $x * $fish-spacing;
+
             @if $x == 0 {
-              //@include col-right;
+              border-top: orange 3px solid !important;
+              clear: left;
             }
           }
           $x: $x + 1
@@ -158,13 +183,44 @@ $row-5-count: 6;
 
         // Row 5+
         $x: 0;
-        @for $i from 18 through 40 {
+        @for $i from 18 through 23 {
           &[data-pos-start='#{$i}']{
             @include fish-width($row-5-count);
+            @include row-ltr;
             float: left;
+            left: $x * $fish-spacing;
+            padding-bottom: 5px;
+            margin-top: 5px;
+            @if $x == 0 {
+              border-top: orange 3px solid !important;
+              clear: right;
+            }
+            @if $x == 5 {
+              border-top: purple 3px solid !important;
+              clear: right;
+            }
+          }
+          $x: $x + 1
+        }
+
+        $x: 0;
+        @for $i from 24 through 30 {
+          &[data-pos-start='#{$i}']{
             
-            &:nth-child(6n+6){
-              @include col-right;
+            @include fish-width($row-5-count);
+            @include row-ltr;
+            border-top: blue 3px solid;
+            float: left;
+            left: $x * $fish-spacing;
+            padding-bottom: 5px;
+        
+            @if $x == 0 {
+              border-top: orange 3px solid !important;
+              clear: left;
+            }
+            @if $x == 5 {
+              border-top: purple 3px solid !important;
+              clear: right;
             }
           }
           $x: $x + 1
@@ -176,9 +232,6 @@ $row-5-count: 6;
           @for $i from 0 through 2 {
             &[data-pos-end='#{$i}']{ 
               @include fish-width(3);
-              .thumbnail{
-                border-top: red 3px solid;
-              }
             }
           }
 
