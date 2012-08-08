@@ -22,7 +22,7 @@ task :publish do
   commands << 'git commit -am "[Automated] Pre-publish safety build"'
   commands << 'git pull origin master'
   commands << 'git push origin master'
-  commands << 'middleman build'
+  commands << 'bundle exec middleman build'
   commands << 'git add build/*'
   commands << 'git commit -am "[Automated] Building pages"'
   commands << 'git symbolic-ref HEAD refs/heads/gh-pages'
