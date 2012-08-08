@@ -9,7 +9,7 @@
 				%img{:alt => "{{ metadata.title }}", :src => "{{ metadata.image_url }}"}/
 			.span8
 				.description
-					{{ markdown.description }}
+					{{ metadata.description }}
 				= link_to "Find out more", "{{ metadata.url }}", :target => "_blank"
 				%br
 				%br

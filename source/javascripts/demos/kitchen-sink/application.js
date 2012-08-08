@@ -13,7 +13,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
   var animation = {
     enabled       : true,
-    duration      : 1000,
+    duration      : $("#animation-duration").length > 0 ? $("#animation-duration").find(":selected").val() : "1000",
     easingMethod  : $("#animation-easing").length > 0 ? $("#animation-easing").find(":selected").val() : "easeInOutQuad",
     inProgress    : false // Do not edit
   };
@@ -23,6 +23,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     evaluate : /\{\[([\s\S]+?)\]\}/g,
     interpolate : /\{\{(.+?)\}\}/g
   };
+
+  // Init Markdown converter
+  var converter = new Showdown.converter();
 
   /////////////////////////////////////////
   // Fishpond loading
@@ -184,7 +187,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     });
 
     // Animation Duration
-      // TODO
+    $("#animation-duration").change(function(){
+      animation.duration = $(this).find(":selected").val().toString();
+    });
 
     ////////////////////
     // Listeners
@@ -338,10 +343,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   //var resultsList = $("#results ul");
   var modalManager = function () {
-    // Init Markdown converter
-  //  var Showdown = require('showdown');
-    var converter = new Showdown.converter();
-
     // Modal Toggle Listener
     $("#query").on("click", "[data-toggle='modal']", function(event){
       event.preventDefault();
@@ -351,6 +352,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       var fishModal = $("#"+fishID+".modal");
       var metadata = $.jStorage.get("metadata-"+fishID);
 
+      // Convert description to Markdown
+      metadata.description = converter.makeHtml(metadata.description);
+      
       // if Modal for Fish doesn't already exist.  
       if (fishModal.length === 0){
         // Clone empty Modal template and display temporarily
@@ -363,9 +367,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           metadata   : metadata,
           shortlist  : shortlist.template(),
           upvote     : upvote.template(),
-          markdown   : {
-            description : converter.makeHtml(metadata.description)
-          }
         }; 
         fishModal.empty().append( modalTemplate( modalData ));
       } else {
@@ -624,10 +625,12 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         $(this).attr('data-pos-end', newPos); 
       });
 
+      console.log("Changes duration = " + animation.duration);
+
       resultsList.quicksand(query.list.find("li"), {
         easing      : animation.easingMethod,
-        Duration    : animation.duration,
-        useScaling  : true
+        duration    : parseInt(animation.duration),
+        useScaling  : false
       }, function() {
         animation.inProgress = false;
         // Update templates for Fish in Queue once animation has stopped

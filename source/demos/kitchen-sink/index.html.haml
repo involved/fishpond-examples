@@ -81,12 +81,7 @@
               %fieldset.options
                 = partial "demos/kitchen-sink/partials/limit"
                 = partial "demos/kitchen-sink/partials/easing"
-                
-                .control-group
-                  %label.control-label Animation Duration
-                  .controls
-                    %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "10"}/
-                    .slider.span2{"data-target" => "query[tags][biological]"}
+                = partial "demos/kitchen-sink/partials/duration"
 
                 .control-group
                   .control-label 
