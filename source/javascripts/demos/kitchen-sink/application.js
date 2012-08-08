@@ -6,16 +6,17 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   var debugMode = false;
   var pond;
 
-  var queryAnimation = {
+  var query = {
+    limit         : $("#results-limit").length > 0 ? $("#results-limit").find(":selected").val() : null,
+    list          : $("<ul></ul>")
+  };
+
+  var animation = {
     enabled       : true,
     duration      : 1000,
     easingMethod  : $("#animation-easing").length > 0 ? $("#animation-easing").find(":selected").val() : "easeInOutQuad",
-    limitResults  : $("#results-limit").length > 0 ? $("#results-limit").find(":selected").val() : null,
-    
-    // Do not edit options below
-    list          : $("<ul></ul>"),
-    inProgress    : false
-  };
+    inProgress    : false // Do not edit
+  }
 
   // Changes underscore.js tenplate settings to use moustache syntax
   _.templateSettings = {
@@ -163,14 +164,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
     // Limit results
     $("#results-limit").change(function(){
-      queryAnimation.limitResults = $(this).find(":selected").val().toString();
+      query.limit = $(this).find(":selected").val().toString();
       sendQuery();
     });
     
 
     // Disable animation
     $("#query_options_animation:checkbox").change(function(){
-      queryAnimation.enabled = this.checked ? false : true;
+      animation.enabled = this.checked ? false : true;
     });
 
     // Zig-Zag results
@@ -186,7 +187,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
     // Animation Easing Method
     $("#animation-easing").change(function(){
-      queryAnimation.easingMethod = $(this).find(":selected").val().toString();
+      animation.easingMethod = $(this).find(":selected").val().toString();
     });
 
     // Animation Duration
@@ -217,13 +218,13 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     fishUpdateQueue = []; // Clear update queue
 
     // If a Results has been set override iFish default max limit
-    if (queryAnimation.limitResults === null){
-      queryAnimation.limitResults = results.length 
+    if (query.limit === null){
+      query.limit = results.length 
     }
 
     // Clear old results
-    if (queryAnimation.enabled){
-      queryAnimation.list.empty(); 
+    if (animation.enabled){
+      query.list.empty(); 
     } else {
       resultsList.empty(); 
     }
@@ -231,7 +232,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     /////////////////////////////////////////
     // Generate Results
     /////////////////////////////////////////
-    for(var i = 0; i < queryAnimation.limitResults; i++){
+    for(var i = 0; i < query.limit; i++){
       var result = results[i];
       var fishID = result.fish.id;
       var fish = fishManager(fishID);
@@ -241,7 +242,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
           fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
           
-          if (queryAnimation.enabled && queryAnimation.inProgress){
+          if (animation.enabled && animation.inProgress){
             fishUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
           } else {
             fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
@@ -252,7 +253,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     }
 
     // Check for animation/filtering method
-    if (queryAnimation.enabled) sortResults();
+    if (animation.enabled) sortResults();
   });
 
 
@@ -302,8 +303,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         };
 
         // Update Results list
-        if (queryAnimation.enabled){
-          queryAnimation.list.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
+        if (animation.enabled){
+          query.list.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
         } else {
           resultsList.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
         }
@@ -605,29 +606,29 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Sort Results (Quicksand)
   /////////////////////////////////////////
   function sortResults() {
-    queryAnimation.inProgress = true;
+    animation.inProgress = true;
     if(resultsList.find("li").length === 0) {
       // On first load populate Quicksand with unsorted results
-      resultsList.append(queryAnimation.list.find("li"));
-      queryAnimation.inProgress = false;
+      resultsList.append(query.list.find("li"));
+      animation.inProgress = false;
     } else {
 
       $(resultsList.find("li")).each(function (index) {
         var id = $(this).data('id');
         var oldPos = index;
-        var newPos = queryAnimation.list.find("li[data-id='"+id+"']").index();
+        var newPos = query.list.find("li[data-id='"+id+"']").index();
 
         $(this).addClass("animating");
         $(this).attr('data-pos-start', oldPos); 
         $(this).attr('data-pos-end', newPos); 
       });
 
-      resultsList.quicksand(queryAnimation.list.find("li"), {
-        easing      : queryAnimation.easingMethod,
-        Duration    : queryAnimation.duration,
+      resultsList.quicksand(query.list.find("li"), {
+        easing      : animation.easingMethod,
+        Duration    : animation.duration,
         useScaling  : true
       }, function() {
-        queryAnimation.inProgress = false;
+        animation.inProgress = false;
         // Update templates for Fish in Queue once animation has stopped
         $.each(fishUpdateQueue, function(index, fishID) {
           fish = fishManager(fishID);
