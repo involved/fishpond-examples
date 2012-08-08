@@ -18,6 +18,11 @@
     <link href="/fishpond-examples/stylesheets/screen.css" media="screen" rel="stylesheet" type="text/css" />
     <link href="/fishpond-examples/stylesheets/zig-zag.css" media="screen" rel="stylesheet" type="text/css" />
     <style type='text/css'>
+      #query #pond-info {
+        margin-bottom: 20px; }
+        #query #pond-info .count {
+          float: none;
+          margin: 0; }
       #query #results.grid .thumbnails .fish {
         width: 140px;
         margin-left: 20px;
@@ -233,6 +238,105 @@
                     <fieldset class='options'>
                       <div class='control-group'>
                         <div class='control-label'>
+                          Limit Results
+                        </div>
+                        <div class='controls'>
+                          <select class='span2' id='results-limit'>
+                            <option value='1'>
+                              1
+                            </option>
+                            <option value='2'>
+                              2
+                            </option>
+                            <option value='3'>
+                              3
+                            </option>
+                            <option value='4'>
+                              4
+                            </option>
+                            <option value='5'>
+                              5
+                            </option>
+                            <option value='6'>
+                              6
+                            </option>
+                            <option value='7'>
+                              7
+                            </option>
+                            <option value='8'>
+                              8
+                            </option>
+                            <option value='9'>
+                              9
+                            </option>
+                            <option value='10'>
+                              10
+                            </option>
+                            <option value='11'>
+                              11
+                            </option>
+                            <option value='12'>
+                              12
+                            </option>
+                            <option value='13'>
+                              13
+                            </option>
+                            <option value='14'>
+                              14
+                            </option>
+                            <option value='15'>
+                              15
+                            </option>
+                            <option value='16'>
+                              16
+                            </option>
+                            <option value='17'>
+                              17
+                            </option>
+                            <option value='18'>
+                              18
+                            </option>
+                            <option value='19'>
+                              19
+                            </option>
+                            <option selected='selected' value='20'>
+                              20
+                            </option>
+                            <option value='21'>
+                              21
+                            </option>
+                            <option value='22'>
+                              22
+                            </option>
+                            <option value='23'>
+                              23
+                            </option>
+                            <option value='24'>
+                              24
+                            </option>
+                            <option value='25'>
+                              25
+                            </option>
+                            <option value='26'>
+                              26
+                            </option>
+                            <option value='27'>
+                              27
+                            </option>
+                            <option value='28'>
+                              28
+                            </option>
+                            <option value='29'>
+                              29
+                            </option>
+                            <option value='30'>
+                              30
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class='control-group'>
+                        <div class='control-label'>
                           Animation Easing
                         </div>
                         <div class='controls'>
@@ -267,6 +371,75 @@
                             <option value='easeInBounce'>easeInBounce</option>
                             <option value='easeOutBounce'>easeOutBounce</option>
                             <option value='easeInOutBounce'>easeInOutBounce</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class='control-group'>
+                        <div class='control-label'>
+                          Animation Duration
+                        </div>
+                        <div class='controls'>
+                          <select class='span2' id='animation-duration'>
+                            <option value='200'>
+                              0.2
+                              s
+                            </option>
+                            <option value='400'>
+                              0.4
+                              s
+                            </option>
+                            <option value='600'>
+                              0.6
+                              s
+                            </option>
+                            <option value='800'>
+                              0.8
+                              s
+                            </option>
+                            <option selected='selected' value='1000'>
+                              1.0
+                              s
+                            </option>
+                            <option value='1200'>
+                              1.2
+                              s
+                            </option>
+                            <option value='1400'>
+                              1.4
+                              s
+                            </option>
+                            <option value='1600'>
+                              1.6
+                              s
+                            </option>
+                            <option value='1800'>
+                              1.8
+                              s
+                            </option>
+                            <option value='2000'>
+                              2.0
+                              s
+                            </option>
+                            <option value='2200'>
+                              2.2
+                              s
+                            </option>
+                            <option value='2400'>
+                              2.4
+                              s
+                            </option>
+                            <option value='2600'>
+                              2.6
+                              s
+                            </option>
+                            <option value='2800'>
+                              2.8
+                              s
+                            </option>
+                            <option value='3000'>
+                              3.0
+                              s
+                            </option>
                           </select>
                         </div>
                       </div>
@@ -374,7 +547,9 @@
             </div>
           </div>
           <div class='span6 offset1'>
-            <h2>Results</h2>
+            <div id='pond-info'>
+              <h2>Results</h2>
+            </div>
             <div class='grid' id='results'>
               <ul class='thumbnails'></ul>
             </div>
@@ -409,11 +584,23 @@
     <script src="/fishpond-examples/javascripts/vendor/jquery-animate-css-rotate-scale.js" type="text/javascript"></script>
     <script src="/fishpond-examples/javascripts/vendor/jquery-css-transform.js" type="text/javascript"></script>
     <script src="/fishpond-examples/javascripts/vendor/jquery.quicksand.js" type="text/javascript"></script>
+    <script src="/fishpond-examples/javascripts/vendor/showdown.js" type="text/javascript"></script>
     <script src="/fishpond-examples/javascripts/demos/kitchen-sink/application.js" type="text/javascript"></script>
     <!-- //////////////////////////////////////// -->
     <!-- / JAVASCRIPT TEMPLATES -->
     <!-- / Powered by Underscore.js 'Templates' -->
     <!-- //////////////////////////////////////// -->
+    <!-- TEMPLATE - Pond Info -->
+    <script id='pondInfoTemplate' type='text/html'>
+      <h2>
+        Results
+        <small>
+          (showing
+          <span class='count'>{{ query.limit }}</span>
+          of {{ pond.fish_count }})
+        </small>
+      </h2>
+    </script>
     <!-- TEMPLATE - Tags -->
     <script id='tagsTemplate' type='text/html'>
       <div class='control-group'>
@@ -478,7 +665,9 @@
             <img alt='{{ metadata.title }}' src='{{ metadata.image_url }}' />
           </div>
           <div class='span8'>
-            <p>{{ metadata.description }}</p>
+            <div class='description'>
+              {{ metadata.description }}
+            </div>
             <a target="_blank" href="{{ metadata.url }}">Find out more</a>
             <br />
             <br />

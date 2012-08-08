@@ -240,6 +240,17 @@
     <!-- / JAVASCRIPT TEMPLATES -->
     <!-- / Powered by Underscore.js 'Templates' -->
     <!-- //////////////////////////////////////// -->
+    <!-- TEMPLATE - Pond Info -->
+    <script id='pondInfoTemplate' type='text/html'>
+      <h2>
+        Results
+        <small>
+          (showing
+          <span class='count'>{{ query.limit }}</span>
+          of {{ pond.fish_count }})
+        </small>
+      </h2>
+    </script>
     <!-- TEMPLATE - Tags -->
     <script id='tagsTemplate' type='text/html'>
       <div class='control-group'>
@@ -304,7 +315,9 @@
             <img alt='{{ metadata.title }}' src='{{ metadata.image_url }}' />
           </div>
           <div class='span8'>
-            <p>{{ metadata.description }}</p>
+            <div class='description'>
+              {{ metadata.description }}
+            </div>
             <a target="_blank" href="{{ metadata.url }}">Find out more</a>
             <br />
             <br />

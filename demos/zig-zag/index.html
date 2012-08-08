@@ -297,7 +297,9 @@
             <img alt='{{ metadata.title }}' src='{{ metadata.image_url }}' />
           </div>
           <div class='span8'>
-            <p>{{ metadata.description }}</p>
+            <div class='description'>
+              {{ metadata.description }}
+            </div>
             <a target="_blank" href="{{ metadata.url }}">Find out more</a>
             <br />
             <br />
