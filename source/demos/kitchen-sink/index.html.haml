@@ -8,6 +8,7 @@
   = javascript_include_tag "vendor/jquery-animate-css-rotate-scale.js"
   = javascript_include_tag "vendor/jquery-css-transform.js"
   = javascript_include_tag "vendor/jquery.quicksand.js"
+  = javascript_include_tag "vendor/showdown.js"
   = javascript_include_tag "demos/kitchen-sink/application.js"
   = partial "demos/kitchen-sink/templates/base"
 
@@ -77,18 +78,10 @@
             %h3.pull-left Options
 
             .form-horizontal
-              %fieldset.options                        
-                .control-group
-                  .control-label 
-                    Animation Easing
-                  .controls
-                    = partial "demos/kitchen-sink/partials/easing"
-                -#
-                  .control-group
-                    %label.control-label Animation Duration
-                    .controls
-                      %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "10"}/
-                      .slider.span2{"data-target" => "query[tags][biological]"}
+              %fieldset.options
+                = partial "demos/kitchen-sink/partials/limit"
+                = partial "demos/kitchen-sink/partials/easing"
+                = partial "demos/kitchen-sink/partials/duration"
 
                 .control-group
                   .control-label 
@@ -162,7 +155,8 @@
 
 
     .span6.offset1
-      %h2 Results
+      #pond-info
+        %h2 Results
       #results.grid
         %ul.thumbnails
 
@@ -179,8 +173,14 @@
   %style(type="text/css") 
     :scss
       #query{
+        #pond-info{
+          margin-bottom: 20px;
+          .count{
+            float: none;
+            margin: 0;
+          }
+        }
         #results{
-
           &.grid{
             .thumbnails{
               .fish{
