@@ -7,7 +7,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   var pond;
 
   var query = {
-    limit         : $("#results-limit").length > 0 ? $("#results-limit").find(":selected").val() : null,
+    limit         : 30,
     list          : $("<ul></ul>")
   };
 
@@ -57,6 +57,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var filtersTemplate = _.template($( "#filtersTemplate" ).html());
 
     // Generate Pond info
+    if ($("#results-limit").length > 0){
+      query.limit = $("#results-limit").find(":selected").val();
+    }
     var pondData = {
       pond  : pond,
       query : query
@@ -217,7 +220,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
     // If a Results has been set override iFish default max limit
     if (query.limit === null){
-      query.limit = results.length 
+      query.limit = results.length;
     }
 
     // Clear old results
@@ -624,8 +627,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         $(this).attr('data-pos-start', oldPos); 
         $(this).attr('data-pos-end', newPos); 
       });
-
-      console.log("Changes duration = " + animation.duration);
 
       resultsList.quicksand(query.list.find("li"), {
         easing      : animation.easingMethod,
