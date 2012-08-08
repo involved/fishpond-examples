@@ -8,6 +8,7 @@
   = javascript_include_tag "vendor/jquery-animate-css-rotate-scale.js"
   = javascript_include_tag "vendor/jquery-css-transform.js"
   = javascript_include_tag "vendor/jquery.quicksand.js"
+  = javascript_include_tag "vendor/showdown.js"
   = javascript_include_tag "demos/kitchen-sink/application.js"
   = partial "demos/kitchen-sink/templates/base"
 
@@ -80,12 +81,12 @@
               %fieldset.options
                 = partial "demos/kitchen-sink/partials/limit"
                 = partial "demos/kitchen-sink/partials/easing"
-                -#
-                  .control-group
-                    %label.control-label Animation Duration
-                    .controls
-                      %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "10"}/
-                      .slider.span2{"data-target" => "query[tags][biological]"}
+                
+                .control-group
+                  %label.control-label Animation Duration
+                  .controls
+                    %input#query_tags_biological{"data-slug" => "biological", :name => "query[tags][biological]", :type => "hidden", :value => "10"}/
+                    .slider.span2{"data-target" => "query[tags][biological]"}
 
                 .control-group
                   .control-label 

@@ -16,7 +16,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     duration      : 1000,
     easingMethod  : $("#animation-easing").length > 0 ? $("#animation-easing").find(":selected").val() : "easeInOutQuad",
     inProgress    : false // Do not edit
-  }
+  };
 
   // Changes underscore.js tenplate settings to use moustache syntax
   _.templateSettings = {
@@ -31,7 +31,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     $("#loading .progress").removeClass("progress-striped");
     $("#loading .bar").css({width: (percent * 100) + "%"});
 
-    if (debugMode == true) $("body").addClass("debug");
+    if (debugMode === true) { $("body").addClass("debug"); }
 
     // Clear LocalStorage of fish data. This is optional but is in here for Development purposes
     $.jStorage.flush();
@@ -53,16 +53,12 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var tagsTemplate = _.template($( "#tagsTemplate" ).html());
     var filtersTemplate = _.template($( "#filtersTemplate" ).html());
 
-    console.log("Pond");
-    console.log(pond);
-
     // Generate Pond info
     var pondData = {
-      pond: pond,
+      pond  : pond,
       query : query
-    }
+    };
     $("#pond-info").html( pondInfoTemplate( pondData ));
-
 
     // Generate Tags
     $.each(pond.tag_ids, function(name, token){ 
@@ -80,6 +76,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       };
       $("fieldset.filters .control-group").append( filtersTemplate( filtersData ));
     });
+
 
     ///////////////////
     // Query UI
@@ -104,9 +101,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       sorter: function(items){
         var query = this.query;
         items.sort(function(item1, item2){
-          if(mappedFish[item1].title.score(query) >  mappedFish[item2].title.score(query)) { return -1 };
-          if(mappedFish[item1].title.score(query) == mappedFish[item2].title.score(query)) { return 0  };
-          if(mappedFish[item1].title.score(query) <  mappedFish[item2].title.score(query)) { return 1  };
+          if(mappedFish[item1].title.score(query) >  mappedFish[item2].title.score(query)) { return -1 }
+          if(mappedFish[item1].title.score(query) === mappedFish[item2].title.score(query)) { return 0  }
+          if(mappedFish[item1].title.score(query) <  mappedFish[item2].title.score(query)) { return 1  }
         });
         return items;
       },
@@ -132,10 +129,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     
     // Query Sliders (jQuery UI Sliders)
     $(".slider").slider({
-      value: 10,
-      min: 0,
-      max: 20,
-      step: 1,
+      value   : 10,
+      min     : 0,
+      max     : 20,
+      step    : 1,
       slide: function(e, ui){
         var output = $(this).parents('.control-group').find('output');
         var hiddenField = $("input[name='" + $(this).data('target') + "']");
@@ -249,7 +246,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     }
 
     // Check for animation/filtering method
-    if (animation.enabled) sortResults();
+    if (animation.enabled) { sortResults() };
   });
 
 
@@ -341,12 +338,18 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   //var resultsList = $("#results ul");
   var modalManager = function () {
+    // Init Markdown converter
+  //  var Showdown = require('showdown');
+    var converter = new Showdown.converter();
+
+    // Modal Toggle Listener
     $("#query").on("click", "[data-toggle='modal']", function(event){
       event.preventDefault();
       var fishID = $(this).closest("li").data('id');
       var shortlist = shortlistManager(fishID);
       var upvote = upvoteManager(fishID);
       var fishModal = $("#"+fishID+".modal");
+      var metadata = $.jStorage.get("metadata-"+fishID);
 
       // if Modal for Fish doesn't already exist.  
       if (fishModal.length === 0){
@@ -357,12 +360,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         // Load data into empty Modal
         var modalTemplate = _.template($( "#modalTemplate" ).html());
         var modalData = {
-          metadata  : $.jStorage.get("metadata-"+fishID),
-          shortlist : shortlist.template(),
-          upvote    : upvote.template(),
+          metadata   : metadata,
+          shortlist  : shortlist.template(),
+          upvote     : upvote.template(),
+          markdown   : {
+            description : converter.makeHtml(metadata.description)
+          }
         }; 
         fishModal.empty().append( modalTemplate( modalData ));
-        
       } else {
         // If Modal already exists in DOM then just show Modal
         // Minimise the comments first 

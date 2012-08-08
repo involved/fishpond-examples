@@ -8,7 +8,8 @@
 			.span3
 				%img{:alt => "{{ metadata.title }}", :src => "{{ metadata.image_url }}"}/
 			.span8
-				%p {{ metadata.description }}
+				.description
+					{{ markdown.description }}
 				= link_to "Find out more", "{{ metadata.url }}", :target => "_blank"
 				%br
 				%br
