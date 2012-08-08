@@ -49,24 +49,20 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     $("#demo h1").append(' "' + pond.name + '"');       
 
     // Setup Templates
+    var pondInfoTemplate = _.template($( "#pondInfoTemplate" ).html());
     var tagsTemplate = _.template($( "#tagsTemplate" ).html());
     var filtersTemplate = _.template($( "#filtersTemplate" ).html());
 
     console.log("Pond");
     console.log(pond);
 
+    // Generate Pond info
     var pondData = {
       pond: pond,
-      limit : 30
+      query : query
     }
-    // Generate Pond Info
-    /*$.each(pond.tag_ids, function(name, token){ 
-      var tagsData = { 
-        name  : name, 
-        token : token
-      };
-      $("fieldset.tags").append( tagsTemplate( tagsData ));
-    });*/
+    $("#pond-info").html( pondInfoTemplate( pondData ));
+
 
     // Generate Tags
     $.each(pond.tag_ids, function(name, token){ 
@@ -165,10 +161,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     // Limit results
     $("#results-limit").change(function(){
       query.limit = $(this).find(":selected").val().toString();
+      $("#pond-info .count").html(query.limit);
       sendQuery();
     });
     
-
     // Disable animation
     $("#query_options_animation:checkbox").change(function(){
       animation.enabled = this.checked ? false : true;

@@ -159,7 +159,8 @@
 
 
     .span6.offset1
-      %h2 Results
+      #pond-info
+        %h2 Results
       #results.grid
         %ul.thumbnails
 
@@ -176,8 +177,14 @@
   %style(type="text/css") 
     :scss
       #query{
+        #pond-info{
+          margin-bottom: 20px;
+          .count{
+            float: none;
+            margin: 0;
+          }
+        }
         #results{
-
           &.grid{
             .thumbnails{
               .fish{
