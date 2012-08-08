@@ -1,0 +1,12 @@
+.control-group
+	.control-label 
+		Limit Results
+	.controls
+		%select#results-limit.span2
+			- (1..30).each do |i|
+				- if i == 20
+					%option{:value => "#{i}", :selected => "selected"}
+						= i
+				- else
+					%option{:value => "#{i}"}
+						= i
