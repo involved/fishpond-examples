@@ -9,7 +9,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   var queryAnimation = {
     enabled       : true,
     duration      : 1000,
-    easingMethod  : _.isElement($("#easing")) ? $("#easing").find(":selected").val() : "easeInOutQuad",
+    easingMethod  : $("#animation-easing").length > 0 ? $("#animation-easing").find(":selected").val() : "easeInOutQuad",
+    limitResults  : $("#results-limit").length > 0 ? $("#results-limit").find(":selected").val() : null,
+    
     // Do not edit options below
     list          : $("<ul></ul>"),
     inProgress    : false
@@ -48,6 +50,22 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     // Setup Templates
     var tagsTemplate = _.template($( "#tagsTemplate" ).html());
     var filtersTemplate = _.template($( "#filtersTemplate" ).html());
+
+    console.log("Pond");
+    console.log(pond);
+
+    var pondData = {
+      pond: pond,
+      limit : 30
+    }
+    // Generate Pond Info
+    /*$.each(pond.tag_ids, function(name, token){ 
+      var tagsData = { 
+        name  : name, 
+        token : token
+      };
+      $("fieldset.tags").append( tagsTemplate( tagsData ));
+    });*/
 
     // Generate Tags
     $.each(pond.tag_ids, function(name, token){ 
@@ -143,6 +161,13 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     // Query Options
     //////////////////
 
+    // Limit results
+    $("#results-limit").change(function(){
+      queryAnimation.limitResults = $(this).find(":selected").val().toString();
+      sendQuery();
+    });
+    
+
     // Disable animation
     $("#query_options_animation:checkbox").change(function(){
       queryAnimation.enabled = this.checked ? false : true;
@@ -165,9 +190,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     });
 
     // Animation Duration
-
-
-
+      // TODO
 
     ////////////////////
     // Listeners
@@ -193,6 +216,11 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   fishpond.resultsUpdated(function(results){
     fishUpdateQueue = []; // Clear update queue
 
+    // If a Results has been set override iFish default max limit
+    if (queryAnimation.limitResults === null){
+      queryAnimation.limitResults = results.length 
+    }
+
     // Clear old results
     if (queryAnimation.enabled){
       queryAnimation.list.empty(); 
@@ -203,7 +231,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     /////////////////////////////////////////
     // Generate Results
     /////////////////////////////////////////
-    for(var i = 0; i < results.length; i++){
+    for(var i = 0; i < queryAnimation.limitResults; i++){
       var result = results[i];
       var fishID = result.fish.id;
       var fish = fishManager(fishID);
