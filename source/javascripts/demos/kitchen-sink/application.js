@@ -70,22 +70,22 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     $.each(pond.tag_ids, function(name, token){ 
       var tagsData = { 
         name  : name,
-        tag1  : splitTagName(name)[0],
-        tag2  : splitTagName(name)[1] ? splitTagName(name)[1] : "",
+        tag1  : splitTag(name)[0],
+        tag2  : splitTag(name)[1] ? splitTag(name)[1] : "",
         token : token
       };
       $("fieldset.tags").append( tagsTemplate( tagsData ));
     });
 
-    function splitTagName(string){
-      var tags = string.split('_');
+    function splitTag(name){
+      var tags = name.split('_');
       var splitTag = [];
       if (tags.length > 1){
         tags.forEach(function(tag, i) {
           splitTag[i] = tag;
         });
       } else {
-        splitTag[0] = string;
+        splitTag[0] = name;
       }
       return splitTag;
     }
@@ -683,7 +683,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var output = $(this).parents('.control-group').find('output');
     var hiddenField = $("input[name='" + $(this).data('target') + "']");
     var value = ui['value'];
-
     if(value.toString() !== hiddenField.val().toString()){
       hiddenField.val(value);
       output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
@@ -700,7 +699,13 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   
     // Sliders
     $("form input[name*='tags']").each(function(){
-      tags[$(this).data('slug')] = $(this).val();
+      var switcher = $(this).attr("name").replace(/tags/i, "switch");
+      if( $("input[name='"+ switcher + "']:checked").length == 0 ){
+        console.log("DISABLE - " + switcher);
+        tags[$(this).data('slug')] = false;
+      } else {
+        tags[$(this).data('slug')] = $(this).val();
+      }
     });
 
     // Filters

@@ -5,7 +5,6 @@
 			.span10
 				%input{ :id => "query_tag_{{ token }}", :name => "query[tags][{{ token }}]", :type => "hidden", :value => "10", :data => { :slug => "{{ name }}" } }
 				.slider{ :data => { :target => "query[tags][{{ token }}]" } }
-
 			.span1
 				%label.checkbox			
 					%input{ :id => "query_switch_{{ token }}", :name => "query[switch][{{ token }}]", :type => "checkbox", :checked => "checked", :value => "true", :data => { :slug => "{{ name }}" }}
@@ -16,18 +15,3 @@
 				{{ tag1 }}
 			.tag2.span3
 				{{ tag2 }}
-
-
-
--#
-	.control-group
-		%label.control-label
-			{{ tag1 }}
-			%output (10)
-		.controls
-			%input{ :id => "query_tag_{{ token }}", :name => "query[tags][{{ token }}]", :type => "hidden", :value => "10", :data => { :slug => "{{ name }}" } }
-			.slider.span2{ :data => { :target => "query[tags][{{ token }}]" } }
-		.controls
-			.span2
-				%label.checkbox
-					%input.query_options_disable{:name => "query[tags][disable]", :type => "checkbox", :value => "0"}
