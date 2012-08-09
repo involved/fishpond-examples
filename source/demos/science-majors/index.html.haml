@@ -9,6 +9,7 @@
   = javascript_include_tag "vendor/jquery-animate-css-rotate-scale.js"
   = javascript_include_tag "vendor/jquery-css-transform.js"
   = javascript_include_tag "vendor/jquery.quicksand.js"
+  = javascript_include_tag "vendor/showdown.js"
   = javascript_include_tag "demos/kitchen-sink/application.js"
   = partial "demos/kitchen-sink/templates/base"
 
@@ -55,7 +56,8 @@
               Clear Shortlist
 
     .span6.offset1
-      %h2 Results
+      #pond-info
+        %h2 Results
       #results
         %ul.thumbnails
 
@@ -81,7 +83,7 @@
                 margin-bottom: 18px;
                 &.loading{
                   .thumbnail{
-                    background: url(/images/common/loading.gif) no-repeat center center;
+                    background: url(http://involved.github.com/fishpond-examples/images/common/loading.gif) no-repeat center center;
                     color: #999;
                   }
                 }

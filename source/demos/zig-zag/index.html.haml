@@ -8,6 +8,7 @@
   = javascript_include_tag "vendor/jquery-animate-css-rotate-scale.js"
   = javascript_include_tag "vendor/jquery-css-transform.js"
   = javascript_include_tag "vendor/jquery.quicksand.js"
+  = javascript_include_tag "vendor/showdown.js"
   = javascript_include_tag "demos/kitchen-sink/application.js"
  
   /////////////////////////////////////////
@@ -15,7 +16,7 @@
   // Powered by Underscore.js 'Templates'
   /////////////////////////////////////////
   = partial "demos/zig-zag/templates/fish"
-
+  = partial "demos/kitchen-sink/templates/pond-info"
   = partial "demos/kitchen-sink/templates/tags"
   = partial "demos/kitchen-sink/templates/filters"
   = partial "demos/kitchen-sink/templates/fish-details"
@@ -68,7 +69,8 @@
               Clear Shortlist
 
     .span6.offset1
-      %h2 Results
+      #pond-info
+        %h2 Results
       #results.zigzag
         %ul.thumbnails
 
