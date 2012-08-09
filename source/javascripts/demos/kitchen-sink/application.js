@@ -69,11 +69,26 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     // Generate Tags
     $.each(pond.tag_ids, function(name, token){ 
       var tagsData = { 
-        name  : name, 
+        name  : name,
+        tag1  : splitTagName(name)[0],
+        tag2  : splitTagName(name)[1] ? splitTagName(name)[1] : "",
         token : token
       };
       $("fieldset.tags").append( tagsTemplate( tagsData ));
     });
+
+    function splitTagName(string){
+      var tags = string.split('_');
+      var splitTag = [];
+      if (tags.length > 1){
+        tags.forEach(function(tag, i) {
+          splitTag[i] = tag;
+        });
+      } else {
+        splitTag[0] = string;
+      }
+      return splitTag;
+    }
 
     // Generate Filters
     $.each(pond.filters, function(index, token){
@@ -139,17 +154,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       min     : 0,
       max     : 20,
       step    : 1,
-      slide: function(e, ui){
-        var output = $(this).parents('.control-group').find('output');
-        var hiddenField = $("input[name='" + $(this).data('target') + "']");
-        var value = ui['value'];
-
-        if(value.toString() !== hiddenField.val().toString()){
-          hiddenField.val(value);
-          output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
-          sendQuery();
-        }
-      }
+      slide   : sliderChanged,
+      change  : sliderChanged
     });
 
     // Query Filters
@@ -673,6 +679,18 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   // Other Functions
   /////////////////////////////////////////
+  function sliderChanged(e, ui){
+    var output = $(this).parents('.control-group').find('output');
+    var hiddenField = $("input[name='" + $(this).data('target') + "']");
+    var value = ui['value'];
+
+    if(value.toString() !== hiddenField.val().toString()){
+      hiddenField.val(value);
+      output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+      sendQuery();
+    }
+  }
+
   function sendQuery(){
     var tags = {};
     var filters = {};

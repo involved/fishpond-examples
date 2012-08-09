@@ -26,9 +26,15 @@
         %li
           = link_to "JStorage", "http://www.jstorage.info/", :target => "_blank"
           (Javascript client-side caching)
+        %li 
+          = link_to "Showdown", "https://github.com/coreyti/showdown/", :target => "_blank"
+          (JS Markdown Parser)
         %li
           = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
           (Filtering and Animation)
+        %li
+          = link_to "Twitter Bootstrap Typeahead", "http://twitter.github.com/bootstrap/javascript.html#typeahead", :target => "_blank"
+          (Search autocomplete)
         %li
           = link_to "Disqus", "http://disqus.com", :target => "_blank"
           (Commenting engine)
@@ -38,6 +44,7 @@
         %li
           = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
           (Allows asynchronous javascript functions)
+
     .span2.offset1
       %span.label.label-success Metadata enabled
       %br 
@@ -173,6 +180,32 @@
   %style(type="text/css") 
     :scss
       #query{
+        #fishpond{
+          .tags{
+            margin-top: 10px;
+            .control-group{
+              margin-bottom: 15px;
+              .row-fluid [class*="span"]{
+                min-height: 20px;
+              }
+              .sliders{
+                .checkbox input[type="checkbox"]{
+                  margin-left: -10px;
+                }
+              }
+              .tag-labels{
+                position: relative;
+                top: -8px;
+                font-size: 13px;
+                font-weight: bold;
+                .tag2{
+                  text-align: right;
+                }
+              }
+            }
+          }
+        }
+
         #pond-info{
           margin-bottom: 20px;
           .count{

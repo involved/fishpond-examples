@@ -4,7 +4,7 @@
 	.controls
 		%select#animation-duration.span2
 			- (1..15).each do |i|
-				- if i == 5
+				- if i == 10
 					%option{:value => "#{i * 100}", :selected => "selected"}
 						= ((i * 100).round(2)/1000)
 						s
