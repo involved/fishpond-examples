@@ -1,9 +1,17 @@
 / TEMPLATE - Tags
 %script{:id => "tagsTemplate", :type => "text/html"}
 	.control-group
-		%label.control-label
-			{{ name }}
-			%output (10)
-		.controls
-			%input{ :id => "query_tag_{{ token }}", :name => "query[tags][{{ token }}]", :type => "hidden", :value => "10", :data => { :slug => "{{ name }}" } }
-			.slider.span2{ :data => { :target => "query[tags][{{ token }}]" } }
+		.sliders.row-fluid
+			.span10
+				%input{ :id => "query_tag_{{ token }}", :name => "query[tags][{{ token }}]", :type => "hidden", :value => "10", :data => { :slug => "{{ name }}" } }
+				.slider{ :data => { :target => "query[tags][{{ token }}]" } }
+			.span1
+				%label.checkbox			
+					%input{ :id => "query_switch_{{ token }}", :name => "query[switch][{{ token }}]", :type => "checkbox", :checked => "checked", :value => "true", :data => { :slug => "{{ name }}" }}
+			.span1
+				%output (10)
+		.tag-labels.row-fluid
+			.tag1.span7
+				{{ tag1 }}
+			.tag2.span3
+				{{ tag2 }}

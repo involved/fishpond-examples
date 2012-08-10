@@ -61,11 +61,7 @@
       #results
         %ul.thumbnails
 
-
-
-  #emptyModal.modal.hide
-    .modal-body.loading
-      // Empty
+  = partial "demos/kitchen-sink/partials/modal"
 
 
 - content_for :css do
@@ -117,6 +113,11 @@
                     .btn{
                       margin-top: 7px;
                     }
+                  }
+                  .favourite{
+                    position: absolute;
+                    top: 49px;
+                    left: 4px;
                   }
                 }
               }

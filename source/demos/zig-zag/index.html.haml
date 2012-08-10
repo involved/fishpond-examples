@@ -74,11 +74,7 @@
       #results.zigzag
         %ul.thumbnails
 
-
-
-  #emptyModal.modal.hide
-    .modal-body.loading
-      // Empty
+  = partial "demos/kitchen-sink/partials/modal"
 
 
 - content_for :css do
@@ -124,10 +120,14 @@
                       height: auto;
                       overflow: hidden;
                     }
-
                     .btn{
                       margin-top: 7px;
                     }
+                  }
+                  .favourite{
+                    position: absolute;
+                    top: 49px;
+                    left: 4px;
                   }
                 }
               }
