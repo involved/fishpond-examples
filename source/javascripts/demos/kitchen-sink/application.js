@@ -77,19 +77,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $("fieldset.tags").append( tagsTemplate( tagsData ));
     });
 
-    function splitTag(name){
-      var tags = name.split('_');
-      var splitTag = [];
-      if (tags.length > 1){
-        tags.forEach(function(tag, i) {
-          splitTag[i] = tag;
-        });
-      } else {
-        splitTag[0] = name;
-      }
-      return splitTag;
-    }
-
     // Generate Filters
     $.each(pond.filters, function(index, token){
       var filtersData = { 
@@ -133,14 +120,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       },
       updater: function (item) {
         var fish = mappedFish[item];
-        $("form#fishpond input:checkbox").removeAttr('checked');
+        $("form input:checkbox").removeAttr('checked');
 
         for( var token in fish.tags ){
           var value = fish.tags[token];
-          $("form#fishpond input[name='query[tags][" + token + "]']").val(value);
-          $("form#fishpond .slider[data-target='query[tags][" + token + "]']").slider("value", value); // Update jQuery UI sliders positions
+          $("form input[name='query[tags][" + token + "]']").val(value);
+          $("form .slider[data-target='query[tags][" + token + "]']").slider("value", value); // Update jQuery UI sliders positions
           if(value >= 1){
-            $("form#fishpond input[name='query[filters][" + token + "]']").attr('checked', 'checked');
+            $("form input[name='query[filters][" + token + "]']").attr('checked', 'checked');
           }
         }
         sendQuery();
@@ -158,8 +145,13 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       change  : sliderChanged
     });
 
+    // Disable Slider
+    $("form input[name*='switch']:checkbox").change(function(){
+      sendQuery();
+    });
+
     // Query Filters
-    $("input[name*='filters']:checkbox").change(function(){
+    $("form input[name*='filters']:checkbox").change(function(){
       sendQuery();
     });
 
@@ -683,11 +675,26 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var output = $(this).parents('.control-group').find('output');
     var hiddenField = $("input[name='" + $(this).data('target') + "']");
     var value = ui['value'];
+    console.log("value - " + value);
     if(value.toString() !== hiddenField.val().toString()){
       hiddenField.val(value);
-      output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+      updateTagOutput(output, value);
       sendQuery();
     }
+  }
+
+  function regexToken(txt){
+    // Find value in second [] i.e. WxI in 'query[switch][WxI]'
+    var re1='.*?';    // Non-greedy match on filler
+    var re2='(?:[a-z][a-z]+)';    // Uninteresting: word
+    var re3='.*?';    // Non-greedy match on filler
+    var re4='(?:[a-z][a-z]+)';    // Uninteresting: word
+    var re5='.*?';    // Non-greedy match on filler
+    var re6='((?:[a-z][a-z]+))';    // Word 1
+
+    var p = new RegExp(re1+re2+re3+re4+re5+re6,["i"]);
+    var m = p.exec(txt);
+    if (m != null) return m[1];
   }
 
   function sendQuery(){
@@ -699,13 +706,20 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   
     // Sliders
     $("form input[name*='tags']").each(function(){
-      var switcher = $(this).attr("name").replace(/tags/i, "switch");
-      if( $("input[name='"+ switcher + "']:checked").length == 0 ){
-        console.log("DISABLE - " + switcher);
+      var token = regexToken($(this).attr("name"));
+      var tagControl = $(".slider[data-target='query[tags]["+token+"]']");
+      var output = $(this).parents('.control-group').find('output');
+
+      if( $("input[name='query[switch]["+token+"]']:checked").length == 0 ){
         tags[$(this).data('slug')] = false;
+        tagControl.slider('disable');
+        updateTagOutput(output, 0);
       } else {
         tags[$(this).data('slug')] = $(this).val();
+        tagControl.slider('enable');
+        updateTagOutput(output, $(this).val());
       }
+      
     });
 
     // Filters
@@ -719,5 +733,22 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     fishpond.query(tags, filters);
   }
 
-};
+  function updateTagOutput(element, val){
+    if (element.length > 0){
+      element.html(element.html().split("(")[0] + "(" + val.toString() + ")");
+    }
+  }
 
+  function splitTag(name){
+    var tags = name.split('_');
+    var splitTag = [];
+    if (tags.length > 1){
+      tags.forEach(function(tag, i) {
+        splitTag[i] = tag;
+      });
+    } else {
+      splitTag[0] = name;
+    }
+    return splitTag;
+  }
+};

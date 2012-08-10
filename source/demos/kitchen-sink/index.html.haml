@@ -14,48 +14,6 @@
 
 .page-header
   %h1 Kitchen Sink - Demo
-  %br
-  .row
-    .span9
-      %p
-        %strong Powered by:
-      %ul
-        %li 
-          = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
-          (Javascript Templates)
-        %li
-          = link_to "JStorage", "http://www.jstorage.info/", :target => "_blank"
-          (Javascript client-side caching)
-        %li 
-          = link_to "Showdown", "https://github.com/coreyti/showdown/", :target => "_blank"
-          (JS Markdown Parser)
-        %li
-          = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
-          (Filtering and Animation)
-        %li
-          = link_to "Twitter Bootstrap Typeahead", "http://twitter.github.com/bootstrap/javascript.html#typeahead", :target => "_blank"
-          (Search autocomplete)
-        %li
-          = link_to "Disqus", "http://disqus.com", :target => "_blank"
-          (Commenting engine)
-        %li
-          = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
-          (Form UI controls)
-        %li
-          = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
-          (Allows asynchronous javascript functions)
-
-    .span2.offset1
-      %span.label.label-success Metadata enabled
-      %br 
-      %span.label.label-success Comments enabled
-      %br 
-      %span.label.label-success Filters enabled
-      %br 
-      %span.label.label-success Search Box enabled
-      -#
-        %br 
-        %span.label.label-warning Popularity Sliders [In Dev]
 
 #query
   .row
@@ -169,9 +127,60 @@
 
 
 
+.credits.row
+  %hr
+  .span9
+    %p
+      %strong Powered by:
+    %ul
+      %li 
+        = link_to "Underscore JS Templates", "http://underscorejs.org/", :target => "_blank"
+        (Javascript Templates)
+      %li
+        = link_to "JStorage", "http://www.jstorage.info/", :target => "_blank"
+        (Javascript client-side caching)
+      %li 
+        = link_to "Showdown", "https://github.com/coreyti/showdown/", :target => "_blank"
+        (JS Markdown Parser)
+      %li
+        = link_to "jQuery Quicksand Plugin", "http://razorjack.net/quicksand/", :target => "_blank"
+        (Filtering and Animation)
+      %li
+        = link_to "Twitter Bootstrap Typeahead", "http://twitter.github.com/bootstrap/javascript.html#typeahead", :target => "_blank"
+        (Search autocomplete)
+      %li
+        = link_to "Disqus", "http://disqus.com", :target => "_blank"
+        (Commenting engine)
+      %li
+        = link_to "jQuery UI Slider", "http://jqueryui.com/demos/slider/", :target => "_blank"
+        (Form UI controls)
+      %li
+        = link_to "jQuery Deferred.Promise()", "http://api.jquery.com/deferred.promise/", :target => "_blank"
+        (Allows asynchronous javascript functions)
+
+  .span2.offset1
+    %span.label.label-success Metadata
+    %br 
+    %span.label.label-success Comments
+    %br 
+    %span.label.label-success Filters
+    %br 
+    %span.label.label-success Shortlists
+    %br 
+    %span.label.label-success Search Box
+    %br 
+    %span.label.label-success Upvotes
+    %br 
+    %span.label.label-success Disable sliders
+    %br 
+    %span.label.label-success Popularity Sliders
+
+
+
   #emptyModal.modal.modal-wide.hide
     .modal-body.loading
       // Empty
+
 
 
 
