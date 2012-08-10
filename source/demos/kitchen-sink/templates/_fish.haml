@@ -7,3 +7,8 @@
 				{[ if (!_.isEmpty(metadata)) { ]}
 				{{ fishDetailsData }}
 				{[ } ]}
+			{[ if (fish.popularity() >= 15) { ]}   
+			.favourite
+				%a{ :href => "#", :class => "btn btn-mini btn-danger" }
+					%i.icon-heart.icon-white.disabled
+			{[ } ]}

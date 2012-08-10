@@ -327,7 +327,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
         // If Metadata has loaded then populate 'Details Template'
         if (currentFish.getMetadata()) {
-          fishDetailsData = { 
+          fishDetailsData = {
             metadata      : currentFish.getMetadata(),
             shortlist     : shortlist.template(),
             upvote        : upvote.template()
