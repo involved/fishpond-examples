@@ -120,7 +120,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       },
       updater: function (item) {
         var fish = mappedFish[item];
-        $("form input:checkbox").removeAttr('checked');
+        $("form input[name=*'query[tags]:checkbox").removeAttr('checked');
 
         for( var token in fish.tags ){
           var value = fish.tags[token];
