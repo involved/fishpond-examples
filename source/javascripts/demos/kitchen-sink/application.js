@@ -217,7 +217,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     fishUpdateQueue = []; // Clear update queue
 
     // If a Results has been set override iFish default max limit
-    if (query.limit === null){
+    if (query.limit === null || query.limit >= results.length){
       query.limit = results.length;
     }
 
@@ -233,8 +233,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     /////////////////////////////////////////
     for(var i = 0; i < query.limit; i++){
       var result = results[i];
-      var fishID = result.fish.id;
-      var fish = fishManager(fishID);
+      var fish = fishManager(result.fish.id);
 
       if (fish.getMetadata() === null){
         // If Metadata is NOT cached
@@ -722,10 +721,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
     // Filters
     $("form input[name*='filters']").each(function(){
-      var value = 0;
-      if(this.checked){
-        value = 1;
-      }
+      var value = this.checked ? 1 : 0;
       filters[$(this).data('slug')] = value;
     });
     fishpond.query(tags, filters);
