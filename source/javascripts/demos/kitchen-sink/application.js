@@ -13,7 +13,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
   var animation = {
     enabled       : true,
-    duration      : $("#animation-duration").length > 0 ? $("#animation-duration").find(":selected").val() : "1000",
+    duration      : $("#animation-duration").length > 0 ? $("#animation-duration").find(":selected").val() : "800",
     easingMethod  : $("#animation-easing").length > 0 ? $("#animation-easing").find(":selected").val() : "easeInOutQuad",
     inProgress    : false // Do not edit
   };
@@ -675,7 +675,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var output = $(this).parents('.control-group').find('output');
     var hiddenField = $("input[name='" + $(this).data('target') + "']");
     var value = ui['value'];
-    console.log("value - " + value);
     if(value.toString() !== hiddenField.val().toString()){
       hiddenField.val(value);
       updateTagOutput(output, value);
@@ -713,13 +712,12 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       if( $("input[name='query[switch]["+token+"]']:checked").length == 0 ){
         tags[$(this).data('slug')] = false;
         tagControl.slider('disable');
-        updateTagOutput(output, 0);
+        updateTagOutput(output, "n/a");
       } else {
         tags[$(this).data('slug')] = $(this).val();
         tagControl.slider('enable');
         updateTagOutput(output, $(this).val());
       }
-      
     });
 
     // Filters
