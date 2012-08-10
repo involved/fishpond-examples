@@ -2,7 +2,7 @@
 %script{:id => "fishTemplate", :type => "text/html"}
 	%li{ :data => { :id => "{{ fish.id }}", "pos-start" => "{{ position }}", "pos-end" => "na" }, :class => "{{ status }} fish" }
 		.thumbnail
-			%strong.title {{ fish.title }}      
+			%strong.title {{ fish.title }} - {{ fish.popularity() }} 
 			.details
 				{[ if (!_.isEmpty(metadata)) { ]}
 				{{ fishDetailsData }}

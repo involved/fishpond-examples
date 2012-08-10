@@ -740,6 +740,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       tags.forEach(function(tag, i) {
         splitTag[i] = tag;
       });
+    } else if (name === "popularity"){
+      splitTag.push("unpopular", "popular");
     } else {
       splitTag[0] = name;
     }
