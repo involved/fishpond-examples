@@ -7,13 +7,13 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   var pond;
 
   var query = {
-    limit         : $("#results-limit").length > 0 ? $("#results-limit").find(":selected").val() : null,
+    limit         : 30,
     list          : $("<ul></ul>")
   };
 
   var animation = {
     enabled       : true,
-    duration      : $("#animation-duration").length > 0 ? $("#animation-duration").find(":selected").val() : "1000",
+    duration      : $("#animation-duration").length > 0 ? $("#animation-duration").find(":selected").val() : "800",
     easingMethod  : $("#animation-easing").length > 0 ? $("#animation-easing").find(":selected").val() : "easeInOutQuad",
     inProgress    : false // Do not edit
   };
@@ -57,6 +57,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var filtersTemplate = _.template($( "#filtersTemplate" ).html());
 
     // Generate Pond info
+    if ($("#results-limit").length > 0){
+      query.limit = $("#results-limit").find(":selected").val();
+    }
     var pondData = {
       pond  : pond,
       query : query
@@ -66,7 +69,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     // Generate Tags
     $.each(pond.tag_ids, function(name, token){ 
       var tagsData = { 
-        name  : name, 
+        name  : name,
+        tag1  : splitTag(name)[0],
+        tag2  : splitTag(name)[1] ? splitTag(name)[1] : "",
         token : token
       };
       $("fieldset.tags").append( tagsTemplate( tagsData ));
@@ -115,14 +120,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       },
       updater: function (item) {
         var fish = mappedFish[item];
-        $("form#fishpond input:checkbox").removeAttr('checked');
+        $("form input[name=*'query[tags]:checkbox").removeAttr('checked');
 
         for( var token in fish.tags ){
           var value = fish.tags[token];
-          $("form#fishpond input[name='query[tags][" + token + "]']").val(value);
-          $("form#fishpond .slider[data-target='query[tags][" + token + "]']").slider("value", value); // Update jQuery UI sliders positions
+          $("form input[name='query[tags][" + token + "]']").val(value);
+          $("form .slider[data-target='query[tags][" + token + "]']").slider("value", value); // Update jQuery UI sliders positions
           if(value >= 1){
-            $("form#fishpond input[name='query[filters][" + token + "]']").attr('checked', 'checked');
+            $("form input[name='query[filters][" + token + "]']").attr('checked', 'checked');
           }
         }
         sendQuery();
@@ -136,21 +141,17 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       min     : 0,
       max     : 20,
       step    : 1,
-      slide: function(e, ui){
-        var output = $(this).parents('.control-group').find('output');
-        var hiddenField = $("input[name='" + $(this).data('target') + "']");
-        var value = ui['value'];
+      slide   : sliderChanged,
+      change  : sliderChanged
+    });
 
-        if(value.toString() !== hiddenField.val().toString()){
-          hiddenField.val(value);
-          output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
-          sendQuery();
-        }
-      }
+    // Disable Slider
+    $("form input[name*='switch']:checkbox").change(function(){
+      sendQuery();
     });
 
     // Query Filters
-    $("input[name*='filters']:checkbox").change(function(){
+    $("form input[name*='filters']:checkbox").change(function(){
       sendQuery();
     });
 
@@ -216,8 +217,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     fishUpdateQueue = []; // Clear update queue
 
     // If a Results has been set override iFish default max limit
-    if (query.limit === null){
-      query.limit = results.length 
+    if (query.limit === null || query.limit >= results.length){
+      query.limit = results.length;
     }
 
     // Clear old results
@@ -232,8 +233,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     /////////////////////////////////////////
     for(var i = 0; i < query.limit; i++){
       var result = results[i];
-      var fishID = result.fish.id;
-      var fish = fishManager(fishID);
+      var fish = fishManager(result.fish.id);
 
       if (fish.getMetadata() === null){
         // If Metadata is NOT cached
@@ -327,7 +327,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
         // If Metadata has loaded then populate 'Details Template'
         if (currentFish.getMetadata()) {
-          fishDetailsData = { 
+          fishDetailsData = {
             metadata      : currentFish.getMetadata(),
             shortlist     : shortlist.template(),
             upvote        : upvote.template()
@@ -625,8 +625,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         $(this).attr('data-pos-end', newPos); 
       });
 
-      console.log("Changes duration = " + animation.duration);
-
       resultsList.quicksand(query.list.find("li"), {
         easing      : animation.easingMethod,
         duration    : parseInt(animation.duration),
@@ -672,6 +670,31 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   // Other Functions
   /////////////////////////////////////////
+  function sliderChanged(e, ui){
+    var output = $(this).parents('.control-group').find('output');
+    var hiddenField = $("input[name='" + $(this).data('target') + "']");
+    var value = ui['value'];
+    if(value.toString() !== hiddenField.val().toString()){
+      hiddenField.val(value);
+      updateTagOutput(output, value);
+      sendQuery();
+    }
+  }
+
+  function regexToken(txt){
+    // Find value in second [] i.e. WxI in 'query[switch][WxI]'
+    var re1='.*?';    // Non-greedy match on filler
+    var re2='(?:[a-z][a-z]+)';    // Uninteresting: word
+    var re3='.*?';    // Non-greedy match on filler
+    var re4='(?:[a-z][a-z]+)';    // Uninteresting: word
+    var re5='.*?';    // Non-greedy match on filler
+    var re6='((?:[a-z][a-z]+))';    // Word 1
+
+    var p = new RegExp(re1+re2+re3+re4+re5+re6,["i"]);
+    var m = p.exec(txt);
+    if (m != null) return m[1];
+  }
+
   function sendQuery(){
     var tags = {};
     var filters = {};
@@ -681,19 +704,47 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   
     // Sliders
     $("form input[name*='tags']").each(function(){
-      tags[$(this).data('slug')] = $(this).val();
+      var token = regexToken($(this).attr("name"));
+      var tagControl = $(".slider[data-target='query[tags]["+token+"]']");
+      var output = $(this).parents('.control-group').find('output');
+
+      if( $("input[name='query[switch]["+token+"]']:checked").length == 0 ){
+        tags[$(this).data('slug')] = false;
+        tagControl.slider('disable');
+        updateTagOutput(output, "n/a");
+      } else {
+        tags[$(this).data('slug')] = $(this).val();
+        tagControl.slider('enable');
+        updateTagOutput(output, $(this).val());
+      }
     });
 
     // Filters
     $("form input[name*='filters']").each(function(){
-      var value = 0;
-      if(this.checked){
-        value = 1;
-      }
+      var value = this.checked ? 1 : 0;
       filters[$(this).data('slug')] = value;
     });
     fishpond.query(tags, filters);
   }
 
-};
+  function updateTagOutput(element, val){
+    if (element.length > 0){
+      element.html(element.html().split("(")[0] + "(" + val.toString() + ")");
+    }
+  }
 
+  function splitTag(name){
+    var tags = name.split('_');
+    var splitTag = [];
+    if (tags.length > 1){
+      tags.forEach(function(tag, i) {
+        splitTag[i] = tag;
+      });
+    } else if (name === "popularity"){
+      splitTag.push("unpopular", "popular");
+    } else {
+      splitTag[0] = name;
+    }
+    return splitTag;
+  }
+};
