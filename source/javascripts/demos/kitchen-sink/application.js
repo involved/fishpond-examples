@@ -1,20 +1,42 @@
 var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
 
   // Setup global variables
-  var resultsList = $("#results ul");
   var fishUpdateQueue = [];
   var debugMode = false;
   var pond;
 
+  var resultsList = $("#results ul");
+  var pondInfo = $("#pond-info");
+
+  var templates = {
+    query: {
+      info    : $("#pondInfoTemplate"),
+      tags    : $("#tagsTemplate"),
+      filters : $("#filtersTemplate")
+    },
+    fish: {
+      result  : $("#fishTemplate"),
+      details : $("#fishDetailsTemplate"),
+      modal   : $("#modalTemplate")
+    },
+    shortlist : {
+      master  : $("#shortlistTemplate"),
+      email   : $("#shortlistEmail"),
+      print   : $("#shortlistPrint")
+    }
+  }
+
+
+  // Settings for demo, with fallback.
   var query = {
-    limit         : 30,
-    list          : $("<ul></ul>")
+    limit         : $("#results-limit").length > 0 ? $("#results-limit :selected").val() : 30,
+    list          : $("<ul></ul>") // Do not edit
   };
 
   var animation = {
     enabled       : true,
-    duration      : $("#animation-duration").length > 0 ? $("#animation-duration").find(":selected").val() : "800",
-    easingMethod  : $("#animation-easing").length > 0 ? $("#animation-easing").find(":selected").val() : "easeInOutQuad",
+    duration      : $("#animation-duration").length > 0 ? $("#animation-duration :selected").val() : "800",
+    easingMethod  : $("#animation-easing").length > 0 ? $("#animation-easing :selected").val() : "easeInOutQuad",
     inProgress    : false // Do not edit
   };
 
@@ -57,14 +79,11 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var filtersTemplate = _.template($( "#filtersTemplate" ).html());
 
     // Generate Pond info
-    if ($("#results-limit").length > 0){
-      query.limit = $("#results-limit").find(":selected").val();
-    }
     var pondData = {
       pond  : pond,
       query : query
     };
-    $("#pond-info").html( pondInfoTemplate( pondData ));
+    pondInfo.html( pondInfoTemplate( pondData ));
 
     // Generate Tags
     $.each(pond.tag_ids, function(name, token){ 
