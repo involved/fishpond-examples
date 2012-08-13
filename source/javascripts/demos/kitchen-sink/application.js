@@ -3,7 +3,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Setup global variables
   var fishUpdateQueue = [];
   var debugMode = false;
-  var queryLimit = $("#results-limit").length > 0 ? $("#results-limit :selected").val() : 30;
+  var queryLimit = $("#results-limit").length > 0 ? $("#results-limit :selected").val() : 20;
   var pond;
 
   var ui = {
@@ -89,8 +89,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var queryInfoTemplate = _.template(ui.templates.query.info.html());
     var tagsTemplate = _.template(ui.templates.query.tag.html());
     var filtersTemplate = _.template(ui.templates.query.filter.html());
-
-    console.log(query);
 
     // Generate Pond info
     var pondData = {
@@ -195,7 +193,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     // Limit results
     $("#results-limit").change(function(){
       queryLimit = $(this).find(":selected").val().toString();
-      $("#pond-info .count").html(queryLimit);
       sendQuery();
     });
     
@@ -249,9 +246,12 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   fishpond.resultsUpdated(function(results){
     fishUpdateQueue = []; // Clear update queue
 
-    // If a Results has been set override iFish default max limit
-    if (queryLimit === null || queryLimit >= results.length){
+    queryLimit = $("#results-limit :selected").val().toString();;
+
+    // If a Result Limit has been set, then override iFish default max limit
+    if (queryLimit === null || results.length <= queryLimit){
       queryLimit = results.length;
+      ui.query.info.find(".count").html(queryLimit);
     }
 
     // Clear old results
@@ -726,6 +726,9 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   function sendQuery(){
     var tags = {};
     var filters = {};
+
+    // Update Query Count
+    ui.query.info.find(".count").html(queryLimit);
    
     // Search Box
     ui.query.form.find("input.search-query").val("");// Reset search value
