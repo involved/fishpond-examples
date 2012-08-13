@@ -3,35 +3,41 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Setup global variables
   var fishUpdateQueue = [];
   var debugMode = false;
+  var queryLimit = $("#results-limit").length > 0 ? $("#results-limit :selected").val() : 30;
   var pond;
 
-  var resultsList = $("#results ul");
   var pondInfo = $("#pond-info");
 
-  var templates = {
+  var ui = {
     query: {
-      info    : $("#pondInfoTemplate"),
-      tags    : $("#tagsTemplate"),
-      filters : $("#filtersTemplate")
+      list        : $("<ul></ul>"), // Do not edit
+      tags        : $("form fieldset.tags"),
+      filters     : $("form fieldset.filters"),
+      search      : $("form .search-query")
     },
-    fish: {
-      result  : $("#fishTemplate"),
-      details : $("#fishDetailsTemplate"),
-      modal   : $("#modalTemplate")
+    results: {
+      list        : $("#results ul")
     },
-    shortlist : {
-      master  : $("#shortlistTemplate"),
-      email   : $("#shortlistEmail"),
-      print   : $("#shortlistPrint")
+    templates: {
+      query: {
+        info      : $("#pondInfoTemplate"),
+        tags      : $("#tagsTemplate"),
+        filters   : $("#filtersTemplate")
+      },
+      fish: {
+        result    : $("#fishTemplate"),
+        details   : $("#fishDetailsTemplate"),
+        modal     : $("#modalTemplate")
+      },
+      shortlist: {
+        master    : $("#shortlistTemplate"),
+        email     : $("#shortlistEmail"),
+        print     : $("#shortlistPrint")
+      }
     }
   }
 
 
-  // Settings for demo, with fallback.
-  var query = {
-    limit         : $("#results-limit").length > 0 ? $("#results-limit :selected").val() : 30,
-    list          : $("<ul></ul>") // Do not edit
-  };
 
   var animation = {
     enabled       : true,
@@ -71,12 +77,12 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     // Loading transitions (Demo site purposes)
     $("#loading").fadeOut(0);
     $("#demo").fadeIn(400);
-    $("#demo h1").append(' "' + pond.name + '"');       
+    $("#demo h1").append(' "' + pond.name + '"');
 
     // Setup Templates
-    var pondInfoTemplate = _.template($( "#pondInfoTemplate" ).html());
-    var tagsTemplate = _.template($( "#tagsTemplate" ).html());
-    var filtersTemplate = _.template($( "#filtersTemplate" ).html());
+    var pondInfoTemplate = _.template(ui.templates.query.info.html());
+    var tagsTemplate = _.template(ui.templates.query.tags.html());
+    var filtersTemplate = _.template(ui.templates.query.filters.html());
 
     // Generate Pond info
     var pondData = {
@@ -93,7 +99,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         tag2  : splitTag(name)[1] ? splitTag(name)[1] : "",
         token : token
       };
-      $("fieldset.tags").append( tagsTemplate( tagsData ));
+      ui.query.tags.append( tagsTemplate( tagsData ));
     });
 
     // Generate Filters
@@ -119,7 +125,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       fishIds.push(fish.id);
     }
 
-    $("form#search .search-query").typeahead({
+    ui.query.search.typeahead({
       items: 5,
       source: fishIds,
       matcher: function(item){
@@ -180,8 +186,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
     // Limit results
     $("#results-limit").change(function(){
-      query.limit = $(this).find(":selected").val().toString();
-      $("#pond-info .count").html(query.limit);
+      queryLimit = $(this).find(":selected").val().toString();
+      $("#pond-info .count").html(queryLimit);
       sendQuery();
     });
     
@@ -236,21 +242,21 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     fishUpdateQueue = []; // Clear update queue
 
     // If a Results has been set override iFish default max limit
-    if (query.limit === null || query.limit >= results.length){
-      query.limit = results.length;
+    if (queryLimit === null || queryLimit >= results.length){
+      queryLimit = results.length;
     }
 
     // Clear old results
     if (animation.enabled){
-      query.list.empty(); 
+      ui.query.list.empty(); 
     } else {
-      resultsList.empty(); 
+      ui.results.list.empty(); 
     }
 
     /////////////////////////////////////////
     // Generate Results
     /////////////////////////////////////////
-    for(var i = 0; i < query.limit; i++){
+    for(var i = 0; i < queryLimit; i++){
       var result = results[i];
       var fish = fishManager(result.fish.id);
 
@@ -307,7 +313,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       },
       generateTemplate: function (result, position) {
         var currentFish = this;
-        var fishTemplate = _.template($( "#fishTemplate" ).html());
+        var fishTemplate = _.template(ui.templates.fish.result.html());
         var metadata = currentFish.getMetadata();
         var resultData = {
           fish            : result.fish, 
@@ -321,14 +327,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
         // Update Results list
         if (animation.enabled){
-          query.list.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
+          ui.query.list.append( fishTemplate( resultData ));  // Use Quicksand plugin to handle filtering + animations.         
         } else {
-          resultsList.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
+          ui.results.list.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
         }
       },
       updateTemplate: function () {
         var currentFish = this;
-        var fishResult = resultsList.find("li[data-id='" + fishID + "']");
+        var fishResult = ui.results.list.find("li[data-id='" + fishID + "']");
         var fishDetailsData = { 
           metadata        : currentFish.getMetadata(),
           shortlist       : shortlist.template(),
@@ -341,7 +347,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       },
       fishDetails: function () {
         var currentFish = this;
-        var fishDetailsTemplate = _.template($( "#fishDetailsTemplate" ).html());
+        var fishDetailsTemplate = _.template(ui.templates.fish.details.html());
         var fishDetailsData;
 
         // If Metadata has loaded then populate 'Details Template'
@@ -360,7 +366,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   // Modal Manager
   /////////////////////////////////////////
-  //var resultsList = $("#results ul");
   var modalManager = function () {
     // Modal Toggle Listener
     $("#query").on("click", "[data-toggle='modal']", function(event){
@@ -381,7 +386,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         fishModal.modal("show");
 
         // Load data into empty Modal
-        var modalTemplate = _.template($( "#modalTemplate" ).html());
+        var modalTemplate = _.template(ui.templates.fish.modal.html());
         var modalData = {
           metadata   : metadata,
           shortlist  : shortlist.template(),
@@ -522,7 +527,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
       // Update Master list
       if (shortlistStatus){
-        var shortlistTemplate = _.template($( "#shortlistTemplate" ).html());
+        var shortlistTemplate = _.template(ui.templates.shortlist.master.html());
         var shortlistData = { 
           fishID        : fishID,
           title         : $(this).data("title"),
@@ -628,23 +633,23 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   function sortResults() {
     animation.inProgress = true;
-    if(resultsList.find("li").length === 0) {
+    if(ui.results.list.find("li").length === 0) {
       // On first load populate Quicksand with unsorted results
-      resultsList.append(query.list.find("li"));
+      ui.results.list.append(ui.query.list.find("li"));
       animation.inProgress = false;
     } else {
 
-      $(resultsList.find("li")).each(function (index) {
+      $(ui.results.list.find("li")).each(function (index) {
         var id = $(this).data('id');
         var oldPos = index;
-        var newPos = query.list.find("li[data-id='"+id+"']").index();
+        var newPos = ui.query.list.find("li[data-id='"+id+"']").index();
 
         $(this).addClass("animating");
         $(this).attr('data-pos-start', oldPos); 
         $(this).attr('data-pos-end', newPos); 
       });
 
-      resultsList.quicksand(query.list.find("li"), {
+      ui.results.list.quicksand(ui.query.list.find("li"), {
         easing      : animation.easingMethod,
         duration    : parseInt(animation.duration),
         useScaling  : false
@@ -719,7 +724,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var filters = {};
    
     // Search Box
-    $("form#search input").val("");// Reset search value
+    $("form input.search-query").val("");// Reset search value
   
     // Sliders
     $("form input[name*='tags']").each(function(){
