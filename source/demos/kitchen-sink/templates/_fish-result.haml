@@ -1,5 +1,5 @@
-/ TEMPLATE - Fish
-%script{:id => "fishTemplate", :type => "text/html"}
+/ TEMPLATE - Fish Result
+%script{:id => "template-fish-result", :type => "text/html"}
 	%li{ :data => { :id => "{{ fish.id }}", "pos-start" => "{{ position }}", "pos-end" => "na", :popularity => "{{ fish.popularity() }}" }, :class => "{{ status }} fish" }
 		.thumbnail
 			%strong.title {{ fish.title }} 
