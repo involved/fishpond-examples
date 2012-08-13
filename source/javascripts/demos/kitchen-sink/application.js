@@ -12,10 +12,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       tags        : $("form fieldset.tags"),
       filters     : $("form fieldset.filters"),
       search      : $("form .search-query"),
-      list        : $("<ul></ul>") // Do not edit
+      list        : $("<ul></ul>"), // Do not edit
+      info        : $("#query-info")
     },
     results: {
-      info        : $("#pond-info"),
       container   : $("#results"),
       list        : $("#results ul")
     },
@@ -28,7 +28,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     },
     templates: {
       query: {
-        info      : $("#template-query-info"),
+        info     : $("#template-query-info"),
         tag      : $("#template-query-tag"),
         filter   : $("#template-query-filter")
       },
@@ -86,16 +86,18 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     $("#demo h1").append(' "' + pond.name + '"');
 
     // Setup Templates
-    var pondInfoTemplate = _.template(ui.templates.query.info.html());
+    var queryInfoTemplate = _.template(ui.templates.query.info.html());
     var tagsTemplate = _.template(ui.templates.query.tag.html());
     var filtersTemplate = _.template(ui.templates.query.filter.html());
 
+    console.log(query);
+
     // Generate Pond info
     var pondData = {
-      pond  : pond,
-      query : query
+      pond        : pond,
+      queryLimit  : queryLimit
     };
-    ui.results.info.html( pondInfoTemplate( pondData ));
+    ui.query.info.html( queryInfoTemplate( pondData ));
 
     // Generate Tags
     $.each(pond.tag_ids, function(name, token){ 
