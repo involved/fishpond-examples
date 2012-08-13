@@ -1,5 +1,5 @@
 / TEMPLATE - Fish Details
-%script{:id => "fishDetailsTemplate", :type => "text/html"}
+%script{:id => "template-fish-details", :type => "text/html"}
 	%a{ :href => "#", :data => { :toggle => "modal" } }
 		%img{ :src => "{{ metadata.thumbnail_url }}", :alt => "{{ metadata.title }}", :class => "profile" }
 		{[ if (!_.isEmpty(shortlist)) { ]}          

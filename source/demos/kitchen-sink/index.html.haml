@@ -20,13 +20,13 @@
     .span5
       .row
         .span5
-          %form#search.form-horizontal
+          %form.form-horizontal
             .well
               %fieldset
                 %center
                   %input.search-query{:type => "text", :class => "span4", :placeholder => "Search by title"}
 
-          %form#fishpond.form-horizontal.well
+          %form.form-horizontal.well
             %h2 Tags
             %fieldset.tags
               -# Sliders Dynamically added
@@ -120,7 +120,7 @@
 
 
     .span6.offset1
-      #pond-info
+      #query-info
         %h2 Results
       #results.grid
         %ul.thumbnails
@@ -174,6 +174,8 @@
     %span.label.label-success Disable sliders
     %br 
     %span.label.label-success Popularity Sliders
+    %br 
+    %span.label.label-success Markdown descriptions
 
 
   = partial "demos/kitchen-sink/partials/modal"
