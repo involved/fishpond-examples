@@ -37,7 +37,7 @@
         localStorage.setItem("fishpond_api_key", apiKey);
         localStorage.setItem("fishpond_pond_token", pondToken);
 
-        var options = { debug: false };
+        var options = { debug: true };
         var fishpond = new Fishpond(apiKey, options);
         setupFishpond(fishpond);
         fishpond.init(pondToken);

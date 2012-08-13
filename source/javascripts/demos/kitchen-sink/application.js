@@ -246,7 +246,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   fishpond.resultsUpdated(function(results){
     fishUpdateQueue = []; // Clear update queue
 
-    queryLimit = $("#results-limit :selected").val().toString();;
+    // Get Demo-mode queryLimit from dropdown
+    queryLimit = $("#results-limit :selected").val().toString();
 
     // If a Result Limit has been set, then override iFish default max limit
     if (queryLimit === null || results.length <= queryLimit){
@@ -299,7 +300,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     return {
       setMetadata: function (result) {
         var defered = new $.Deferred();  // Uses jQuery deferred to load Fish Metadata and then pass it back on completion.
-        fishpond.get_fish(fishID, function(metadata){
+        fishpond.get_fish(fishID, function(fish){
+          metadata = fish.metadata;
 
           // Parse Metadata and provide fallbacks to avoid breakages
           var parsedMetadata = {
