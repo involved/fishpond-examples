@@ -28,19 +28,19 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     },
     templates: {
       query: {
-        info      : $("#pondInfoTemplate"),
-        tags      : $("#tagsTemplate"),
-        filters   : $("#filtersTemplate")
+        info      : $("#template-query-info"),
+        tag      : $("#template-query-tag"),
+        filter   : $("#template-query-filter")
       },
       fish: {
-        result    : $("#fishTemplate"),
-        details   : $("#fishDetailsTemplate"),
-        modal     : $("#modalTemplate")
+        result    : $("#template-fish-result"),
+        details   : $("#template-fish-details"),
+        modal     : $("#template-fish-modal")
       },
       shortlist: {
-        master    : $("#shortlistTemplate"),
-        email     : $("#shortlistEmail"),
-        print     : $("#shortlistPrint")
+        master    : $("#template-shortlist-master"),
+        email     : $("#template-shortlist-email"),
+        print     : $("#template-shortlist-print")
       }
     }
   }
@@ -374,7 +374,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   var modalManager = function () {
     // Modal Toggle Listener
-    $("#query").on("click", "[data-toggle='modal']", function(event){
+    ui.results.container.on("click", "[data-toggle='modal']", function(event){
       event.preventDefault();
       var fishID = $(this).closest("li").data('id');
       var shortlist = shortlistManager(fishID);
