@@ -182,7 +182,7 @@
           <div class='span5'>
             <div class='row'>
               <div class='span5'>
-                <form class='form-horizontal' id='search'>
+                <form class='form-horizontal'>
                   <div class='well'>
                     <fieldset>
                       <center>
@@ -191,7 +191,7 @@
                     </fieldset>
                   </div>
                 </form>
-                <form class='form-horizontal well' id='fishpond'>
+                <form class='form-horizontal well'>
                   <h2>Tags</h2>
                   <fieldset class='tags'>
                   </fieldset>
@@ -523,7 +523,7 @@
             </div>
           </div>
           <div class='span6 offset1'>
-            <div id='pond-info'>
+            <div id='query-info'>
               <h2>Results</h2>
             </div>
             <div class='grid' id='results'>
@@ -589,6 +589,8 @@
           <span class='label label-success'>Disable sliders</span>
           <br />
           <span class='label label-success'>Popularity Sliders</span>
+          <br />
+          <span class='label label-success'>Markdown descriptions</span>
         </div>
         <div class='modal modal-wide hide' id='emptyModal'>
           <div class='modal-body loading'></div>
@@ -623,19 +625,19 @@
     <!-- / JAVASCRIPT TEMPLATES -->
     <!-- / Powered by Underscore.js 'Templates' -->
     <!-- //////////////////////////////////////// -->
-    <!-- TEMPLATE - Pond Info -->
-    <script id='pondInfoTemplate' type='text/html'>
+    <!-- TEMPLATE - Query Info -->
+    <script id='template-query-info' type='text/html'>
       <h2>
         Results
         <small>
           (showing
-          <span class='count'>{{ query.limit }}</span>
+          <span class='count'>{{ queryLimit }}</span>
           of {{ pond.fish_count }})
         </small>
       </h2>
     </script>
-    <!-- TEMPLATE - Tags -->
-    <script id='tagsTemplate' type='text/html'>
+    <!-- TEMPLATE - Query Tag -->
+    <script id='template-query-tag' type='text/html'>
       <div class='control-group'>
         <div class='sliders row-fluid'>
           <div class='span10'>
@@ -661,8 +663,8 @@
         </div>
       </div>
     </script>
-    <!-- TEMPLATE - Filters -->
-    <script id='filtersTemplate' type='text/html'>
+    <!-- TEMPLATE - Query Filter -->
+    <script id='template-query-filter' type='text/html'>
       <div class='controls'>
         <label class='checkbox'>
           <input data-slug='{{ token.slug }}' id='query_filter_{{ token.id }}' name='query[filters][{{ token.id }}]' type='checkbox' value='0' />
@@ -670,8 +672,8 @@
         </label>
       </div>
     </script>
-    <!-- TEMPLATE - Fish -->
-    <script id='fishTemplate' type='text/html'>
+    <!-- TEMPLATE - Fish Result -->
+    <script id='template-fish-result' type='text/html'>
       <li class='{{ status }} fish' data-id='{{ fish.id }}' data-popularity='{{ fish.popularity() }}' data-pos-end='na' data-pos-start='{{ position }}'>
         <div class='thumbnail'>
           <strong class='title'>{{ fish.title }}</strong>
@@ -691,7 +693,7 @@
       </li>
     </script>
     <!-- TEMPLATE - Fish Details -->
-    <script id='fishDetailsTemplate' type='text/html'>
+    <script id='template-fish-details' type='text/html'>
       <a data-toggle='modal' href='#'>
         <img alt='{{ metadata.title }}' class='profile' src='{{ metadata.thumbnail_url }}' />
         {[ if (!_.isEmpty(shortlist)) { ]}
@@ -707,8 +709,8 @@
         </a>
       </a>
     </script>
-    <!-- TEMPLATE - Modal -->
-    <script id='modalTemplate' type='text/html'>
+    <!-- TEMPLATE - Fish Modal -->
+    <script id='template-fish-modal' type='text/html'>
       <div class='modal-header'>
         <button class='close' data-dismiss='modal'>×</button>
         <h3>{{ metadata.title }}</h3>
@@ -754,8 +756,8 @@
         <a class='btn' data-dismiss='modal' href='#'>Close</a>
       </div>
     </script>
-    <!-- TEMPLATE - Shortlist (Master) -->
-    <script id='shortlistTemplate' type='text/html'>
+    <!-- TEMPLATE - Shortlist Master -->
+    <script id='template-shortlist-master' type='text/html'>
       <li data-id='{{ fishID }}'>
         <a data-toggle='modal' href='#'>
           <img alt='{{ title }}' class='profile' src='{{ thumbnail_url }}' />
@@ -763,7 +765,7 @@
       </li>
     </script>
     <!-- TEMPLATE - Shortlist Email -->
-    <script id='shortlistEmail' type='text/html'>
+    <script id='template-shortlist-email' type='text/html'>
       <div class='row-fluid' data-id='{{ metadata.id }}'>
         <div class='span12'>
           <h3>{{ metadata.title }}</h3>
@@ -774,7 +776,7 @@
       </div>
     </script>
     <!-- TEMPLATE - Shortlist Print -->
-    <script id='shortlistPrint' type='text/html'>
+    <script id='template-shortlist-print' type='text/html'>
       <div class='row-fluid' data-id='{{ metadata.id }}'>
         <div class='span12'>
           <h3>{{ metadata.title }}</h3>
@@ -824,7 +826,7 @@
           localStorage.setItem("fishpond_api_key", apiKey);
           localStorage.setItem("fishpond_pond_token", pondToken);
     
-          var options = { debug: false };
+          var options = { debug: true };
           var fishpond = new Fishpond(apiKey, options);
           setupFishpond(fishpond);
           fishpond.init(pondToken);
