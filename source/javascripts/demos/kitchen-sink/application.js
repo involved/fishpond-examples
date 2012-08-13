@@ -269,11 +269,11 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       var result = results[i];
       var fish = fishManager(result.fish.id);
 
-      if (fish.getMetadata() === null){
+
+      if (result.fish.is_cached === false){
         // If Metadata is NOT cached
         $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
           fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
-          
           if (animation.enabled && animation.inProgress){
             fishUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
           } else {
@@ -296,35 +296,31 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     var fishDetailsTemplate = _.template(ui.templates.fish.details.html());
     var shortlist = shortlistManager(fishID);
     var upvote = upvoteManager(fishID);
-    
+
     return {
       setMetadata: function (result) {
         var defered = new $.Deferred();  // Uses jQuery deferred to load Fish Metadata and then pass it back on completion.
         fishpond.get_fish(fishID, function(fish){
-          metadata = fish.metadata;
-
-          // Parse Metadata and provide fallbacks to avoid breakages
-          var parsedMetadata = {
-            description   : _.isNull(metadata.description) ? "No description set" : metadata.description,
-            image_url     : _.isNull(metadata.image_url) ? "http://placehold.it/300x300" : metadata.image_url,
-            thumbnail_url : _.isNull(metadata.thumbnail_url) ? "http://placehold.it/120x120" : metadata.thumbnail_url,
-            url           : (metadata.url === "" || _.isNull(metadata.url)) ? "#" : metadata.url,
-            id            : metadata.id,
-            title         : metadata.title
-          };
-          
-          $.jStorage.set("metadata-"+fishID, parsedMetadata);
+          console.log("Metadata loaded and cached");
           defered.resolve(result);
         });    
         return defered.promise();
       },
+      checkMetadata: function () {
+        return fish.metadata ? true : false;
+      },
       getMetadata: function () {
-        return $.jStorage.get("metadata-"+fishID);
+        fishpond.get_fish(fishID, function(fish){
+          console.log("Returned metadata");
+          return fish.metadata;
+        });
       },
       generateTemplate: function (result, position) {
+        console.log("Generate template");
         var currentFish = this;
         var fishTemplate = _.template(ui.templates.fish.result.html());
         var metadata = currentFish.getMetadata();
+        console.log("MD - " + metadata.id);
         var resultData = {
           fish            : result.fish, 
           fishDetailsData : currentFish.fishDetails(),  // Pass 'details' template into this template
@@ -343,6 +339,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         }
       },
       updateTemplate: function () {
+        console.log("Update template");
         var currentFish = this;
         var fishResult = ui.results.list.find("li[data-id='" + fishID + "']");
         var fishDetailsData = { 
@@ -357,12 +354,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       },
       fishDetails: function () {
         var currentFish = this;
-        var fishDetailsTemplate = _.template(ui.templates.fish.details.html());
-        var fishDetailsData;
-
         // If Metadata has loaded then populate 'Details Template'
         if (currentFish.getMetadata()) {
-          fishDetailsData = {
+          var fishDetailsTemplate = _.template(ui.templates.fish.details.html());
+          var fishDetailsData = {
             metadata      : currentFish.getMetadata(),
             shortlist     : shortlist.template(),
             upvote        : upvote.template()
