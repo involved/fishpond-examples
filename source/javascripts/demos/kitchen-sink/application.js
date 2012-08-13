@@ -267,21 +267,21 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     /////////////////////////////////////////
     for(var i = 0; i < queryLimit; i++){
       var result = results[i];
-      var fish = fishManager(result.fish.id);
+      var fish = fishManager(result);
 
 
       if (result.fish.is_cached === false){
         // If Metadata is NOT cached
-        $.when( fish.setMetadata(result) ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
-          fish = fishManager(result.fish.id); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
+        $.when( fish.setMetadata() ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
+          fish = fishManager(); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
           if (animation.enabled && animation.inProgress){
             fishUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
           } else {
-            fish.updateTemplate(); // Update the Fish Template with the newly aquired Metadata. 
+            fish.updateTemplate(result.fish.metadata); // Update the Fish Template with the newly aquired Metadata. 
           }
         });
       } 
-      fish.generateTemplate(result, i); // Generate Fish - This will either create a 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded then the partial Fish will be dynamically updated later after Metadata has loaded.
+      fish.generateTemplate(i); // Generate Fish - This will either create a 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded then the partial Fish will be dynamically updated later after Metadata has loaded.
     }
 
     // Check for animation/filtering method
@@ -292,40 +292,39 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   // Fish Manager
   /////////////////////////////////////////
-  var fishManager = function (fishID) {
+  var fishManager = function (result) {
+    var fishID;
     var fishDetailsTemplate = _.template(ui.templates.fish.details.html());
     var shortlist = shortlistManager(fishID);
     var upvote = upvoteManager(fishID);
 
     return {
-      setMetadata: function (result) {
+      setMetadata: function () {
+        fishID = result.fish.id;
         var defered = new $.Deferred();  // Uses jQuery deferred to load Fish Metadata and then pass it back on completion.
         fishpond.get_fish(fishID, function(fish){
-          console.log("Metadata loaded and cached");
           defered.resolve(result);
         });    
         return defered.promise();
       },
-      checkMetadata: function () {
-        return fish.metadata ? true : false;
-      },
       getMetadata: function () {
-        fishpond.get_fish(fishID, function(fish){
-          console.log("Returned metadata");
-          return fish.metadata;
-        });
+        if (result.fish.is_cached) {
+          return result.fish.metadata
+        } else {
+          fishpond.get_fish(fishID, function(fish){
+            return fish.metadata;
+          });
+        }
       },
-      generateTemplate: function (result, position) {
+      generateTemplate: function (position) {
         console.log("Generate template");
         var currentFish = this;
         var fishTemplate = _.template(ui.templates.fish.result.html());
-        var metadata = currentFish.getMetadata();
-        console.log("MD - " + metadata.id);
         var resultData = {
           fish            : result.fish, 
           fishDetailsData : currentFish.fishDetails(),  // Pass 'details' template into this template
-          metadata        : metadata,
-          status          : metadata ? "loaded" : "loading",
+          metadata        : currentFish.getMetadata(),
+          status          : result.fish.is_cached ? "loaded" : "loading",
           shortlist       : shortlist.template(),       // Pass in 'shortlistButton' Object
           upvote          : upvote.template(),        
           position        : position
@@ -338,21 +337,22 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           ui.results.list.append( fishTemplate( resultData ));    // Fall back to non-animated filtering.
         }
       },
-      updateTemplate: function () {
-        console.log("Update template");
+      updateTemplate: function (metadata) {
         var currentFish = this;
         var fishResult = ui.results.list.find("li[data-id='" + fishID + "']");
         var fishDetailsData = { 
-          metadata        : currentFish.getMetadata(),
+          metadata        : metadata,
           shortlist       : shortlist.template(),
           upvote          : upvote.template()
         };
+        console.log(fishResult);
         fishResult.removeClass("loading").addClass("loaded");
 
         // Once Metadata is loaded then inject it into result.
         return fishResult.find(ui.fish.details).html( fishDetailsTemplate( fishDetailsData ));
       },
       fishDetails: function () {
+        console.log("fish details");
         var currentFish = this;
         // If Metadata has loaded then populate 'Details Template'
         if (currentFish.getMetadata()) {
@@ -658,8 +658,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         animation.inProgress = false;
         // Update templates for Fish in Queue once animation has stopped
         $.each(fishUpdateQueue, function(index, fishID) {
-          fish = fishManager(fishID);
-          fish.updateTemplate();
+          //fish = fishManager(fishID);
+          //fish.updateTemplate();
         });
       });
     }
