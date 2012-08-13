@@ -87,8 +87,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
     // Setup Templates
     var pondInfoTemplate = _.template(ui.templates.query.info.html());
-    var tagsTemplate = _.template(ui.templates.query.tags.html());
-    var filtersTemplate = _.template(ui.templates.query.filters.html());
+    var tagsTemplate = _.template(ui.templates.query.tag.html());
+    var filtersTemplate = _.template(ui.templates.query.filter.html());
 
     // Generate Pond info
     var pondData = {
