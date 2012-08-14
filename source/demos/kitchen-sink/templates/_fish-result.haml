@@ -4,7 +4,7 @@
 		.thumbnail
 			%strong.title {{ fish.title }} 
 			.details
-				{[ if (!_.isEmpty(metadata)) { ]}
+				{[ if (!_.isEmpty(fishDetailsData)) { ]}
 				{{ fishDetailsData }}
 				{[ } ]}
 			{[ if (fish.popularity() >= 15) { ]}   

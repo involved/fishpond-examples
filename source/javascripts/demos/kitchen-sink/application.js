@@ -269,11 +269,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       var result = results[i];
       var fish = fishManager(result);
 
-
       if (result.fish.is_cached === false){
         // If Metadata is NOT cached
         $.when( fish.setMetadata() ).then( function(result){ // This will go away and Load & Cache the Metadata then pass back the 'Result' on completion. (Uses jQuery deferred).
-          fish = fishManager(); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
+          fish = fishManager(result); // After Metadata has loaded then re-initalise 'Fish' as it is no longer in the queue.  
           if (animation.enabled && animation.inProgress){
             fishUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
           } else {
@@ -307,26 +306,39 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         });    
         return defered.promise();
       },
-      getMetadata: function () {
-        if (result.fish.is_cached) {
-          return result.fish.metadata
+      getMetadata: function (origin) {
+        if (result.fish.is_cached) {    // If Metadata has loaded then populate 'Details Template'
+          var metadata = result.fish.metadata;
+          console.log('GM - ' + origin + " - " + metadata.id);
+
+          // Clean up Metadata and provide fallbacks (Data to be passed into 'Fish Details Template')
+          var fishDetailsData = {
+            metadata      : {
+              description   : _.isNull(metadata.description) ? "No description set" : metadata.description,
+              image_url     : _.isNull(metadata.image_url) ? "http://placehold.it/300x300" : metadata.image_url,
+              thumbnail_url : _.isNull(metadata.thumbnail_url) ? "http://placehold.it/120x120" : metadata.thumbnail_url,
+              url           : (metadata.url === "" || _.isNull(metadata.url)) ? "#" : metadata.url,
+              id            : metadata.id,
+              title         : metadata.title
+            },
+            shortlist     : shortlist.template(),
+            upvote        : upvote.template()
+          };
+          return fishDetailsTemplate( fishDetailsData );
         } else {
-          fishpond.get_fish(fishID, function(fish){
-            return fish.metadata;
-          });
+          console.log("GM - Fail - " + result.fish.id);
+          return false;
         }
       },
       generateTemplate: function (position) {
-        console.log("Generate template");
         var currentFish = this;
         var fishTemplate = _.template(ui.templates.fish.result.html());
         var resultData = {
-          fish            : result.fish, 
-          fishDetailsData : currentFish.fishDetails(),  // Pass 'details' template into this template
-          metadata        : currentFish.getMetadata(),
+          fish            : result.fish,
+          fishDetailsData : currentFish.getMetadata('Generate'),  // Pass 'details' template into this template
           status          : result.fish.is_cached ? "loaded" : "loading",
           shortlist       : shortlist.template(),       // Pass in 'shortlistButton' Object
-          upvote          : upvote.template(),        
+          upvote          : upvote.template(),
           position        : position
         };
 
@@ -338,35 +350,51 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         }
       },
       updateTemplate: function (metadata) {
-        var currentFish = this;
-        var fishResult = ui.results.list.find("li[data-id='" + fishID + "']");
-        var fishDetailsData = { 
-          metadata        : metadata,
-          shortlist       : shortlist.template(),
-          upvote          : upvote.template()
-        };
-        console.log(fishResult);
-        fishResult.removeClass("loading").addClass("loaded");
-
         // Once Metadata is loaded then inject it into result.
-        return fishResult.find(ui.fish.details).html( fishDetailsTemplate( fishDetailsData ));
-      },
-      fishDetails: function () {
-        console.log("fish details");
         var currentFish = this;
-        // If Metadata has loaded then populate 'Details Template'
-        if (currentFish.getMetadata()) {
-          var fishDetailsTemplate = _.template(ui.templates.fish.details.html());
-          var fishDetailsData = {
-            metadata      : currentFish.getMetadata(),
-            shortlist     : shortlist.template(),
-            upvote        : upvote.template()
-          };
-          return fishDetailsTemplate( fishDetailsData );
-        }
-      } 
+        var fishResult = ui.results.list.find("li[data-id='" + metadata.id + "']");
+        fishResult.removeClass("loading").addClass("loaded");        
+        return fishResult.find(ui.fish.details).html( currentFish.getMetadata('Update') );
+      }
     };
   };
+
+  /////////////////////////////////////////
+  // Sort Results (Quicksand)
+  /////////////////////////////////////////
+  function sortResults() {
+    animation.inProgress = true;
+    if(ui.results.list.find("li").length === 0) {
+      // On first load populate Quicksand with unsorted results
+      ui.results.list.append(ui.query.list.find("li"));
+      animation.inProgress = false;
+    } else {
+
+      $(ui.results.list.find("li")).each(function (index) {
+        var id = $(this).data('id');
+        var oldPos = index;
+        var newPos = ui.query.list.find("li[data-id='"+id+"']").index();
+
+        $(this).addClass("animating");
+        $(this).attr('data-pos-start', oldPos); 
+        $(this).attr('data-pos-end', newPos); 
+      });
+
+      ui.results.list.quicksand(ui.query.list.find("li"), {
+        easing      : animation.easingMethod,
+        duration    : parseInt(animation.duration),
+        useScaling  : false
+      }, function() {
+        animation.inProgress = false;
+        // Update templates for Fish in Queue once animation has stopped
+        $.each(fishUpdateQueue, function(index, fishID) {
+          fishpond.get_fish(fishID, function(fish){
+            fishManager(fish).updateTemplate(fish.metadata);
+          });
+        });
+      });
+    }
+  }
 
   /////////////////////////////////////////
   // Modal Manager
@@ -627,42 +655,6 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   /////////////////////////////////////////
   function shortlistReset() {
     // TODO
-  }
-
-  /////////////////////////////////////////
-  // Sort Results (Quicksand)
-  /////////////////////////////////////////
-  function sortResults() {
-    animation.inProgress = true;
-    if(ui.results.list.find("li").length === 0) {
-      // On first load populate Quicksand with unsorted results
-      ui.results.list.append(ui.query.list.find("li"));
-      animation.inProgress = false;
-    } else {
-
-      $(ui.results.list.find("li")).each(function (index) {
-        var id = $(this).data('id');
-        var oldPos = index;
-        var newPos = ui.query.list.find("li[data-id='"+id+"']").index();
-
-        $(this).addClass("animating");
-        $(this).attr('data-pos-start', oldPos); 
-        $(this).attr('data-pos-end', newPos); 
-      });
-
-      ui.results.list.quicksand(ui.query.list.find("li"), {
-        easing      : animation.easingMethod,
-        duration    : parseInt(animation.duration),
-        useScaling  : false
-      }, function() {
-        animation.inProgress = false;
-        // Update templates for Fish in Queue once animation has stopped
-        $.each(fishUpdateQueue, function(index, fishID) {
-          //fish = fishManager(fishID);
-          //fish.updateTemplate();
-        });
-      });
-    }
   }
 
 
