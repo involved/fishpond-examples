@@ -247,7 +247,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     fishUpdateQueue = []; // Clear update queue
 
     // Get Demo-mode queryLimit from dropdown
-    queryLimit = $("#results-limit :selected").val().toString();
+    queryLimit = $("#results-limit").length > 0 ? $("#results-limit :selected").val() : 20;
 
     // If a Result Limit has been set, then override iFish default max limit
     if (queryLimit === null || results.length <= queryLimit){
