@@ -4,7 +4,7 @@
 	.controls
 		%select#results-limit.span2
 			- (1..30).each do |i|
-				- if i == 20
+				- if i == 10
 					%option{:value => "#{i}", :selected => "selected"}
 						= i
 				- else

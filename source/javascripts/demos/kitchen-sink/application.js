@@ -276,10 +276,12 @@ var setupFishpond = function(fishpond){ // you must define this function in your
           if (animation.enabled && animation.inProgress){
             fishUpdateQueue.push(result.fish.id); // If results are still animating add Fish to render process queue 
           } else {
-            fish.updateTemplate(result.fish.metadata); // Update the Fish Template with the newly aquired Metadata. 
+            //fish.updateTemplate(result.fish.metadata); // Update the Fish Template with the newly aquired Metadata. 
           }
         });
-      } 
+      } else {
+        console.log("Fail early - " + result.fish.id);
+      }
       fish.generateTemplate(i); // Generate Fish - This will either create a 'partial/empty Fish' - or - a 'complete Fish' (depending if the Metadata is loaded). In the event the Metadata is not loaded then the partial Fish will be dynamically updated later after Metadata has loaded.
     }
 
@@ -307,10 +309,14 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         return defered.promise();
       },
       getMetadata: function (origin) {
-        if (result.fish.is_cached) {    // If Metadata has loaded then populate 'Details Template'
+        console.log("------------------------------------");
+        console.log("origin - " + origin);
+        console.log("result.fish.id - " + result.fish.id);
+        console.log("result.fish.is_cached - " + result.fish.is_cached);
+        /*if (result.fish.is_cached) {    // If Metadata has loaded then populate 'Details Template'
           var metadata = result.fish.metadata;
           console.log('GM - ' + origin + " - " + metadata.id);
-
+          
           // Clean up Metadata and provide fallbacks (Data to be passed into 'Fish Details Template')
           var fishDetailsData = {
             metadata      : {
@@ -328,7 +334,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         } else {
           console.log("GM - Fail - " + result.fish.id);
           return false;
-        }
+        }*/
       },
       generateTemplate: function (position) {
         var currentFish = this;
