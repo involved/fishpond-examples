@@ -1,10 +1,15 @@
 .page-header
 	%h1 
 		Demo Labs
-		%small (Expertimental &amp; proof-of-concept demos)
+		%small (Expertimental &amp; proof-of-concept demos). 
 
 .row
 	.span12
+		%p 
+			%strong Note:
+			These demos are not maintained and were super early proof-of-concept demos to explore different User Interface techniques.
+		%br
+		%br
 		%ul
 			- @lab_demos.each do |demo|
 				%li= link_to demo, lab_demo_path(demo)
