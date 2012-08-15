@@ -247,7 +247,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     fishUpdateQueue = []; // Clear update queue
 
     // Get Demo-mode queryLimit from dropdown
-    queryLimit = $("#results-limit :selected").val().toString();
+    queryLimit = $("#results-limit").length > 0 ? $("#results-limit :selected").val() : 20;
 
     // If a Result Limit has been set, then override iFish default max limit
     if (queryLimit === null || results.length <= queryLimit){
@@ -705,13 +705,12 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   }
 
   function regexToken(txt){
-    // Find value in second [] i.e. WxI in 'query[switch][WxI]'
-    var re1='.*?';    // Non-greedy match on filler
-    var re2='(?:[a-z][a-z]+)';    // Uninteresting: word
-    var re3='.*?';    // Non-greedy match on filler
-    var re4='(?:[a-z][a-z]+)';    // Uninteresting: word
-    var re5='.*?';    // Non-greedy match on filler
-    var re6='((?:[a-z][a-z]+))';    // Word 1
+    var re1='.*?';  // Non-greedy match on filler
+    var re2='(?:[a-z][a-z0-9_]*)';  // Uninteresting: var
+    var re3='.*?';  // Non-greedy match on filler
+    var re4='(?:[a-z][a-z0-9_]*)';  // Uninteresting: var
+    var re5='.*?';  // Non-greedy match on filler
+    var re6='((?:[a-z][a-z0-9_]*))';  // Variable Name 1
 
     var p = new RegExp(re1+re2+re3+re4+re5+re6,["i"]);
     var m = p.exec(txt);
@@ -735,9 +734,10 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       var output = $(this).parents('.control-group').find('output');
 
       if( $("input[name='query[switch]["+token+"]']:checked").length == 0 ){
+        console.log("DISABLE SLIDER - " + token);
         tags[$(this).data('slug')] = false;
         tagControl.slider('disable');
-        updateTagOutput(output, "n/a");
+        updateTagOutput(output, "off");
       } else {
         tags[$(this).data('slug')] = $(this).val();
         tagControl.slider('enable');
