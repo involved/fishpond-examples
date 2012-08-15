@@ -5,11 +5,34 @@
 	%h1 Demos
 
 .row
-	.span12
+	.span3
+		%h3 Advanced
 		%ul
-			- @demos.each do |demo|
-				%li= link_to demo, demo_path(demo)
+			%li= link_to "Kitchen Sink", demo_path('kitchen-sink')
+			%li= link_to "Stand Alone", demo_path('stand-alone')
+			%li= link_to "Zig Zag", demo_path('zig-zag')
 
+	.span3
+		%h3 Basic
+		%ul
+			%li= link_to "Basic Static", demo_path('basic-static')
+			%li= link_to "Basic Dynamic", demo_path('basic-dynamic')
+			%li= link_to "Basic HTML5", demo_path('basic-html5')
+
+	.span3
+		%h3 Experimental (Labs)
+		%ul
+			%li= link_to "jQuery Knob", lab_demo_path('jquery-knob')
+			%li= link_to "Spider Graph", lab_demo_path('spider-graph')
+			%li= link_to "Flotr", lab_demo_path('flotr')
+
+%br
+%br
+.row
+	.span12
+		%h3 Documentation
+		%ul
+			%li= link_to "Getting Started", "https://github.com/involved/fishpond-examples/wiki/iFish-Demos-Documentation", :target => "_blank"
 %br
 %br
 %br
@@ -17,6 +40,17 @@
 
 .page-header
 	%h2 Changelog
+
+%h3= link_to "16-08-2012", "https://github.com/involved/fishpond-examples/pull/13", :target => "_blank"
+%ul	
+	%li 
+		Fixed broken sliders. Closes 
+		= link_to "issue #14", "https://github.com/involved/fishpond-examples/issues/14", :target => "_blank"
+		(JP - Fish stop swimming).
+	%li Renamed 'Science-Majors' demo to 'Stand-Alone'
+	%li Updated demos homepage
+	%li Added Demo 'Getting Started' documentation
+	%li Added Flotr demo back to 'Labs'
 
 %h3= link_to "10-08-2012", "https://github.com/involved/fishpond-examples/pull/11", :target => "_blank"
 %ul	
@@ -82,7 +116,8 @@
 %br
 %small 
 	[SM] =
-	= link_to "Science Majors Demo", demo_path("science-majors")
+	= link_to "Stand Alone Demo", demo_path("stand-alone")
+	(Formerly 'Science Majors [SM]')
 %br
 %small
 	[BD] =
