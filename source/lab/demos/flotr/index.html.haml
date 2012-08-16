@@ -1,0 +1,183 @@
+.page-header
+  %h1 Flotr Demo
+  %br
+  .row
+    .span9
+      %p
+        %strong Powered by: 
+        = link_to "Flotr2", "https://github.com/HumbleSoftware/Flotr2", :target => "_blank"
+        Canvas Graphing Library by
+        = link_to "HumbleSoftware", "https://github.com/HumbleSoftware/", :target => "_blank"
+        %br 
+        %strong Requires:
+        Canvas
+        %br
+        %strong Notes:
+        %br
+        This is an experiment to display the search values using a charting Library (Not a search tool). Can be any sort of chart provided by 
+        = link_to "Flotr2", "https://github.com/HumbleSoftware/Flotr2", :target => "_blank"
+    .span2.offset1
+      %span.label.label-important Metadata disabled
+      %br 
+      %span.label.label-important Filters disabled
+
+.row
+  .span5
+    .well
+      %h2 Tags
+      %form#fishpond.form-horizontal
+        %fieldset
+          -# Sliders Dynamically added
+
+      %h2 Filters
+      %span.label
+        Filters not included in this demo
+
+  #radar.span6.offset1
+
+.row
+  #results.span12
+    %h2 Results
+    %ul.thumbnails.results
+    
+
+-# content_for :css do
+:css
+  #radar{
+    height: 350px;
+  }
+
+
+- content_for :javascript do
+
+  = javascript_include_tag "http://humblesoftware.com/static/js/hsd-flotr2.js"
+
+  :javascript
+    var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
+      // Flotr Array Variables
+      var resultsList = [];
+      var tags = [];
+      var tagsList = [];
+      
+
+      fishpond.resultsUpdated(function(results){
+        console.log(results);
+
+        $(".results li").remove(); // Clear old results
+
+        for(var i = 0; i < results.length; i++){
+
+          var li = $("<li></li>");
+          var thumbnail = $("<div></div>");
+          thumbnail.html(results[i].fish.title);
+          li.append(thumbnail);
+          $(".results").append(li);
+        }
+
+        flotr();
+      });
+
+      fishpond.ready(function(pond){
+        $("#loading").fadeOut(0);
+        $("#demo").fadeIn(400);
+        $("#demo h1").append(' "' + pond.name + '"');       
+        
+        // Create Array for Flotr
+        var positionCount = 0;
+        $.each(pond.tag_ids, function(name, token){
+          tagsList.push([ positionCount, name ]);
+          resultsList.push([ positionCount, 6 ]);
+          positionCount++;
+        });
+       
+        // Dynamically Generate Form Controls
+        var form = $("form fieldset");
+        var controlGroup;
+
+        $.each(pond.tag_ids, function(name, token){ 
+          controlGroup = $("" +
+            "<div class='control-group'>" +
+              "<label class='control-label'>" +
+                name + " <output>(10)</output>" +
+              "</label>" +
+              "<div class='controls'>" +
+                "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
+                "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
+              "</div>" +
+            "</div>");
+
+          form.append(controlGroup);
+        });
+
+        // jQuery UI Slider
+        $(".slider").slider({
+          value: 10,
+          min: 0,
+          max: 20,
+          step: 1,
+          slide: function(e, ui){
+            var output = $(this).parents('.control-group').find('output');
+            var hiddenField = $("input[name='" + $(this).data('target') + "']");
+            var value = ui['value'];
+
+            if(value.toString() != hiddenField.val().toString()){
+              hiddenField.val(value);
+              output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+
+              var tags = {};
+              var filters = {};
+              resultsList = [];
+
+              var count = 0;
+              $("form#fishpond input").each(function(){
+                tags[$(this).data('slug')] = $(this).val();
+              
+                // Update Array for Flotr
+                resultsList.push([ count, $(this).val() ]);
+                count++;
+              });
+
+              fishpond.query(tags, filters);
+            }
+          }
+        });
+
+        fishpond.query({}, {});
+
+      });
+
+      fishpond.loading(function(percent){
+        $("#loading .progress").removeClass("progress-striped");
+        $("#loading .bar").css({width: (percent * 100) + "%"});
+      });
+
+      // Flotr HTML5 Canvas Graphing Library
+      function flotr(){   
+      //console.log(pondTags + "test");     
+        var container = document.getElementById("radar");
+        var
+          results = { label : false, data : resultsList },
+          graph, ticks;
+
+          console.log(tagsList);
+
+        // Radar Labels
+        /*ticks = [
+          [0, "Statutory"],
+          [1, "External"],
+          [2, "Videos"],
+          [3, "Yippy"],
+          [4, "Management"],
+          [5, "oops"]
+        ];*/
+        ticks = tagsList;
+          
+        // Draw the graph.
+        graph = Flotr.draw(container, [ results ], {
+          radar : { show : true}, 
+          grid  : { circular : true, minorHorizontalLines : false, horizontalLines : false, verticalLines : true}, 
+          yaxis : { min : 0, max : 20, minorTickFreq : 2, showLabels : false}, 
+          xaxis : { ticks : ticks}
+        });
+      }
+    };
