@@ -70,6 +70,31 @@
       html{
         overflow-y: scroll;
         #query{
+          form{
+              .tags{
+                margin-top: 10px;
+                .control-group{
+                  margin-bottom: 15px;
+                  .row-fluid [class*="span"]{
+                    min-height: 20px;
+                  }
+                  .sliders{
+                    .checkbox input[type="checkbox"]{
+                      margin-left: -10px;
+                    }
+                  }
+                  .tag-labels{
+                    position: relative;
+                    top: -8px;
+                    font-size: 13px;
+                    font-weight: bold;
+                    .tag2{
+                      text-align: right;
+                    }
+                  }
+                }
+              }
+            }
           #results{
             .thumbnails{
               .fish{

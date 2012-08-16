@@ -1,8 +1,8 @@
 / TEMPLATE - Fish Result
 %script{:id => "template-fish-result", :type => "text/html"}
-	%li{ :data => { :id => "{{ fish.id }}", "pos-start" => "{{ position }}", "pos-end" => "na", :popularity => "{{ fish.popularity() }}" }, :class => "{{ status }} fish" }
+	%li{ :data => { :id => "{{ fish.id }}", "pos-start" => "{{ position }}", "pos-end" => "na", :popularity => "{{ fish.popularity() }}", :score => "{{ score }}" }, :class => "{{ status }} fish" }
 		.thumbnail
-			%strong.title {{ fish.title }} 
+			%strong.title {{ fish.title }}  
 			.details
 				{[ if (!_.isEmpty(metadata)) { ]}
 				{{ fishDetailsData }}

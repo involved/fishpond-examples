@@ -327,6 +327,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         var metadata = currentFish.getMetadata();
         var resultData = {
           fish            : result.fish, 
+          score           : result.score,
           fishDetailsData : currentFish.fishDetails(),  // Pass 'details' template into this template
           metadata        : metadata,
           status          : metadata ? "loaded" : "loading",
