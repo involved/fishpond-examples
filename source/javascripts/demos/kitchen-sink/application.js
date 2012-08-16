@@ -712,15 +712,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   }
 
   function regexToken(txt){
-    var re1='.*?';  // Non-greedy match on filler
-    var re2='(?:[a-z][a-z0-9_]*)';  // Uninteresting: var
-    var re3='.*?';  // Non-greedy match on filler
-    var re4='(?:[a-z][a-z0-9_]*)';  // Uninteresting: var
-    var re5='.*?';  // Non-greedy match on filler
-    var re6='((?:[a-z][a-z0-9_]*))';  // Variable Name 1
-
-    var p = new RegExp(re1+re2+re3+re4+re5+re6,["i"]);
-    var m = p.exec(txt);
+    var re = new RegExp(/\w+\[\w+\]\[(\w+)\]/);
+    var m = re.exec(txt);
     if (m != null) return m[1];
   }
 
