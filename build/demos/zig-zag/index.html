@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html lang="en" class="no-js ie6 old-ie"> <![endif]-->
+<!--[if IE 7]>    <html lang="en" class="no-js ie7 old-ie"> <![endif]-->
+<!--[if IE 8]>    <html lang="en" class="no-js ie8 old-ie"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class='no-js' lang='en'>
+  <!--<![endif]-->
+  <head>
+    <meta charset='utf-8' />
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible' />
+    <title>Zig-Zag | Demo | Fishpond</title>
+    <meta content='noindex, nofollow' name='robots' />
+    <meta content='' name='keywords' />
+    <meta content='width=device-width, maximum-scale=1.0' name='viewport' />
+    <script src="/fishpond-examples/javascripts/plugins.js" type="text/javascript"></script>
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/cupertino/jquery-ui.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="/fishpond-examples/stylesheets/screen.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="/fishpond-examples/stylesheets/zig-zag.css" media="screen" rel="stylesheet" type="text/css" />
+    <style type='text/css'>
+      html {
+        overflow-y: scroll; }
+        html #query #results .thumbnails .fish.loading .thumbnail {
+          background: url(/images/common/loading.gif) no-repeat center center;
+          color: #999; }
+        html #query #results .thumbnails .fish .thumbnail {
+          text-align: center;
+          position: relative;
+          background: #fff; }
+          html #query #results .thumbnails .fish .thumbnail .title {
+            height: 35px;
+            display: block; }
+          html #query #results .thumbnails .fish .thumbnail .details {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 10px; }
+            html #query #results .thumbnails .fish .thumbnail .details a[data-toggle='modal'] {
+              display: block;
+              width: 100%;
+              height: auto;
+              overflow: hidden; }
+            html #query #results .thumbnails .fish .thumbnail .details .btn {
+              margin-top: 7px; }
+          html #query #results .thumbnails .fish .thumbnail .favourite {
+            position: absolute;
+            top: 49px;
+            left: 4px; }
+        html .modal.modal-wide {
+          width: 940px;
+          margin-left: -470px;
+          top: 40%; }
+          html .modal.modal-wide .modal-body {
+            max-height: 700px; }
+            html .modal.modal-wide .modal-body.loading {
+              background: white url(/images/common/loading.gif) no-repeat center center;
+              min-height: 200px; }
+            html .modal.modal-wide .modal-body .comment_box {
+              display: none; }
+        html #shortlist-master {
+          list-style: none;
+          float: left;
+          margin: 15px 0 0 0;
+          padding: 0; }
+          html #shortlist-master li {
+            float: left;
+            padding: 3px;
+            width: 107px;
+            margin-bottom: 10px;
+            overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <div class='navbar navbar-fixed-top'>
+      <div class='navbar-inner'>
+        <div class='container'>
+          <a class='brand' href='/fishpond-examples/'>Fishpond Examples</a>
+          <ul class='nav'>
+            <li class='dropdown'>
+              <a class='dropdown-toggle' data-toggle='dropdown' href='#'>
+                Demos
+                <b class='caret'></b>
+              </a>
+              <ul class='dropdown-menu'>
+                <li><a href="/fishpond-examples/demos/basic-dynamic">basic-dynamic</a></li>
+                <li><a href="/fishpond-examples/demos/basic-html5">basic-html5</a></li>
+                <li><a href="/fishpond-examples/demos/basic-static">basic-static</a></li>
+                <li><a href="/fishpond-examples/demos/kitchen-sink">kitchen-sink</a></li>
+                <li><a href="/fishpond-examples/demos/stand-alone">stand-alone</a></li>
+                <li><a href="/fishpond-examples/demos/zig-zag">zig-zag</a></li>
+                <li class='divider'></li>
+                <li><a href="/fishpond-examples/lab/">Labs</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class='container' id='loading'>
+      <div class='span4 offset4'>
+        <div class='progress progress-striped active'>
+          <div class='bar' style='width: 100%'></div>
+        </div>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='span12'>
+        <div class='hidden'>
+          <div id='disqus_thread'></div>
+        </div>
+        <script type='text/javascript'>
+          //<![CDATA[
+            var disqus_shortname = 'ifishdemos'; 
+            var disqus_developer = 1;
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+            
+            function disqus_config() {
+              this.callbacks.onReady = [function() {
+                var frameHeight = $(document).height();
+                $('iframe.comment_frame', top.document).attr("height", frameHeight)
+              }];
+              this.callbacks.onNewComment = [function() {
+                var frameHeight = $(document).height();
+                $('iframe.comment_frame', top.document).attr("height", frameHeight)
+              }];
+            }
+          //]]>
+        </script>
+      </div>
+    </div>
+    <div class='container hide' id='auth'>
+      <div class='span6 offset3'>
+        <center>
+          <form class='well form-inline'>
+            <input class='input-large' id='api_key' placeholder='API key' type='text' />
+            <input class='input-small' id='pond_token' placeholder='Pond Token' type='text' />
+            <button class='btn btn-success' type='submit'>
+              Connect
+            </button>
+          </form>
+        </center>
+      </div>
+    </div>
+    <div class='container hide' id='demo'>
+      <div class='dev' id='query'>
+        <div class='page-header'>
+          <h1>Zig-Zag Demo</h1>
+        </div>
+        <div class='row'>
+          <div class='span5'>
+            <div class='row'>
+              <div class='span5'>
+                <form class='form-horizontal' id='search'>
+                  <div class='well'>
+                    <fieldset>
+                      <center>
+                        <input class='search-query span4' placeholder='Search by title' type='text' />
+                      </center>
+                    </fieldset>
+                  </div>
+                </form>
+                <form class='form-horizontal well' id='fishpond'>
+                  <h2>Tags</h2>
+                  <fieldset class='tags'>
+                  </fieldset>
+                  <h2>Filters</h2>
+                  <fieldset class='filters'>
+                    <div class='control-group'>
+                      <div class='control-label'>
+                        Only show:
+                      </div>
+                    </div>
+                  </fieldset>
+                  <h2>Options</h2>
+                  <fieldset class='options'>
+                    <div class='control-group'>
+                      <div class='control-label'></div>
+                      <div class='controls'>
+                        <label class='checkbox'>
+                          <input data-slug='options-animation' id='query_options_animation' name='query[options][animation]' type='checkbox' value='0'>
+                            Disable Animation?
+                          </input>
+                        </label>
+                      </div>
+                    </div>
+                  </fieldset>
+                </form>
+              </div>
+              <div class='span5'>
+                <h3>Shortlisted</h3>
+                <ul id='shortlist-master'></ul>
+              </div>
+            </div>
+          </div>
+          <div class='span6 offset1'>
+            <div id='pond-info'>
+              <h2>Results</h2>
+            </div>
+            <div class='zigzag' id='results'>
+              <ul class='thumbnails'></ul>
+            </div>
+          </div>
+        </div>
+        <div class='modal modal-wide hide' id='emptyModal'>
+          <div class='modal-body loading'></div>
+        </div>
+      </div>
+    </div>
+    <div class='container'>
+      <hr />
+      <footer>
+        &copy; iFish 2012
+      </footer>
+    </div>
+    <!-- //////////////////////////////////////// -->
+    <!-- / REQUIRED JAVASCRIPT LIBRARIES -->
+    <!-- //////////////////////////////////////// -->
+    <script src="/fishpond-examples/javascripts/vendor/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js" type="text/javascript"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js" type="text/javascript"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-typeahead.js" type="text/javascript"></script>
+    <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
+    <script src="/fishpond-examples/javascripts/vendor/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
+    <script src="/fishpond-examples/javascripts/vendor/underscore.js" type="text/javascript"></script>
+    <script src="/fishpond-examples/javascripts/vendor/jstorage.js" type="text/javascript"></script>
+    <script src="/fishpond-examples/javascripts/vendor/jquery.easing.1.3.js" type="text/javascript"></script>
+    <script src="/fishpond-examples/javascripts/vendor/jquery-animate-css-rotate-scale.js" type="text/javascript"></script>
+    <script src="/fishpond-examples/javascripts/vendor/jquery-css-transform.js" type="text/javascript"></script>
+    <script src="/fishpond-examples/javascripts/vendor/jquery.quicksand.js" type="text/javascript"></script>
+    <script src="/fishpond-examples/javascripts/vendor/showdown.js" type="text/javascript"></script>
+    <script src="/fishpond-examples/javascripts/demos/kitchen-sink/application.js" type="text/javascript"></script>
+    <!-- //////////////////////////////////////// -->
+    <!-- / JAVASCRIPT TEMPLATES -->
+    <!-- / Powered by Underscore.js 'Templates' -->
+    <!-- //////////////////////////////////////// -->
+    <!-- TEMPLATE - Fish -->
+    <script id='template-fish-result' type='text/html'>
+      <li class='{{ status }} fish' data-id='{{ fish.id }}' data-pos-end='na' data-pos-start='{{ position }}'>
+        <div class='thumbnail'>
+          <div class='details'>
+            {[ if (!_.isEmpty(metadata)) { ]}
+            {{ fishDetailsData }}
+            {[ } ]}
+          </div>
+        </div>
+      </li>
+    </script>
+    <!-- TEMPLATE - Query Info -->
+    <script id='template-query-info' type='text/html'>
+      <h2>
+        Results
+        <small>
+          (showing
+          <span class='count'>{{ queryLimit }}</span>
+          of {{ pond.fish_count }})
+        </small>
+      </h2>
+    </script>
+    <!-- TEMPLATE - Query Tag -->
+    <script id='template-query-tag' type='text/html'>
+      <div class='control-group'>
+        <div class='sliders row-fluid'>
+          <div class='span10'>
+            <input data-slug='{{ name }}' id='query_tag_{{ token }}' name='query[tags][{{ token }}]' type='hidden' value='10' />
+            <div class='slider' data-target='query[tags][{{ token }}]'></div>
+          </div>
+          <div class='span1'>
+            <label class='checkbox'>
+              <input checked='checked' data-slug='{{ name }}' id='query_switch_{{ token }}' name='query[switch][{{ token }}]' type='checkbox' value='true' />
+            </label>
+          </div>
+          <div class='span1'>
+            <output>(10)</output>
+          </div>
+        </div>
+        <div class='tag-labels row-fluid'>
+          <div class='tag1 span7'>
+            {{ tag1 }}
+          </div>
+          <div class='tag2 span3'>
+            {{ tag2 }}
+          </div>
+        </div>
+      </div>
+    </script>
+    <!-- TEMPLATE - Query Filter -->
+    <script id='template-query-filter' type='text/html'>
+      <div class='controls'>
+        <label class='checkbox'>
+          <input data-slug='{{ token.slug }}' id='query_filter_{{ token.id }}' name='query[filters][{{ token.id }}]' type='checkbox' value='0' />
+          {{ token.name }}
+        </label>
+      </div>
+    </script>
+    <!-- TEMPLATE - Fish Details -->
+    <script id='template-fish-details' type='text/html'>
+      <a data-toggle='modal' href='#'>
+        <img alt='{{ metadata.title }}' class='profile' src='{{ metadata.thumbnail_url }}' />
+        {[ if (!_.isEmpty(shortlist)) { ]}
+        <a class='btn btn-mini {{ shortlist.shortlistClass }}' data-id='{{ metadata.id }}' data-thumbnail='{{ metadata.thumbnail_url }}' data-title='{{ metadata.title }}' data-toggle='shortlist' href='#'>
+          <i class='icon-star'></i>
+          <span>
+            {{ shortlist.wording }}
+          </span>
+        </a>
+        {[ } ]}
+        <a class='btn btn-mini {{ upvote.upvoteClass }}' data-id='{{ metadata.id }}' data-toggle='upvote' href='#'>
+          <i class='icon-thumbs-up'></i>
+        </a>
+      </a>
+    </script>
+    <!-- TEMPLATE - Fish Modal -->
+    <script id='template-fish-modal' type='text/html'>
+      <div class='modal-header'>
+        <button class='close' data-dismiss='modal'>×</button>
+        <h3>{{ metadata.title }}</h3>
+      </div>
+      <div class='modal-body'>
+        <div class='row'>
+          <div class='span3'>
+            <img alt='{{ metadata.title }}' src='{{ metadata.image_url }}' />
+          </div>
+          <div class='span8'>
+            <div class='description'>
+              {{ metadata.description }}
+            </div>
+            <a target="_blank" href="{{ metadata.url }}">Find out more</a>
+            <br />
+            <br />
+            <a class='btn btn-mini {{ upvote.upvoteClass }}' data-id='{{ metadata.id }}' data-toggle='upvote' href='#'>
+              <i class='icon-thumbs-up'></i>
+            </a>
+            {[ if (!_.isEmpty(shortlist)) { ]}
+            <a class='btn btn-mini {{ shortlist.shortlistClass }}' data-id='{{ metadata.id }}' data-thumbnail='{{ metadata.thumbnail_url }}' data-title='{{ metadata.title }}' data-toggle='shortlist' href='#'>
+              <i class='icon-star'></i>
+              <span>
+                {{ shortlist.wording }}
+              </span>
+            </a>
+            {[ } ]}
+            <a class='btn btn-mini' data-id='{{ metadata.id }}' data-toggle='comments' href='./kitchen-sink/comments/?1234#disqus_thread'>
+              <i class='icon-comment'></i>
+              <span>
+                View Comments
+              </span>
+            </a>
+          </div>
+        </div>
+        <div class='row'>
+          <div class='span11'>
+            <div class='comment_box' id='comment_{{ metadata.id }}'></div>
+          </div>
+        </div>
+      </div>
+      <div class='modal-footer'>
+        <a class='btn' data-dismiss='modal' href='#'>Close</a>
+      </div>
+    </script>
+    <!-- TEMPLATE - Shortlist Master -->
+    <script id='template-shortlist-master' type='text/html'>
+      <li data-id='{{ fishID }}'>
+        <a data-toggle='modal' href='#'>
+          <img alt='{{ title }}' class='profile' src='{{ thumbnail_url }}' />
+        </a>
+      </li>
+    </script>
+    <!-- TEMPLATE - Shortlist Email -->
+    <script id='template-shortlist-email' type='text/html'>
+      <div class='row-fluid' data-id='{{ metadata.id }}'>
+        <div class='span12'>
+          <h3>{{ metadata.title }}</h3>
+          <p>{{ metadata.description }}</p>
+          <a href="{{ metadata.url }}">{{ metadata.url }}</a>
+          <hr />
+        </div>
+      </div>
+    </script>
+    <!-- TEMPLATE - Shortlist Print -->
+    <script id='template-shortlist-print' type='text/html'>
+      <div class='row-fluid' data-id='{{ metadata.id }}'>
+        <div class='span12'>
+          <h3>{{ metadata.title }}</h3>
+          <p>{{ metadata.description }}</p>
+          <a href="{{ metadata.url }}">{{ metadata.url }}</a>
+          <hr />
+        </div>
+      </div>
+    </script>
+    <script type='text/javascript'>
+  //<![CDATA[
+    $(function(){
+      // Autofill auth form
+      $("#auth form").each(function(){
+        var form = $(this);
+        var apiKeyInput = $("#api_key", form);
+        var pondTokenInput = $("#pond_token", form);
+        apiKeyInput.val(localStorage.getItem("fishpond_api_key"));
+        pondTokenInput.val(localStorage.getItem("fishpond_pond_token"));
+       });
+    
+      $("#auth").fadeIn(400);
+      $("#loading").fadeOut(0);
+    
+      // Default Authentication setup
+      $("#auth form").submit(function(e){
+        e.preventDefault();
+        var form = $(this);
+        var apiKeyInput = $("#api_key", form);
+        var pondTokenInput = $("#pond_token", form);
+        var apiKey = apiKeyInput.val();
+        var pondToken = pondTokenInput.val();
+        var errors = [];
+    
+        if(apiKey.length != 41){
+          errors.push("API key should be 41 characters long");
+        }
+        if(pondToken.length != 6){
+          errors.push("Pond token should be 6 characters long");
+        }
+    
+        if(errors.length > 0){
+          alert("There were errors in your authentication: " + errors.join(", "));
+        } else {
+          $("#auth").fadeOut(0);
+          $("#loading").fadeIn(400);
+          localStorage.setItem("fishpond_api_key", apiKey);
+          localStorage.setItem("fishpond_pond_token", pondToken);
+    
+          var options = { debug: true };
+          var fishpond = new Fishpond(apiKey, options);
+          setupFishpond(fishpond);
+          fishpond.init(pondToken);
+          }
+      });
+    });
+  //]]>
+</script>
+  </body>
+</html>

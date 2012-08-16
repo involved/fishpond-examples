@@ -1,0 +1,25 @@
+html {
+  overflow-y: scroll; }
+  html body {
+    padding-top: 100px; }
+    html body.debug #results .thumbnails .fish {
+      border-top: orange 3px solid; }
+      html body.debug #results .thumbnails .fish:before {
+        content: "Pos: " attr(data-pos-start); }
+      html body.debug #results .thumbnails .fish:after {
+        content: "Pop: " attr(data-popularity);
+        background: #ff3c3a;
+        color: white;
+        padding: 2px 5px;
+        font-size: 11px;
+        width: 100%;
+        display: block; }
+      html body.debug #results .thumbnails .fish.animating {
+        border-top: green 3px solid; }
+        html body.debug #results .thumbnails .fish.animating:before {
+          content: "Dest: " attr(data-pos-end); }
+    html body .credits {
+      margin-top: 50px; }
+
+.hidden {
+  display: none; }
