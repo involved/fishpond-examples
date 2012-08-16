@@ -96,21 +96,23 @@
     </div>
     <div class='container hide' id='demo'>
       <div class='page-header'>
-        <h1>Spider Graph Demo</h1>
+        <h1>Flotr Demo</h1>
         <br />
         <div class='row'>
           <div class='span9'>
             <p>
               <strong>Powered by:</strong>
-              <a target="_blank" href="https://github.com/jmstriegel/jquery.spidergraph">Spidergraph</a>
-              jQuery Plugin by
-              <a target="_blank" href="https://github.com/jmstriegel">jmstriegel</a>
+              <a target="_blank" href="https://github.com/HumbleSoftware/Flotr2">Flotr2</a>
+              Canvas Graphing Library by
+              <a target="_blank" href="https://github.com/HumbleSoftware/">HumbleSoftware</a>
               <br />
               <strong>Requires:</strong>
-              Canvas capable
-              <a target="_blank" href="http://caniuse.com/#feat=canvas">browser</a>
+              Canvas
               <br />
-              <span class='label label-info'>iOS compatible</span>
+              <strong>Notes:</strong>
+              <br />
+              This is an experiment to display the search values using a charting Library (Not a search tool). Can be any sort of chart provided by
+              <a target="_blank" href="https://github.com/HumbleSoftware/Flotr2">Flotr2</a>
             </p>
           </div>
           <div class='span2 offset1'>
@@ -120,40 +122,33 @@
           </div>
         </div>
       </div>
-      <section id='query'>
-        <div class='row'>
-          <div class='span7'>
-            <div class='well'>
-              <h2>Tags</h2>
-              <div class='span6'>
-                <div id='radar'></div>
-                <br />
-                <br />
-                <h2>Filters</h2>
-                <span class='label'>
-                  Filters not included in this demo
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class='span4 offset1'>
-            <h2>Results</h2>
-            <ul class='thumbnails results'></ul>
+      <div class='row'>
+        <div class='span5'>
+          <div class='well'>
+            <h2>Tags</h2>
+            <form class='form-horizontal' id='fishpond'>
+              <fieldset>
+              </fieldset>
+            </form>
+            <h2>Filters</h2>
+            <span class='label'>
+              Filters not included in this demo
+            </span>
           </div>
         </div>
-      </section>
+        <div class='span6 offset1' id='radar'></div>
+      </div>
+      <div class='row'>
+        <div class='span12' id='results'>
+          <h2>Results</h2>
+          <ul class='thumbnails results'></ul>
+        </div>
+      </div>
       <style type='text/css'>
         /*<![CDATA[*/
-          .well{
-            overflow: auto
-            }
-            #radar{
-              position: relative;;
-              height: 500px;
-            }
-          .results{
-            min-height: 550px;
-            }
+          #radar{
+            height: 350px;
+          }
         /*]]>*/
       </style>
     </div>
@@ -173,22 +168,23 @@
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-typeahead.js" type="text/javascript"></script>
     <script src="http://ifish-prototype.herokuapp.com/assets/api/v1/fishpond.js" type="text/javascript"></script>
     <script src="/fishpond-examples/javascripts/vendor/jquery.ui.touch-punch.min.js" type="text/javascript"></script>
-    <script src="https://raw.github.com/jmstriegel/jquery.spidergraph/master/assets/js/jquery.spidergraph.js" type="text/javascript"></script>
+    <script src="http://humblesoftware.com/static/js/hsd-flotr2.js" type="text/javascript"></script>
     <script type='text/javascript'>
       //<![CDATA[
         var setupFishpond = function(fishpond){ // you must define this function in your demo, if you want hooks to the fishpond
-          
-          // Spidergraph Array Variables
-          var tagValues = [];
-          var tagList = [];
+          // Flotr Array Variables
+          var resultsList = [];
+          var tags = [];
+          var tagsList = [];
           
         
           fishpond.resultsUpdated(function(results){
-            //console.log(results);
+            console.log(results);
         
             $(".results li").remove(); // Clear old results
         
             for(var i = 0; i < results.length; i++){
+        
               var li = $("<li></li>");
               var thumbnail = $("<div></div>");
               thumbnail.html(results[i].fish.title);
@@ -196,6 +192,7 @@
               $(".results").append(li);
             }
         
+            flotr();
           });
         
           fishpond.ready(function(pond){
@@ -203,13 +200,13 @@
             $("#demo").fadeIn(400);
             $("#demo h1").append(' "' + pond.name + '"');       
             
-            // Create Array for Spidergraph
+            // Create Array for Flotr
+            var positionCount = 0;
             $.each(pond.tag_ids, function(name, token){
-              tagList.push(name);
-              tagValues.push(10); // Inital value
+              tagsList.push([ positionCount, name ]);
+              resultsList.push([ positionCount, 6 ]);
+              positionCount++;
             });
-        
-            spidergraph(tagList, tagValues);
            
             // Dynamically Generate Form Controls
             var form = $("form fieldset");
@@ -219,10 +216,10 @@
               controlGroup = $("" +
                 "<div class='control-group'>" +
                   "<label class='control-label'>" +
-                    name + " <output>(6)</output>" +
+                    name + " <output>(10)</output>" +
                   "</label>" +
                   "<div class='controls'>" +
-                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='10'>" +
+                    "<input id='query_tag_"+token+"' data-slug='"+name+"' name='query[tags]["+token+"]' type='hidden' value='6'>" +
                     "<div class='slider span2' data-target='query[tags]["+token+"]'></div>" +
                   "</div>" +
                 "</div>");
@@ -230,7 +227,41 @@
               form.append(controlGroup);
             });
         
+            // jQuery UI Slider
+            $(".slider").slider({
+              value: 10,
+              min: 0,
+              max: 20,
+              step: 1,
+              slide: function(e, ui){
+                var output = $(this).parents('.control-group').find('output');
+                var hiddenField = $("input[name='" + $(this).data('target') + "']");
+                var value = ui['value'];
+        
+                if(value.toString() != hiddenField.val().toString()){
+                  hiddenField.val(value);
+                  output.html(output.html().split("(")[0] + "(" + value.toString() + ")");
+        
+                  var tags = {};
+                  var filters = {};
+                  resultsList = [];
+        
+                  var count = 0;
+                  $("form#fishpond input").each(function(){
+                    tags[$(this).data('slug')] = $(this).val();
+                  
+                    // Update Array for Flotr
+                    resultsList.push([ count, $(this).val() ]);
+                    count++;
+                  });
+        
+                  fishpond.query(tags, filters);
+                }
+              }
+            });
+        
             fishpond.query({}, {});
+        
           });
         
           fishpond.loading(function(percent){
@@ -238,37 +269,33 @@
             $("#loading .bar").css({width: (percent * 100) + "%"});
           });
         
+          // Flotr HTML5 Canvas Graphing Library
+          function flotr(){   
+          //console.log(pondTags + "test");     
+            var container = document.getElementById("radar");
+            var
+              results = { label : false, data : resultsList },
+              graph, ticks;
         
-          function spidergraph(tagList, tagValues){   
-            $('#radar').spidergraph({
-                'fields': tagList,
-                'strokewidth': 2,
-                'handlewidth': 4,
-                'increments': 20,
-                'minrad': 0,
-                'gridcolor': 'rgba(20,20,20,1)'   
-            });
-            
-            $('#radar').spidergraph('resetdata');
-            
-            $('#radar').spidergraph('setactivedata', { 
-              'strokecolor': 'rgba(0, 41, 199,0.8)',
-              'fillcolor': 'rgba(10,77,255,0.6)',
-              'data': tagValues
-            });
+              console.log(tagsList);
         
-            $('#radar').bind('spiderdatachange', function( ev, data ) {
-              var tags = {};
-              var filters = {};
-              var new_value;
-        
-              $.each(data, function(index, value) { 
-                console.log(tagList[index] + ': ' + value); 
-        
-                tags[tagList[index]] = value;
-              });
-        
-              fishpond.query(tags, filters);
+            // Radar Labels
+            /*ticks = [
+              [0, "Statutory"],
+              [1, "External"],
+              [2, "Videos"],
+              [3, "Yippy"],
+              [4, "Management"],
+              [5, "oops"]
+            ];*/
+            ticks = tagsList;
+              
+            // Draw the graph.
+            graph = Flotr.draw(container, [ results ], {
+              radar : { show : true}, 
+              grid  : { circular : true, minorHorizontalLines : false, horizontalLines : false, verticalLines : true}, 
+              yaxis : { min : 0, max : 20, minorTickFreq : 2, showLabels : false}, 
+              xaxis : { ticks : ticks}
             });
           }
         };
