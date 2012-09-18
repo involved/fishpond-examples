@@ -2,11 +2,13 @@
 %script{:id => "template-fish-details", :type => "text/html"}
 	%a{ :href => "#", :data => { :toggle => "modal" } }
 		%img{ :src => "{{ metadata.thumbnail_url }}", :alt => "{{ metadata.title }}", :class => "profile" }
-		{[ if (!_.isEmpty(shortlist)) { ]}          
-		%a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :title => "{{ metadata.title }}", :thumbnail => "{{ metadata.thumbnail_url }}", :toggle => "shortlist" } }
-			%i.icon-star
-			%span
-				{{ shortlist.wording }}
-		{[ } ]}
-		%a{ :href => "#", :class => "btn btn-mini {{ upvote.upvoteClass }}", :data => { :id => "{{ metadata.id }}", :toggle => "upvote" } }
-			%i.icon-thumbs-up
+
+		-#
+			{[ if (!_.isEmpty(shortlist)) { ]}          
+			%a{ :href => "#", :class => "btn btn-mini {{ shortlist.shortlistClass }}", :data => { :id => "{{ metadata.id }}", :title => "{{ metadata.title }}", :thumbnail => "{{ metadata.thumbnail_url }}", :toggle => "shortlist" } }
+				%i.icon-star
+				%span
+					{{ shortlist.wording }}
+			{[ } ]}
+			%a{ :href => "#", :class => "btn btn-mini {{ upvote.upvoteClass }}", :data => { :id => "{{ metadata.id }}", :toggle => "upvote" } }
+				%i.icon-thumbs-up

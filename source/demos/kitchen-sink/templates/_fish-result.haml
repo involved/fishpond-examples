@@ -3,12 +3,4 @@
 	%li{ :data => { :id => "{{ fish.id }}", "pos-start" => "{{ position }}", "pos-end" => "na", :popularity => "{{ fish.popularity() }}", :score => "{{ score }}" }, :class => "{{ status }} fish" }
 		.thumbnail
 			%strong.title {{ fish.title }}  
-			.details
-				{[ if (!_.isEmpty(metadata)) { ]}
-				{{ fishDetailsData }}
-				{[ } ]}
-			{[ if (fish.popularity() >= 15) { ]}   
-			.favourite
-				%a{ :href => "#", :class => "btn btn-mini btn-danger" }
-					%i.icon-heart.icon-white.disabled
-			{[ } ]}
+	

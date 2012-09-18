@@ -71,7 +71,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     if (debugMode === true) { $("body").addClass("debug"); }
 
     // Clear LocalStorage of fish data. This is optional but is in here for Development purposes
-    $.jStorage.flush();
+    //$.jStorage.flush();
   });
 
 
@@ -444,7 +444,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Upvote Listener
   /////////////////////////////////////////
   function upvoteListener() {
-    var fishID;
+    /*var fishID;
 
     // Upvote add/remove
     $("body").on("click", "[data-toggle='upvote']", function(event){
@@ -467,7 +467,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
       // Upvote Fish on iFish Server
       pond.find_fish(fishID).up_vote();
-    });
+    });*/
   }
 
 
@@ -507,7 +507,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Shortlist Listener
   /////////////////////////////////////////
   function shortlistListener() {
-    var fishID;
+    /*var fishID;
 
     // Shortlist Options
     shortlistPrint();
@@ -555,7 +555,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         console.log("No Shortlist children");
         ui.shortlist.options.addClass("disabled");
       }
-    });
+    });*/
   }
 
 
@@ -563,7 +563,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Shortlist Options: Print
   /////////////////////////////////////////
   function shortlistPrint() {
-    $("body").on("click", "#shortlist-print", function(event) {
+    /*$("body").on("click", "#shortlist-print", function(event) {
       event.preventDefault();
 
       $("#shortlist-export-print .modal-body").empty();
@@ -591,7 +591,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $('#shortlist-export-print .modal-body').clone().appendTo( w.document.body );
       w.print();
       w.close();
-    });
+    });*/
   }
 
   /////////////////////////////////////////
@@ -659,7 +659,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       ui.results.list.quicksand(ui.query.list.find("li"), {
         easing      : animation.easingMethod,
         duration    : parseInt(animation.duration),
-        useScaling  : false
+        useScaling  : false,
+        adjustHeight: false
       }, function() {
         animation.inProgress = false;
         // Update templates for Fish in Queue once animation has stopped
@@ -676,7 +677,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Comments Manager (Disqus)
   /////////////////////////////////////////
   function commentsManager(pond) {
-    $("body").on("click", "[data-toggle='comments']", function(event){
+    /*$("body").on("click", "[data-toggle='comments']", function(event){
       event.preventDefault();
 
       var id = $(this).data("id");
@@ -695,7 +696,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         });
       }
       comments.toggle('slow');
-    });
+    });*/
   }
 
   /////////////////////////////////////////
