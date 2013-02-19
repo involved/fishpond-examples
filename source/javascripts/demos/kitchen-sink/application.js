@@ -71,7 +71,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
     if (debugMode === true) { $("body").addClass("debug"); }
 
     // Clear LocalStorage of fish data. This is optional but is in here for Development purposes
-    $.jStorage.flush();
+    //$.jStorage.flush();
   });
 
 
@@ -327,6 +327,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         var metadata = currentFish.getMetadata();
         var resultData = {
           fish            : result.fish, 
+          score           : result.score,
           fishDetailsData : currentFish.fishDetails(),  // Pass 'details' template into this template
           metadata        : metadata,
           status          : metadata ? "loaded" : "loading",
@@ -443,7 +444,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Upvote Listener
   /////////////////////////////////////////
   function upvoteListener() {
-    var fishID;
+    /*var fishID;
 
     // Upvote add/remove
     $("body").on("click", "[data-toggle='upvote']", function(event){
@@ -466,7 +467,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
 
       // Upvote Fish on iFish Server
       pond.find_fish(fishID).up_vote();
-    });
+    });*/
   }
 
 
@@ -506,7 +507,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Shortlist Listener
   /////////////////////////////////////////
   function shortlistListener() {
-    var fishID;
+    /*var fishID;
 
     // Shortlist Options
     shortlistPrint();
@@ -554,7 +555,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         console.log("No Shortlist children");
         ui.shortlist.options.addClass("disabled");
       }
-    });
+    });*/
   }
 
 
@@ -562,7 +563,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Shortlist Options: Print
   /////////////////////////////////////////
   function shortlistPrint() {
-    $("body").on("click", "#shortlist-print", function(event) {
+    /*$("body").on("click", "#shortlist-print", function(event) {
       event.preventDefault();
 
       $("#shortlist-export-print .modal-body").empty();
@@ -590,7 +591,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       $('#shortlist-export-print .modal-body').clone().appendTo( w.document.body );
       w.print();
       w.close();
-    });
+    });*/
   }
 
   /////////////////////////////////////////
@@ -658,7 +659,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
       ui.results.list.quicksand(ui.query.list.find("li"), {
         easing      : animation.easingMethod,
         duration    : parseInt(animation.duration),
-        useScaling  : false
+        useScaling  : false,
+        adjustHeight: false
       }, function() {
         animation.inProgress = false;
         // Update templates for Fish in Queue once animation has stopped
@@ -675,7 +677,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   // Comments Manager (Disqus)
   /////////////////////////////////////////
   function commentsManager(pond) {
-    $("body").on("click", "[data-toggle='comments']", function(event){
+    /*$("body").on("click", "[data-toggle='comments']", function(event){
       event.preventDefault();
 
       var id = $(this).data("id");
@@ -694,7 +696,7 @@ var setupFishpond = function(fishpond){ // you must define this function in your
         });
       }
       comments.toggle('slow');
-    });
+    });*/
   }
 
   /////////////////////////////////////////
@@ -712,15 +714,8 @@ var setupFishpond = function(fishpond){ // you must define this function in your
   }
 
   function regexToken(txt){
-    var re1='.*?';  // Non-greedy match on filler
-    var re2='(?:[a-z][a-z0-9_]*)';  // Uninteresting: var
-    var re3='.*?';  // Non-greedy match on filler
-    var re4='(?:[a-z][a-z0-9_]*)';  // Uninteresting: var
-    var re5='.*?';  // Non-greedy match on filler
-    var re6='((?:[a-z][a-z0-9_]*))';  // Variable Name 1
-
-    var p = new RegExp(re1+re2+re3+re4+re5+re6,["i"]);
-    var m = p.exec(txt);
+    var re = new RegExp(/\w+\[\w+\]\[(\w+)\]/);
+    var m = re.exec(txt);
     if (m != null) return m[1];
   }
 

@@ -6,8 +6,8 @@
   = javascript_include_tag "vendor/underscore.js"
   = javascript_include_tag "vendor/jstorage.js"
   = javascript_include_tag "vendor/jquery.easing.1.3.js"
-  = javascript_include_tag "vendor/jquery-animate-css-rotate-scale.js"
-  = javascript_include_tag "vendor/jquery-css-transform.js"
+  = #javascript_include_tag "vendor/jquery-animate-css-rotate-scale.js"
+  = #javascript_include_tag "vendor/jquery-css-transform.js"
   = javascript_include_tag "vendor/jquery.quicksand.js"
   = javascript_include_tag "vendor/showdown.js"
   = javascript_include_tag "demos/kitchen-sink/application.js"
@@ -70,6 +70,31 @@
       html{
         overflow-y: scroll;
         #query{
+          form{
+              .tags{
+                margin-top: 10px;
+                .control-group{
+                  margin-bottom: 15px;
+                  .row-fluid [class*="span"]{
+                    min-height: 20px;
+                  }
+                  .sliders{
+                    .checkbox input[type="checkbox"]{
+                      margin-left: -10px;
+                    }
+                  }
+                  .tag-labels{
+                    position: relative;
+                    top: -8px;
+                    font-size: 13px;
+                    font-weight: bold;
+                    .tag2{
+                      text-align: right;
+                    }
+                  }
+                }
+              }
+            }
           #results{
             .thumbnails{
               .fish{

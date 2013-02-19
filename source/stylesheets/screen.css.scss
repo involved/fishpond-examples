@@ -15,7 +15,7 @@ html{
 		        border-top: orange 3px solid;
 		        &:before { content: "Pos: " attr(data-pos-start); }
 		        &:after { 
-		        		content: "Pop: " attr(data-popularity);
+		        		content: "Score: " attr(data-score) ", Pop: " attr(data-popularity);
 		      			background: #ff3c3a;
 		      			color: white;
 		      			padding: 2px 5px;
